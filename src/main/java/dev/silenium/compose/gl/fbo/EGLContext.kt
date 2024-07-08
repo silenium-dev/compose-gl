@@ -29,10 +29,6 @@ data class EGLContext(
         eglMakeCurrent(display, surface, surface, context)
     }
 
-    fun swapBuffers() {
-        eglSwapBuffers(display, surface)
-    }
-
     fun destroy() {
         eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)
         eglDestroyContext(display, context)
