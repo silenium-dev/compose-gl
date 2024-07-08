@@ -1,6 +1,7 @@
 package dev.silenium.compose.gl.surface
 
 import androidx.compose.ui.unit.IntSize
+import dev.silenium.compose.gl.fbo.FBOPool
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 

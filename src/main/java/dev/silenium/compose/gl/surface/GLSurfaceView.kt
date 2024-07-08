@@ -7,6 +7,8 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.*
+import dev.silenium.compose.gl.fbo.EGLContext
+import dev.silenium.compose.gl.fbo.FBOPool
 import org.jetbrains.skia.*
 import org.lwjgl.opengles.GLES32.*
 import org.lwjgl.system.MemoryUtil
@@ -54,14 +56,14 @@ class GLSurfaceView(
         fboPool?.size = size
     }
 
-    fun display(canvas: Canvas, directContext: DirectContext) {
-        fboPool?.display { displayImpl(canvas, directContext) }
+    fun display(canvas: Canvas, displayContext: DirectContext) {
+        fboPool?.display { displayImpl(canvas, displayContext) }
         if (fboPool == null) invalidate()
     }
 
     private fun GLDisplayScope.displayImpl(
         canvas: Canvas,
-        directContext: DirectContext
+        displayContext: DirectContext
     ) {
         val rt = BackendRenderTarget.makeGL(
             fbo.size.width,
@@ -72,20 +74,16 @@ class GLSurfaceView(
             GL_RGBA8,
         )
         val surface = Surface.makeFromBackendRenderTarget(
-            directContext,
+            displayContext,
             rt,
             SurfaceOrigin.TOP_LEFT,
             SurfaceColorFormat.RGBA_8888,
             ColorSpace.sRGB
         ) ?: error("Failed to create surface")
-        surface.draw(canvas, 0, 0, null)
-//        val bitmap = Bitmap()
-//        bitmap.allocPixels(ImageInfo(fbo.size.width, fbo.size.height, ColorType.RGBA_8888, ColorAlphaType.OPAQUE))
-//        surface.readPixels(bitmap, 0, 0)
-//        snapshot(bitmap, Path("main.png"))
-//        bitmap.close()
+        surface.draw(canvas, 0, 0, Paint())
         surface.close()
         rt.close()
+        displayContext.resetGLAll()
     }
 
     private fun initEGL() {
@@ -128,7 +126,7 @@ class GLSurfaceView(
 //            println("Render time: $renderTime")
             val nextFrame = now + waitTime.inWholeNanoseconds - renderTime
 //            println("Current frame: $now, Next frame: $nextFrame, waitTime: $waitTime")
-            while (System.nanoTime() < nextFrame && !isInterrupted);
+            while (System.nanoTime() <= nextFrame && !isInterrupted);
         }
         fboPool?.destroy()
         fboPool = null
