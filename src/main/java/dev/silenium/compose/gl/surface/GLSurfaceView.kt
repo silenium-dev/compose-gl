@@ -27,7 +27,7 @@ fun GLSurfaceView(
     paint: Paint = Paint(),
     presentMode: GLSurfaceView.PresentMode = GLSurfaceView.PresentMode.FIFO,
     swapChainSize: Int = 10,
-    drawBlock: GLDrawScope.() -> Unit,
+    drawBlock: suspend GLDrawScope.() -> Unit,
 ) {
     var invalidations by remember { mutableStateOf(0) }
     val surfaceView = remember {
@@ -61,7 +61,7 @@ fun GLSurfaceView(
 
 class GLSurfaceView(
     private val parentContext: EGLContext,
-    private val drawBlock: GLDrawScope.() -> Unit,
+    private val drawBlock: suspend GLDrawScope.() -> Unit,
     private val invalidate: () -> Unit = {},
     private val paint: Paint = Paint(),
     private val presentMode: PresentMode = PresentMode.MAILBOX,

@@ -4,7 +4,7 @@ import androidx.compose.ui.unit.IntSize
 
 interface IFBOPresentMode {
     fun display(block: (FBOPool.FBO) -> Unit)
-    fun <R> render(block: (FBOPool.FBO) -> R): R?
+    suspend fun <R> render(block: suspend (FBOPool.FBO) -> R): R?
     fun resize(size: IntSize)
     fun destroyFBOs()
 }

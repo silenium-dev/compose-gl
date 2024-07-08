@@ -9,6 +9,9 @@ import org.lwjgl.egl.EGL15.eglGetError
 import org.lwjgl.opengles.GLES
 import org.lwjgl.opengles.GLES32.*
 import java.nio.IntBuffer
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.time.Duration
 
 class FBOPool(
@@ -53,7 +56,9 @@ class FBOPool(
         DISPLAY,
     }
 
-    private fun <R> ensureContext(contextType: ContextType, block: () -> R): R {
+    @OptIn(ExperimentalContracts::class)
+    private inline fun <R> ensureContext(contextType: ContextType, block: () -> R): R {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
         val previousContext = EGLContext.fromCurrent()
         val nextContext = when (contextType) {
             ContextType.RENDER -> render
@@ -147,20 +152,21 @@ class FBOPool(
     /**
      * @return wait time for the next frame
      */
-    fun render(deltaTime: Duration, block: GLDrawScope.() -> Unit): Duration? = swapChain.render { fbo ->
-        ensureContext(ContextType.RENDER) {
-            if (fbo.size != size) ensureContext(ContextType.RENDER) {
-                swapChain.resize(size)
-            }
-            fbo.bind()
-            val drawScope = GLDrawScopeImpl(fbo, deltaTime)
-            drawScope.block()
-            glFinish()
-            fbo.unbind()
+    suspend fun render(deltaTime: Duration, block: suspend GLDrawScope.() -> Unit): Duration? =
+        swapChain.render { fbo ->
+            ensureContext(ContextType.RENDER) {
+                if (fbo.size != size) ensureContext(ContextType.RENDER) {
+                    swapChain.resize(size)
+                }
+                fbo.bind()
+                val drawScope = GLDrawScopeImpl(fbo, deltaTime)
+                drawScope.block()
+                glFinish()
+                fbo.unbind()
 
-            drawScope.redrawAfter
+                drawScope.redrawAfter
+            }
         }
-    }
 
     fun display(block: GLDisplayScope.() -> Unit) = swapChain.display { fbo ->
         ensureContext(ContextType.DISPLAY) {

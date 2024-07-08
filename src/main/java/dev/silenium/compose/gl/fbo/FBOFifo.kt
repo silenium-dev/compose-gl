@@ -19,7 +19,7 @@ class FBOFifo(capacity: Int, private val fboCreator: (IntSize) -> FBOPool.FBO) :
         }
     }
 
-    override fun <R> render(block: (FBOPool.FBO) -> R): R? {
+    override suspend fun <R> render(block: suspend (FBOPool.FBO) -> R): R? {
         val fbo = renderQueue.poll() ?: return null
         val result = block(fbo)
         displayQueue.offer(fbo)
