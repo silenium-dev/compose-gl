@@ -82,4 +82,11 @@ fun App() {
         }
     }
 }
+
+// awaitApplication{} is required for now. For some reason, the JVM gets stuck on shutdown, when using application{}.
+suspend fun main() = awaitApplication {
+    Window(onCloseRequest = ::exitApplication) {
+        App()
+    }
+}
 ```

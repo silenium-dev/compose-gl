@@ -50,8 +50,11 @@ fun GLSurfaceView(
             }
         }
     }
-    LaunchedEffect(surfaceView) {
+    DisposableEffect(surfaceView) {
         surfaceView.start()
+        onDispose {
+            surfaceView.interrupt()
+        }
     }
 }
 
