@@ -42,6 +42,20 @@ repositories {
 }
 dependencies {
     implementation("dev.silenium.compose:compose-gl:0.0.0-SNAPSHOT")
+    
+    implementation("org.jetbrains.skiko:skiko-awt") {
+        version {
+            strictly("0.0.0-SNAPSHOT")
+        }
+        isChanging = true
+    }
+
+    implementation("org.jetbrains.skiko:skiko-awt-runtime-linux-x64") {
+        version {
+            strictly("0.0.0-SNAPSHOT")
+        }
+        isChanging = true
+    }
 }
 ```
 
