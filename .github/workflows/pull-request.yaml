@@ -24,7 +24,7 @@ jobs:
           build-scan-terms-of-use-agree: "yes"
           add-job-summary-as-pr-comment: on-failure
       - name: Build with Gradle
-        run: ./gradlew build publish --console=plain --info --build-cache --configure-on-demand --configuration-cache --parallel
+        run: ./gradlew build --console=plain --info --build-cache --configure-on-demand --configuration-cache --parallel
       - uses: actions/upload-artifact@v4
         name: 'Upload reports'
         if: always()
