@@ -34,6 +34,7 @@ data class EGLContext(
     }
 
     fun destroy() {
+        eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)
         eglDestroyContext(display, context)
         eglDestroySurface(display, surface)
     }
@@ -106,13 +107,7 @@ data class EGLContext(
             val surface =
                 eglCreatePbufferSurface(display, config.get(0), intArrayOf(EGL_WIDTH, 1, EGL_HEIGHT, 1, EGL_NONE))
             check(surface != EGL_NO_SURFACE) { "Failed to create surface: 0x${eglGetError().toString(16).uppercase()}" }
-            val result = EGLContext(display, context, surface)
-
-            return restorePrevious {
-                result.makeCurrent()
-                GLES.createCapabilities()
-                result
-            }
+            return EGLContext(display, context, surface)
         }
     }
 }
