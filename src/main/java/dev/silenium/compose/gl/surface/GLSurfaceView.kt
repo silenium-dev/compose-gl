@@ -9,10 +9,7 @@ import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.EGL
 import dev.silenium.compose.gl.LocalWindow
 import dev.silenium.compose.gl.directContext
-import dev.silenium.compose.gl.fbo.EGLContext
-import dev.silenium.compose.gl.fbo.FBOFifo
-import dev.silenium.compose.gl.fbo.FBOPool
-import dev.silenium.compose.gl.fbo.IFBOPresentMode
+import dev.silenium.compose.gl.fbo.*
 import org.jetbrains.skia.*
 import org.lwjgl.opengles.GLES32.*
 import org.lwjgl.system.MemoryUtil
@@ -67,7 +64,7 @@ class GLSurfaceView(
     private val swapChainSize: Int = 10,
 ) : Thread("GLSurfaceView") {
     enum class PresentMode(internal val impl: (Int, (IntSize) -> FBOPool.FBO) -> IFBOPresentMode) {
-        MAILBOX(::FBOFifo),
+        MAILBOX(::FBOMailbox),
         FIFO(::FBOFifo),
     }
 
