@@ -6,8 +6,6 @@ env:
   REPOSILITE_USERNAME: ${{ secrets.REPOSILITE_USERNAME }}
   REPOSILITE_PASSWORD: ${{ secrets.REPOSILITE_PASSWORD }}
   REPOSILITE_URL: "https://reposilite.silenium.dev/snapshots"
-permissions:
-  pull-requests: write
 jobs:
   build:
     runs-on: ubuntu-latest
