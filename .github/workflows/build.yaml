@@ -19,3 +19,10 @@ jobs:
           java-version: '11'
       - name: Build with Gradle
         run: ./gradlew build publish --console=plain --info
+      - uses: actions/upload-artifact@v3
+        name: 'Upload reports'
+        if: always()
+        with:
+          name: test-reports
+          path: ./build/reports
+          retention-days: 5
