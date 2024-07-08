@@ -12,7 +12,9 @@ group = "dev.silenium.compose"
 version = "0.0.0-SNAPSHOT"
 
 repositories {
-    mavenLocal()
+    maven("https://reposilite.silenium.dev/snapshots") {
+        name = "reposilite"
+    }
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
@@ -40,14 +42,9 @@ dependencies {
     }
 
     implementation(libs.bundles.kotlinx.coroutines)
-    implementation("org.jetbrains.skiko:skiko-awt:0.0.0-SNAPSHOT") {
+    implementation(libs.bundles.skiko) {
         version {
-            strictly("0.0.0-SNAPSHOT")
-        }
-    }
-    implementation("org.jetbrains.skiko:skiko-awt-runtime-linux-x64:0.0.0-SNAPSHOT") {
-        version {
-            strictly("0.0.0-SNAPSHOT")
+            strictly(libs.bundles.skiko.get().first().version!!)
         }
     }
 }

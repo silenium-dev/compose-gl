@@ -1,6 +1,7 @@
 [versions]
 kotlinx-coroutines = "1.8.1"
 lwjgl = "3.3.3"
+skiko = "0.8.10-egl"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -16,6 +17,9 @@ lwjgl-egl = { group = "org.lwjgl", name = "lwjgl-egl", version.ref = "lwjgl" }
 lwjgl-glfw = { group = "org.lwjgl", name = "lwjgl-glfw", version.ref = "lwjgl" }
 lwjgl-opengles = { group = "org.lwjgl", name = "lwjgl-opengles", version.ref = "lwjgl" }
 
+skiko-awt = { group = "org.jetbrains.skiko", name = "skiko-awt", version.ref = "skiko" }
+skiko-awt-runtime-linux-x64 = { group = "org.jetbrains.skiko", name = "skiko-awt-runtime-linux-x64", version.ref = "skiko" }
+
 [bundles]
 kotlinx-coroutines = [
     "kotlinx-coroutines-core",
@@ -24,6 +28,11 @@ kotlinx-coroutines = [
     "kotlinx-coroutines-jdk9",
     "kotlinx-coroutines-slf4j",
     "kotlinx-coroutines-swing",
+]
+
+skiko = [
+    "skiko-awt",
+    "skiko-awt-runtime-linux-x64",
 ]
 
 lwjgl-natives = [
