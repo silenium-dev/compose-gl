@@ -9,10 +9,15 @@ import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.LocalWindow
 import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.fbo.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.selects.onTimeout
+import kotlinx.coroutines.selects.select
 import org.jetbrains.skia.*
-import org.lwjgl.opengles.GLES32.*
-import org.lwjgl.system.MemoryUtil
-import java.util.concurrent.atomic.AtomicBoolean
+import org.lwjgl.opengles.GLES32.GL_RGBA8
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 
 
@@ -47,9 +52,9 @@ fun GLSurfaceView(
         }
     }
     DisposableEffect(surfaceView) {
-        surfaceView.start()
+        val job = surfaceView.launch()
         onDispose {
-            surfaceView.interrupt()
+            job.cancel()
         }
     }
 }
@@ -61,7 +66,7 @@ class GLSurfaceView(
     private val paint: Paint = Paint(),
     private val presentMode: PresentMode = PresentMode.MAILBOX,
     private val swapChainSize: Int = 10,
-) : Thread("GLSurfaceView") {
+) {
     enum class PresentMode(internal val impl: (Int, (IntSize) -> FBOPool.FBO) -> IFBOPresentMode) {
         /**
          * Renders the latest frame and discards all the previous frames.
@@ -81,13 +86,20 @@ class GLSurfaceView(
     private var renderContext: EGLContext? = null
     private var size: IntSize = IntSize.Zero
     private var fboPool: FBOPool? = null
-    private val updateRequested = AtomicBoolean(false)
+    private val updateRequest = Channel<Unit>(Channel.CONFLATED)
+    private val executor = Executors.newSingleThreadExecutor {
+        Thread(it, "GLSurfaceView-${index.getAndIncrement()}")
+    }
+
+    fun launch() = CoroutineScope(executor.asCoroutineDispatcher()).launch { run() }.also {
+        it.invokeOnCompletion { executor.shutdown() }
+    }
 
     fun resize(size: IntSize) {
         if (size == fboPool?.size) return
         this.size = size
         fboPool?.size = size
-        updateRequested.set(true)
+        updateRequest.trySend(Unit)
     }
 
     fun display(canvas: Canvas, displayContext: DirectContext) {
@@ -129,25 +141,26 @@ class GLSurfaceView(
             .apply(FBOPool::initialize)
     }
 
-    override fun run() {
-        while (size == IntSize.Zero && !isInterrupted) onSpinWait()
-        if (isInterrupted) return
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun run() = coroutineScope {
+        while (size == IntSize.Zero && isActive) delay(10.milliseconds)
+        if (!isActive) return@coroutineScope
         initEGL()
         var lastFrame: Long? = null
-        while (!isInterrupted) {
+        while (isActive) {
             val now = System.nanoTime()
             val deltaTime = lastFrame?.let { now - it } ?: 0
             val waitTime = fboPool!!.render(deltaTime.nanoseconds, drawBlock) ?: continue
             invalidate()
-            val renderTime = System.nanoTime() - now
+            val renderTime = (System.nanoTime() - now).nanoseconds
             lastFrame = now
-            val nextFrame = now + waitTime.inWholeNanoseconds - renderTime
-            while (
-                System.nanoTime() <= nextFrame &&
-                !isInterrupted &&
-                !updateRequested.compareAndSet(true, false)
-            ) {
-                onSpinWait()
+            try {
+                select<Unit> {
+                    updateRequest.onReceive { }
+                    onTimeout(waitTime - renderTime) { }
+                }
+            } catch (e: CancellationException) {
+                break
             }
         }
         fboPool?.destroy()
@@ -156,6 +169,9 @@ class GLSurfaceView(
         directContext = null
         renderContext?.destroy()
         renderContext = null
-        println("GLSurfaceView thread exited")
+    }
+
+    companion object {
+        private val index = AtomicInteger(0)
     }
 }
