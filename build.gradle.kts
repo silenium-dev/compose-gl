@@ -40,12 +40,12 @@ dependencies {
     }
 
     implementation(libs.bundles.kotlinx.coroutines)
-    implementation("org.jetbrains.skiko:skiko-awt:0.0.0-SNAPSHOT") {
+    implementation("org.jetbrains.skiko:skiko-awt:0.8.9") {
         version {
             strictly("0.0.0-SNAPSHOT")
         }
     }
-    implementation("org.jetbrains.skiko:skiko-awt-runtime-linux-x64:0.0.0-SNAPSHOT") {
+    implementation("org.jetbrains.skiko:skiko-awt-runtime-linux-x64:0.8.9") {
         version {
             strictly("0.0.0-SNAPSHOT")
         }
