@@ -1,11 +1,6 @@
-package dev.silenium.compose.gl
+package dev.silenium.compose.gl.surface
 
 import androidx.compose.ui.unit.IntSize
-import dev.silenium.compose.gl.surface.GLDisplayScope
-import dev.silenium.compose.gl.surface.GLDisplayScopeImpl
-import dev.silenium.compose.gl.surface.GLDrawScope
-import dev.silenium.compose.gl.surface.GLDrawScopeImpl
-import dev.silenium.compose.gl.util.snapshot
 import org.lwjgl.egl.EGL
 import org.lwjgl.egl.EGL15.*
 import org.lwjgl.egl.EGLCapabilities
@@ -16,9 +11,7 @@ import java.nio.IntBuffer
 import java.util.concurrent.ArrayBlockingQueue
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import kotlin.io.path.Path
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 data class EGLContext(
     val display: Long,
@@ -161,6 +154,7 @@ class FBOPool(
         }
     }
 
+    // TODO: replace with mailbox
     private val available = ArrayBlockingQueue<FBO>(24)
     private val toDisplay = ArrayBlockingQueue<FBO>(24)
 
@@ -190,8 +184,6 @@ class FBOPool(
     }
 
     private fun createFBO(size: IntSize) = restoreAfter {
-        val context = EGLContext.fromCurrent()
-        println("Context: $context")
         val colorAttachment = glGenTextures()
         check(colorAttachment != 0) { "Failed to create color attachment: 0x${glGetError().toString(16).uppercase()}" }
         glBindTexture(GL_TEXTURE_2D, colorAttachment)
@@ -265,7 +257,6 @@ class FBOPool(
      * @return wait time for the next frame
      */
     fun render(deltaTime: Duration, block: GLDrawScope.() -> Unit): Duration? {
-        println("FBOs: ${available.size}, ${toDisplay.size}")
         val fbo: FBO = available.poll() ?: return null
         val waitTime = ensureContext(ContextType.RENDER) {
             fbo.bind()

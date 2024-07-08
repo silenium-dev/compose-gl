@@ -1,7 +1,5 @@
 package dev.silenium.compose.gl.surface
 
-import dev.silenium.compose.gl.FBOPool
-
 interface GLDisplayScope {
     val fbo: FBOPool.FBO
 }

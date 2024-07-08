@@ -28,7 +28,7 @@ fun GLSurfaceView(modifier: Modifier = Modifier, drawBlock: GLDrawScope.() -> Un
         modifier = modifier.onSizeChanged(surfaceView::resize)
     ) {
         invalidations.let {
-            window.directContext()?.let { directContext ->
+            window?.directContext()?.let { directContext ->
                 surfaceView.display(drawContext.canvas.nativeCanvas, directContext)
             }
         }
@@ -123,11 +123,11 @@ class GLSurfaceView(
             val waitTime = fboPool!!.render(deltaTime.nanoseconds, drawBlock) ?: continue
             invalidate()
             val renderTime = System.nanoTime() - now
-            println("Last frame: $lastFrame, Current frame: $now, Delta time: $deltaTime")
+//            println("Last frame: $lastFrame, Current frame: $now, Delta time: $deltaTime")
             lastFrame = now
-            println("Render time: $renderTime")
+//            println("Render time: $renderTime")
             val nextFrame = now + waitTime.inWholeNanoseconds - renderTime
-            println("Current frame: $now, Next frame: $nextFrame, waitTime: $waitTime")
+//            println("Current frame: $now, Next frame: $nextFrame, waitTime: $waitTime")
             while (System.nanoTime() < nextFrame && !isInterrupted);
         }
         fboPool?.destroy()

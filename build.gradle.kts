@@ -5,10 +5,11 @@ plugins {
     kotlin("plugin.compose")
     id("org.jetbrains.compose")
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    `maven-publish`
 }
 
 group = "dev.silenium.compose"
-version = "1.0-SNAPSHOT"
+version = "0.0.0-SNAPSHOT"
 
 repositories {
     mavenLocal()
