@@ -86,7 +86,7 @@ class GLSurfaceView(
 
     fun display(canvas: Canvas, displayContext: DirectContext) {
         fboPool?.display { displayImpl(canvas, displayContext) }
-        if (fboPool == null) invalidate()
+        invalidate()
     }
 
     private fun GLDisplayScope.displayImpl(
