@@ -6,7 +6,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
-import dev.silenium.compose.gl.EGL
 import dev.silenium.compose.gl.LocalWindow
 import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.fbo.*
@@ -125,7 +124,6 @@ class GLSurfaceView(
         renderContext = EGLContext.createOffscreen(parentContext)
         renderContext!!.makeCurrent()
         directContext = DirectContext.makeGL()
-        EGL.debugContext()
 
         glEnable(GL_DEBUG_OUTPUT)
         glDebugMessageCallback({ _, type, _, severity, _, message, _ ->

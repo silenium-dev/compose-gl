@@ -30,7 +30,7 @@ dependencies {
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
-    natives(project(":native", configuration = "main"))
+//    natives(project(":native", configuration = "main"))
 
     implementation(platform(libs.lwjgl.bom))
     implementation(libs.lwjgl.egl)
@@ -65,22 +65,22 @@ compose.desktop {
 }
 
 tasks {
-    processResources {
-        dependsOn(":native:build")
-        from(natives) {
-            into("natives")
-        }
-    }
+//    processResources {
+//        dependsOn(":native:build")
+//        from(natives) {
+//            into("natives")
+//        }
+//    }
 
-    compileKotlin {
-        dependsOn(":native:build")
-    }
+//    compileKotlin {
+//        dependsOn(":native:build")
+//    }
 
     shadowJar {
-        dependsOn(":native:build")
-        from(natives) {
-            into("natives")
-        }
+//        dependsOn(":native:build")
+//        from(natives) {
+//            into("natives")
+//        }
 
         manifest {
             attributes["Main-Class"] = "MainKt"
