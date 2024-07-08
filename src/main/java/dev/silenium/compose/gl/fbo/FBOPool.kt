@@ -15,7 +15,7 @@ class FBOPool(
     private val render: EGLContext,
     private val display: EGLContext,
     var size: IntSize,
-    swapChainFactory: (Int, (IntSize) -> FBO) -> IFBOSwapChain,
+    swapChainFactory: (Int, (IntSize) -> FBO) -> IFBOPresentMode,
     swapChainSize: Int = 10,
 ) {
     data class FBO(
@@ -46,7 +46,7 @@ class FBOPool(
         }
     }
 
-    private val swapChain: IFBOSwapChain = swapChainFactory(swapChainSize, ::createFBO)
+    private val swapChain: IFBOPresentMode = swapChainFactory(swapChainSize, ::createFBO)
 
     private enum class ContextType {
         RENDER,

@@ -5,7 +5,7 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-class FBOMailbox(capacity: Int, private val fboCreator: (IntSize) -> FBOPool.FBO) : IFBOSwapChain {
+class FBOMailbox(capacity: Int, private val fboCreator: (IntSize) -> FBOPool.FBO) : IFBOPresentMode {
     private val displayLock = ReentrantLock()
     private val waitingLock = ReentrantLock()
     private var waitingFBO: FBOPool.FBO? = null

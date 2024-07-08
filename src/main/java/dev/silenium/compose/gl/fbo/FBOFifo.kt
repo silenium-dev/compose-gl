@@ -5,7 +5,7 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-class FBOFifo(capacity: Int, private val fboCreator: (IntSize) -> FBOPool.FBO) : IFBOSwapChain {
+class FBOFifo(capacity: Int, private val fboCreator: (IntSize) -> FBOPool.FBO) : IFBOPresentMode {
     private val displayLock = ReentrantLock()
     private var toDisplay: FBOPool.FBO? = null
     private val renderQueue = ArrayBlockingQueue<FBOPool.FBO>(capacity)

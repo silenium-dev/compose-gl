@@ -12,7 +12,7 @@ import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.fbo.EGLContext
 import dev.silenium.compose.gl.fbo.FBOFifo
 import dev.silenium.compose.gl.fbo.FBOPool
-import dev.silenium.compose.gl.fbo.IFBOSwapChain
+import dev.silenium.compose.gl.fbo.IFBOPresentMode
 import org.jetbrains.skia.*
 import org.lwjgl.opengles.GLES32.*
 import org.lwjgl.system.MemoryUtil
@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.nanoseconds
 fun GLSurfaceView(
     modifier: Modifier = Modifier,
     paint: Paint = Paint(),
-    swapChainType: GLSurfaceView.SwapChainType = GLSurfaceView.SwapChainType.MAILBOX,
+    presentMode: GLSurfaceView.PresentMode = GLSurfaceView.PresentMode.MAILBOX,
     swapChainSize: Int = 10,
     drawBlock: GLDrawScope.() -> Unit,
 ) {
@@ -35,7 +35,7 @@ fun GLSurfaceView(
             parentContext = currentContext,
             invalidate = { invalidations++ },
             paint = paint,
-            swapChainType = swapChainType,
+            presentMode = presentMode,
             swapChainSize = swapChainSize,
             drawBlock = drawBlock,
         )
@@ -63,10 +63,10 @@ class GLSurfaceView(
     private val drawBlock: GLDrawScope.() -> Unit,
     private val invalidate: () -> Unit = {},
     private val paint: Paint = Paint(),
-    private val swapChainType: SwapChainType = SwapChainType.MAILBOX,
+    private val presentMode: PresentMode = PresentMode.MAILBOX,
     private val swapChainSize: Int = 10,
 ) : Thread("GLSurfaceView") {
-    enum class SwapChainType(internal val impl: (Int, (IntSize) -> FBOPool.FBO) -> IFBOSwapChain) {
+    enum class PresentMode(internal val impl: (Int, (IntSize) -> FBOPool.FBO) -> IFBOPresentMode) {
         MAILBOX(::FBOFifo),
         FIFO(::FBOFifo),
     }
@@ -133,7 +133,7 @@ class GLSurfaceView(
             )
         }, MemoryUtil.NULL)
 
-        fboPool = FBOPool(renderContext!!, parentContext, size, swapChainType.impl, swapChainSize)
+        fboPool = FBOPool(renderContext!!, parentContext, size, presentMode.impl, swapChainSize)
             .apply(FBOPool::initialize)
     }
 
