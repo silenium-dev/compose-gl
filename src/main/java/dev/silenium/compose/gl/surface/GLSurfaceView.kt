@@ -16,17 +16,28 @@ import dev.silenium.compose.gl.fbo.IFBOSwapChain
 import org.jetbrains.skia.*
 import org.lwjgl.opengles.GLES32.*
 import org.lwjgl.system.MemoryUtil
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.nanoseconds
 
+
 @Composable
-fun GLSurfaceView(modifier: Modifier = Modifier, drawBlock: GLDrawScope.() -> Unit) {
+fun GLSurfaceView(
+    modifier: Modifier = Modifier,
+    paint: Paint = Paint(),
+    swapChainType: GLSurfaceView.SwapChainType = GLSurfaceView.SwapChainType.MAILBOX,
+    swapChainSize: Int = 10,
+    drawBlock: GLDrawScope.() -> Unit,
+) {
     var invalidations by remember { mutableStateOf(0) }
     val surfaceView = remember {
         val currentContext = EGLContext.fromCurrent() ?: error("No current EGL context")
         GLSurfaceView(
             parentContext = currentContext,
+            invalidate = { invalidations++ },
+            paint = paint,
+            swapChainType = swapChainType,
+            swapChainSize = swapChainSize,
             drawBlock = drawBlock,
-            invalidate = { invalidations++ }
         )
     }
     val window = LocalWindow.current
@@ -48,6 +59,7 @@ class GLSurfaceView(
     private val parentContext: EGLContext,
     private val drawBlock: GLDrawScope.() -> Unit,
     private val invalidate: () -> Unit = {},
+    private val paint: Paint = Paint(),
     private val swapChainType: SwapChainType = SwapChainType.MAILBOX,
     private val swapChainSize: Int = 10,
 ) : Thread("GLSurfaceView") {
@@ -92,7 +104,7 @@ class GLSurfaceView(
             SurfaceColorFormat.RGBA_8888,
             ColorSpace.sRGB
         ) ?: error("Failed to create surface")
-        surface.draw(canvas, 0, 0, Paint())
+        surface.draw(canvas, 0, 0, paint)
         surface.close()
         rt.close()
         displayContext.resetGLAll()
@@ -132,9 +144,7 @@ class GLSurfaceView(
             val waitTime = fboPool!!.render(deltaTime.nanoseconds, drawBlock) ?: continue
             invalidate()
             val renderTime = System.nanoTime() - now
-//            println("Last frame: $lastFrame, Current frame: $now, Delta time: $deltaTime")
             lastFrame = now
-//            println("Render time: $renderTime")
             val nextFrame = now + waitTime.inWholeNanoseconds - renderTime
             while (
                 System.nanoTime() <= nextFrame &&
