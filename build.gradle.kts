@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.silenium.compose"
-version = "0.0.0-SNAPSHOT"
+version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
 
 repositories {
     maven("https://reposilite.silenium.dev/snapshots") {
@@ -89,6 +89,15 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
+        }
+    }
+    repositories {
+        maven("https://reposilite.silenium.dev/snapshots") {
+            name = "reposilite"
+            credentials {
+                username = System.getenv("REPOSILITE_USERNAME") ?: project.findProperty("reposiliteUser") as String? ?: ""
+                password = System.getenv("REPOSILITE_PASSWORD") ?: project.findProperty("reposilitePassword") as String? ?: ""
+            }
         }
     }
 }
