@@ -6,9 +6,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
-import dev.silenium.compose.gl.*
+import dev.silenium.compose.gl.EGL
+import dev.silenium.compose.gl.LocalWindow
+import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.fbo.EGLContext
+import dev.silenium.compose.gl.fbo.FBOMailbox
 import dev.silenium.compose.gl.fbo.FBOPool
+import dev.silenium.compose.gl.fbo.IFBOSwapChain
 import org.jetbrains.skia.*
 import org.lwjgl.opengles.GLES32.*
 import org.lwjgl.system.MemoryUtil
@@ -44,7 +48,13 @@ class GLSurfaceView(
     private val parentContext: EGLContext,
     private val drawBlock: GLDrawScope.() -> Unit,
     private val invalidate: () -> Unit = {},
+    private val swapChainType: SwapChainType = SwapChainType.MAILBOX,
+    private val swapChainSize: Int = 10,
 ) : Thread("GLSurfaceView") {
+    enum class SwapChainType(internal val impl: (Int, (IntSize) -> FBOPool.FBO) -> IFBOSwapChain) {
+        MAILBOX(::FBOMailbox),
+    }
+
     private var directContext: DirectContext? = null
     private var renderContext: EGLContext? = null
     private var size: IntSize = IntSize.Zero
@@ -105,9 +115,8 @@ class GLSurfaceView(
             )
         }, MemoryUtil.NULL)
 
-        fboPool = FBOPool(renderContext!!, parentContext, size).apply {
-            initialize()
-        }
+        fboPool = FBOPool(renderContext!!, parentContext, size, swapChainType.impl, swapChainSize)
+            .apply(FBOPool::initialize)
     }
 
     override fun run() {

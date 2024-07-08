@@ -14,7 +14,9 @@ import kotlin.time.Duration
 class FBOPool(
     private val render: EGLContext,
     private val display: EGLContext,
-    var size: IntSize
+    var size: IntSize,
+    swapChainFactory: (Int, (IntSize) -> FBO) -> IFBOSwapChain,
+    swapChainSize: Int = 10,
 ) {
     data class FBO(
         val id: Int,
@@ -44,7 +46,7 @@ class FBOPool(
         }
     }
 
-    private val swapChain: IFBOSwapChain = FBOMailbox(10, ::createFBO)
+    private val swapChain: IFBOSwapChain = swapChainFactory(swapChainSize, ::createFBO)
 
     private enum class ContextType {
         RENDER,

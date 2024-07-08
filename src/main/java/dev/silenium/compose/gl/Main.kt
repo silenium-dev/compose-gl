@@ -31,9 +31,9 @@ fun App() {
                 glClear(GL_COLOR_BUFFER_BIT)
                 val wait = (1000.0 / 240).milliseconds
                 redrawAfter(wait)
-                println("Delta time: $deltaTime")
-                println("Wait: $wait")
-                println("FPS: ${1_000_000.0 / deltaTime.inWholeMicroseconds}")
+//                println("Delta time: $deltaTime")
+//                println("Wait: $wait")
+//                println("FPS: ${1_000_000.0 / deltaTime.inWholeMicroseconds}")
             }
         }
     }
