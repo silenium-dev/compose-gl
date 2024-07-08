@@ -30,22 +30,24 @@ dependencies {
     // compose.desktop.currentOs should be used in launcher-sourceSet
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
-    implementation(compose.desktop.currentOs)
+    implementation(compose.desktop.common)
 //    natives(project(":native", configuration = "main"))
 
-    implementation(platform(libs.lwjgl.bom))
-    implementation(libs.lwjgl.egl)
+    api(platform(libs.lwjgl.bom))
+    api(libs.lwjgl.egl)
     libs.bundles.lwjgl.natives.get().forEach {
-        implementation(it)
+        api(it)
         runtimeOnly(variantOf(provider { it }) { classifier(lwjglNatives) })
     }
 
     implementation(libs.bundles.kotlinx.coroutines)
-    implementation(libs.bundles.skiko) {
+    api(libs.bundles.skiko) {
         version {
             strictly(libs.bundles.skiko.get().first().version!!)
         }
     }
+
+    testImplementation(compose.desktop.currentOs)
 }
 
 compose.desktop {
