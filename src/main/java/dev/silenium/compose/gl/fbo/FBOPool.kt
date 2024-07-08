@@ -67,7 +67,6 @@ class FBOPool(
     }
 
     fun initialize() = ensureContext(ContextType.RENDER) {
-        println("Size: $size")
         swapChain.resize(size)
     }
 
