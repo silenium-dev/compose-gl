@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.awaitApplication
 import dev.silenium.compose.gl.surface.GLSurfaceView
@@ -24,11 +25,13 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 @Preview
-fun App() {
+fun ApplicationScope.App() {
     MaterialTheme {
         Box(contentAlignment = Alignment.TopStart, modifier = Modifier.fillMaxSize().background(Color.Black)) {
-            Button(onClick = {}) {
-                Text("Click me!")
+            Button(onClick = {
+                exitApplication()
+            }) {
+                Text("Exit application")
             }
             var targetHue by remember { mutableStateOf(0f) }
             val color by animateColorAsState(
