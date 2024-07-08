@@ -20,9 +20,12 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 
+@Composable
+fun rememberGLSurfaceState() = remember { GLSurfaceState() }
 
 @Composable
 fun GLSurfaceView(
+    state: GLSurfaceState = rememberGLSurfaceState(),
     modifier: Modifier = Modifier,
     paint: Paint = Paint(),
     presentMode: GLSurfaceView.PresentMode = GLSurfaceView.PresentMode.FIFO,
@@ -33,6 +36,7 @@ fun GLSurfaceView(
     val surfaceView = remember {
         val currentContext = EGLContext.fromCurrent() ?: error("No current EGL context")
         GLSurfaceView(
+            state = state,
             parentContext = currentContext,
             invalidate = { invalidations++ },
             paint = paint,
@@ -59,7 +63,8 @@ fun GLSurfaceView(
     }
 }
 
-class GLSurfaceView(
+class GLSurfaceView internal constructor(
+    private val state: GLSurfaceState,
     private val parentContext: EGLContext,
     private val drawBlock: suspend GLDrawScope.() -> Unit,
     private val invalidate: () -> Unit = {},
@@ -103,8 +108,11 @@ class GLSurfaceView(
     }
 
     fun display(canvas: Canvas, displayContext: DirectContext) {
+        val t1 = System.nanoTime()
         fboPool?.display { displayImpl(canvas, displayContext) }
         invalidate()
+        val t2 = System.nanoTime()
+        state.onDisplay(t2, (t2 - t1).nanoseconds)
     }
 
     private fun GLDisplayScope.displayImpl(
@@ -148,12 +156,14 @@ class GLSurfaceView(
         initEGL()
         var lastFrame: Long? = null
         while (isActive) {
-            val now = System.nanoTime()
-            val deltaTime = lastFrame?.let { now - it } ?: 0
+            val renderStart = System.nanoTime()
+            val deltaTime = lastFrame?.let { renderStart - it } ?: 0
             val waitTime = fboPool!!.render(deltaTime.nanoseconds, drawBlock) ?: continue
             invalidate()
-            val renderTime = (System.nanoTime() - now).nanoseconds
-            lastFrame = now
+            val renderEnd = System.nanoTime()
+            val renderTime = (renderEnd - renderStart).nanoseconds
+            state.onRender(renderEnd, renderTime)
+            lastFrame = renderStart
             try {
                 select<Unit> {
                     updateRequest.onReceive { }
