@@ -150,6 +150,9 @@ class FBOPool(
      */
     fun render(deltaTime: Duration, block: GLDrawScope.() -> Unit): Duration? = swapChain.render { fbo ->
         ensureContext(ContextType.RENDER) {
+            if (fbo.size != size) ensureContext(ContextType.RENDER) {
+                swapChain.resize(size)
+            }
             fbo.bind()
             val drawScope = GLDrawScopeImpl(fbo, deltaTime)
             drawScope.block()
@@ -164,9 +167,6 @@ class FBOPool(
         ensureContext(ContextType.DISPLAY) {
             val displayScope = GLDisplayScopeImpl(fbo)
             displayScope.block()
-        }
-        if (fbo.size != size) ensureContext(ContextType.RENDER) {
-            swapChain.resize(size)
         }
     }
 

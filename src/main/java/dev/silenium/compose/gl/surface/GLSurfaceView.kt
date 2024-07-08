@@ -59,11 +59,13 @@ class GLSurfaceView(
     private var renderContext: EGLContext? = null
     private var size: IntSize = IntSize.Zero
     private var fboPool: FBOPool? = null
+    private val updateRequested = AtomicBoolean(false)
 
     fun resize(size: IntSize) {
         if (size == fboPool?.size) return
         this.size = size
         fboPool?.size = size
+        updateRequested.set(true)
     }
 
     fun display(canvas: Canvas, displayContext: DirectContext) {
@@ -134,8 +136,13 @@ class GLSurfaceView(
             lastFrame = now
 //            println("Render time: $renderTime")
             val nextFrame = now + waitTime.inWholeNanoseconds - renderTime
-//            println("Current frame: $now, Next frame: $nextFrame, waitTime: $waitTime")
-            while (System.nanoTime() <= nextFrame && !isInterrupted);
+            while (
+                System.nanoTime() <= nextFrame &&
+                !isInterrupted &&
+                !updateRequested.compareAndSet(true, false)
+            ) {
+                onSpinWait()
+            }
         }
         fboPool?.destroy()
         fboPool = null
