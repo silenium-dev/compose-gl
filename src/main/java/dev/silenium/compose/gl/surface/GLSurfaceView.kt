@@ -64,7 +64,17 @@ class GLSurfaceView(
     private val swapChainSize: Int = 10,
 ) : Thread("GLSurfaceView") {
     enum class PresentMode(internal val impl: (Int, (IntSize) -> FBOPool.FBO) -> IFBOPresentMode) {
+        /**
+         * Renders the latest frame and discards all the previous frames.
+         * Results in the lowest latency.
+         */
         MAILBOX(::FBOMailbox),
+
+        /**
+         * Renders all the frames in the order they were produced.
+         * Results in a higher latency, but smoother animations.
+         * Limits the framerate to the display refresh rate.
+         */
         FIFO(::FBOFifo),
     }
 
