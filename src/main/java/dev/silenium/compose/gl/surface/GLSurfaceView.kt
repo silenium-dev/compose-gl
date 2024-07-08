@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.nanoseconds
 fun GLSurfaceView(
     modifier: Modifier = Modifier,
     paint: Paint = Paint(),
-    presentMode: GLSurfaceView.PresentMode = GLSurfaceView.PresentMode.MAILBOX,
+    presentMode: GLSurfaceView.PresentMode = GLSurfaceView.PresentMode.FIFO,
     swapChainSize: Int = 10,
     drawBlock: GLDrawScope.() -> Unit,
 ) {
