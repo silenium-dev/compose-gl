@@ -17,4 +17,4 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       - name: Build with Gradle
-        run: ./gradlew build publish
+        run: ./gradlew build publish --console=plain --info
