@@ -11,7 +11,7 @@ group = "dev.silenium.compose"
 version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
 
 repositories {
-    maven("https://reposilite.silenium.dev/snapshots") {
+    maven("https://reposilite.silenium.dev/releases") {
         name = "reposilite"
     }
     mavenCentral()
@@ -41,11 +41,7 @@ dependencies {
     }
 
     implementation(libs.bundles.kotlinx.coroutines)
-    api(libs.bundles.skiko) {
-        version {
-            strictly(libs.bundles.skiko.get().first().version!!)
-        }
-    }
+    api(libs.bundles.skiko)
 
     testImplementation(compose.desktop.currentOs)
 }
@@ -89,7 +85,7 @@ publishing {
         }
     }
     repositories {
-        maven("https://reposilite.silenium.dev/snapshots") {
+        maven(System.getenv("REPOSILITE_URL") ?: "https://reposilite.silenium.dev/snapshots") {
             name = "reposilite"
             credentials {
                 username = System.getenv("REPOSILITE_USERNAME") ?: project.findProperty("reposiliteUser") as String? ?: ""
