@@ -42,6 +42,7 @@ fun ApplicationScope.App() {
             GLSurfaceView(
                 state = state,
                 modifier = Modifier.aspectRatio(1f).fillMaxSize(),
+                presentMode = GLSurfaceView.PresentMode.MAILBOX,
             ) {
                 glClearColor(color.red, color.green, color.blue, color.alpha)
 //                glClearColor(1.0f, 0.2f, 0.6f, 0.5f)

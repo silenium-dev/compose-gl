@@ -18,7 +18,7 @@ class FBOPool(
     private val render: EGLContext,
     private val display: EGLContext,
     var size: IntSize,
-    swapChainFactory: (Int, (IntSize) -> FBO) -> IFBOPresentMode,
+    swapChainFactory: (Int, (IntSize) -> FBO) -> FBOSwapChain,
     swapChainSize: Int = 10,
 ) {
     data class FBO(
@@ -49,7 +49,7 @@ class FBOPool(
         }
     }
 
-    private val swapChain: IFBOPresentMode = swapChainFactory(swapChainSize, ::createFBO)
+    private val swapChain: FBOSwapChain = swapChainFactory(swapChainSize, ::createFBO)
 
     private enum class ContextType {
         RENDER,
@@ -153,11 +153,11 @@ class FBOPool(
      * @return wait time for the next frame
      */
     suspend fun render(deltaTime: Duration, block: suspend GLDrawScope.() -> Unit): Duration? =
-        swapChain.render { fbo ->
-            ensureContext(ContextType.RENDER) {
-                if (fbo.size != size) ensureContext(ContextType.RENDER) {
-                    swapChain.resize(size)
-                }
+        ensureContext(ContextType.RENDER) {
+            if (swapChain.size != size) {
+                swapChain.resize(size)
+            }
+            swapChain.render { fbo ->
                 fbo.bind()
                 val drawScope = GLDrawScopeImpl(fbo, deltaTime)
                 drawScope.block()
