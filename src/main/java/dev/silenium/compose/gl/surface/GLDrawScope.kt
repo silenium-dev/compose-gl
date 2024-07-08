@@ -15,8 +15,7 @@ internal class GLDrawScopeImpl(
     private val fbo: FBOPool.FBO,
     override val deltaTime: Duration,
 ) : GLDrawScope {
-    override val size: IntSize
-        get() = fbo.size
+    override val size: IntSize by fbo::size
     internal var redrawAfter = (1000 / 60).milliseconds
         private set
 
