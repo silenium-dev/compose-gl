@@ -1,0 +1,33 @@
+[versions]
+kotlinx-coroutines = "1.8.1"
+lwjgl = "3.3.3"
+
+[libraries]
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-jdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-jdk9 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk9", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-slf4j = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-slf4j", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+
+lwjgl-bom = { group = "org.lwjgl", name = "lwjgl-bom", version.ref = "lwjgl" }
+lwjgl-core = { group = "org.lwjgl", name = "lwjgl", version.ref = "lwjgl" }
+lwjgl-egl = { group = "org.lwjgl", name = "lwjgl-egl", version.ref = "lwjgl" }
+lwjgl-glfw = { group = "org.lwjgl", name = "lwjgl-glfw", version.ref = "lwjgl" }
+lwjgl-opengles = { group = "org.lwjgl", name = "lwjgl-opengles", version.ref = "lwjgl" }
+
+[bundles]
+kotlinx-coroutines = [
+    "kotlinx-coroutines-core",
+    "kotlinx-coroutines-debug",
+    "kotlinx-coroutines-jdk8",
+    "kotlinx-coroutines-jdk9",
+    "kotlinx-coroutines-slf4j",
+    "kotlinx-coroutines-swing",
+]
+
+lwjgl-natives = [
+    "lwjgl-core",
+    "lwjgl-glfw",
+    "lwjgl-opengles",
+]

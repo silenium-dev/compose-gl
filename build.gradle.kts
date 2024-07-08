@@ -32,31 +32,23 @@ dependencies {
     implementation(compose.desktop.currentOs)
     natives(project(":native", configuration = "main"))
 
-    implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
-
-    implementation("org.lwjgl", "lwjgl")
-    implementation("org.lwjgl", "lwjgl-egl")
-    implementation("org.lwjgl", "lwjgl-glfw")
-    implementation("org.lwjgl", "lwjgl-opengl")
-    implementation("org.lwjgl", "lwjgl-opengles")
-    runtimeOnly("org.lwjgl", "lwjgl", classifier = lwjglNatives)
-    runtimeOnly("org.lwjgl", "lwjgl-glfw", classifier = lwjglNatives)
-    runtimeOnly("org.lwjgl", "lwjgl-opengl", classifier = lwjglNatives)
-    runtimeOnly("org.lwjgl", "lwjgl-opengles", classifier = lwjglNatives)
-
-
-    implementation("org.jetbrains.skiko:skiko-awt") {
-        version {
-            strictly("0.0.0-SNAPSHOT")
-        }
-        isChanging = true
+    implementation(platform(libs.lwjgl.bom))
+    implementation(libs.lwjgl.egl)
+    libs.bundles.lwjgl.natives.get().forEach {
+        implementation(it)
+        runtimeOnly(variantOf(provider { it }) { classifier(lwjglNatives) })
     }
 
-    implementation("org.jetbrains.skiko:skiko-awt-runtime-linux-x64") {
+    implementation(libs.bundles.kotlinx.coroutines)
+    implementation("org.jetbrains.skiko:skiko-awt:0.0.0-SNAPSHOT") {
         version {
             strictly("0.0.0-SNAPSHOT")
         }
-        isChanging = true
+    }
+    implementation("org.jetbrains.skiko:skiko-awt-runtime-linux-x64:0.0.0-SNAPSHOT") {
+        version {
+            strictly("0.0.0-SNAPSHOT")
+        }
     }
 }
 
