@@ -5,7 +5,9 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-class FBOMailbox(capacity: Int, private val fboCreator: (IntSize) -> FBOPool.FBO) : IFBOPresentMode {
+class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> FBOPool.FBO) : FBOSwapChain() {
+    override var size: IntSize = IntSize.Zero
+        private set
     private val displayLock = ReentrantLock()
     private val waitingLock = ReentrantLock()
     private var waitingFBO: FBOPool.FBO? = null
@@ -15,7 +17,12 @@ class FBOMailbox(capacity: Int, private val fboCreator: (IntSize) -> FBOPool.FBO
     override fun display(block: (FBOPool.FBO) -> Unit) = displayLock.withLock {
         toDisplay?.let(block)
         waitingLock.withLock {
-            if (waitingFBO == null) return
+            val waiting = waitingFBO ?: return
+            if (waiting.size != size) {
+                waiting.destroy()
+                waitingFBO = null
+                return
+            }
             toDisplay = waitingFBO
             waitingFBO = null
         }
@@ -24,8 +31,15 @@ class FBOMailbox(capacity: Int, private val fboCreator: (IntSize) -> FBOPool.FBO
     override suspend fun <R> render(block: suspend (FBOPool.FBO) -> R): R? {
         val fbo = renderQueue.poll() ?: return null
         val result = block(fbo)
+        if (fbo.size != size) {
+            fbo.destroy()
+            return null
+        }
         displayLock.withLock {
-            toDisplay?.let(renderQueue::offer)
+            toDisplay?.let {
+                if (it.size != size) it.destroy()
+                else renderQueue.offer(it)
+            }
             toDisplay = fbo
         }
         if (displayLock.tryLock()) {
@@ -38,8 +52,9 @@ class FBOMailbox(capacity: Int, private val fboCreator: (IntSize) -> FBOPool.FBO
     }
 
     override fun resize(size: IntSize) {
-        destroyFBOs()
-        fillRenderQueue { fboCreator(size) }
+        this.size = size
+        renderQueue.onEach { it.destroy() }.clear()
+        renderQueue.fillRenderQueue(fboCreator, size)
     }
 
     override fun destroyFBOs() {
@@ -51,12 +66,6 @@ class FBOMailbox(capacity: Int, private val fboCreator: (IntSize) -> FBOPool.FBO
         waitingLock.withLock {
             waitingFBO?.destroy()
             waitingFBO = null
-        }
-    }
-
-    private fun fillRenderQueue(generator: () -> FBOPool.FBO) {
-        while (renderQueue.remainingCapacity() > 0) {
-            renderQueue.offer(generator())
         }
     }
 }
