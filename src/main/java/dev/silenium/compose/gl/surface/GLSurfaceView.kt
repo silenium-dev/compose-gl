@@ -10,7 +10,7 @@ import dev.silenium.compose.gl.EGL
 import dev.silenium.compose.gl.LocalWindow
 import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.fbo.EGLContext
-import dev.silenium.compose.gl.fbo.FBOMailbox
+import dev.silenium.compose.gl.fbo.FBOFifo
 import dev.silenium.compose.gl.fbo.FBOPool
 import dev.silenium.compose.gl.fbo.IFBOSwapChain
 import org.jetbrains.skia.*
@@ -67,7 +67,8 @@ class GLSurfaceView(
     private val swapChainSize: Int = 10,
 ) : Thread("GLSurfaceView") {
     enum class SwapChainType(internal val impl: (Int, (IntSize) -> FBOPool.FBO) -> IFBOSwapChain) {
-        MAILBOX(::FBOMailbox),
+        MAILBOX(::FBOFifo),
+        FIFO(::FBOFifo),
     }
 
     private var directContext: DirectContext? = null
