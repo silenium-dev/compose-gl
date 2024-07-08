@@ -1,11 +1,6 @@
 name: "Build and Test"
 on:
-  push:
-  workflow_dispatch:
-env:
-  REPOSILITE_USERNAME: ${{ secrets.REPOSILITE_USERNAME }}
-  REPOSILITE_PASSWORD: ${{ secrets.REPOSILITE_PASSWORD }}
-  REPOSILITE_URL: "https://reposilite.silenium.dev/snapshots"
+  pull_request:
 permissions:
   pull-requests: write
 jobs:
@@ -38,6 +33,7 @@ jobs:
           retention-days: 5
   dependency-submission:
     runs-on: ubuntu-latest
+    if: ${{ github.actor == 'silenium-dev' }}
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v4
@@ -48,3 +44,5 @@ jobs:
           build-scan-publish: true
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
           build-scan-terms-of-use-agree: "yes"
+      - name: Perform dependency review
+        uses: actions/dependency-review-action@v3
