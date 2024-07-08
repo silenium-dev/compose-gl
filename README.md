@@ -17,10 +17,11 @@ This library uses a custom skiko+skia build which uses EGL and GLES instead of G
 Both are based on the official builds by JetBrains.
 
 You need to build and publish the Skiko library locally before using this library:
+Ensure your `JAVA_HOME` is set to a JDK 17 installation.
 ```shell
 git clone https://github.com/silenium-dev/skiko.git
 cd skiko/skiko
-SKIA_TARGET=linux SKIA_DEBUG_MODE=true ./build-with-local-skia.sh # Enable debug mode for Skia and publish locally with version 0.0.0-SNAPSHOT+debug
+./gradlew publishToMavenLocal
 ```
 
 ### Building
@@ -40,7 +41,7 @@ repositories {
     mavenLocal()
 }
 dependencies {
-    implementation("dev.silenium:compose-gl:0.0.0-SNAPSHOT")
+    implementation("dev.silenium.compose:compose-gl:0.0.0-SNAPSHOT")
 }
 ```
 

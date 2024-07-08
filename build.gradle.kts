@@ -47,14 +47,14 @@ dependencies {
 
     implementation("org.jetbrains.skiko:skiko-awt") {
         version {
-            strictly("0.0.0-SNAPSHOT+debug")
+            strictly("0.0.0-SNAPSHOT")
         }
         isChanging = true
     }
 
     implementation("org.jetbrains.skiko:skiko-awt-runtime-linux-x64") {
         version {
-            strictly("0.0.0-SNAPSHOT+debug")
+            strictly("0.0.0-SNAPSHOT")
         }
         isChanging = true
     }
