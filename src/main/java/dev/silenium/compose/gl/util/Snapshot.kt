@@ -1,7 +1,7 @@
 package dev.silenium.compose.gl.util
 
 import androidx.compose.ui.unit.IntSize
-import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.*
 import org.lwjgl.opengles.GLES32.*
 import org.lwjgl.system.MemoryUtil
 import java.awt.image.BufferedImage
@@ -32,4 +32,12 @@ fun snapshot(bitmap: Bitmap, target: Path) {
     val pixelArr = bitmap.readPixels() ?: error("Failed to read pixels")
     image.raster.setPixels(0, 0, bitmap.width, bitmap.height, pixelArr.map { it.toInt() }.toIntArray())
     target.outputStream().use { ImageIO.write(image, "png", it) }
+}
+
+fun snapshot(surface: Surface, target: Path) {
+    val bitmap = Bitmap()
+    bitmap.allocPixels(ImageInfo(surface.width, surface.height, ColorType.RGBA_8888, ColorAlphaType.OPAQUE))
+    surface.readPixels(bitmap, 0, 0)
+    snapshot(bitmap, target)
+    bitmap.close()
 }
