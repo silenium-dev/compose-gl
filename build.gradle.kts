@@ -4,7 +4,6 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.compose")
     id("org.jetbrains.compose")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
     `maven-publish`
 }
 
@@ -73,16 +72,12 @@ tasks {
 //        dependsOn(":native:build")
 //    }
 
-    shadowJar {
+//    jar {
 //        dependsOn(":native:build")
 //        from(natives) {
 //            into("natives")
 //        }
-
-        manifest {
-            attributes["Main-Class"] = "MainKt"
-        }
-    }
+//    }
 }
 
 publishing {
