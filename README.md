@@ -19,12 +19,12 @@ You can add the dependency to your project as follows:
 
 ```kotlin
 repositories {
-    maven("https://reposilite.silenium.dev/snapshots") {
+    maven("https://reposilite.silenium.dev/releases") {
         name = "silenium-snapshots"
     }
 }
 dependencies {
-    implementation("dev.silenium.compose:compose-gl:0.0.0-SNAPSHOT")
+    implementation("dev.silenium.compose:compose-gl:0.1.0")
 }
 ```
 
