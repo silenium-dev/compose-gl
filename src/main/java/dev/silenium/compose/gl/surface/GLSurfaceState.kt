@@ -1,8 +1,10 @@
 package dev.silenium.compose.gl.surface
 
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.selects.SelectBuilder
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -96,17 +98,25 @@ data class RollingWindowStatistics(
 }
 
 class GLSurfaceState {
-    internal val renderStatistics_ = MutableStateFlow(RollingWindowStatistics())
-    internal val displayStatistics_ = MutableStateFlow(RollingWindowStatistics())
+    private val renderStatisticsMutable = MutableStateFlow(RollingWindowStatistics())
+    private val displayStatisticsMutable = MutableStateFlow(RollingWindowStatistics())
+    private val updateRequested = Channel<Unit>(Channel.CONFLATED)
 
-    val renderStatistics: StateFlow<RollingWindowStatistics> get() = renderStatistics_.asStateFlow()
-    val displayStatistics: StateFlow<RollingWindowStatistics> get() = displayStatistics_.asStateFlow()
+    val renderStatistics: StateFlow<RollingWindowStatistics> get() = renderStatisticsMutable.asStateFlow()
+    val displayStatistics: StateFlow<RollingWindowStatistics> get() = displayStatisticsMutable.asStateFlow()
+
+    fun requestUpdate() {
+        updateRequested.trySend(Unit)
+    }
+
+    context(SelectBuilder<R>)
+    internal fun <R> onUpdate(block: suspend (Unit) -> R) = updateRequested.onReceive(block)
 
     internal fun onDisplay(nanos: Long, frameTime: Duration) {
-        displayStatistics_.tryEmit(displayStatistics_.value.add(nanos, frameTime))
+        displayStatisticsMutable.tryEmit(displayStatisticsMutable.value.add(nanos, frameTime))
     }
 
     internal fun onRender(nanos: Long, frameTime: Duration) {
-        renderStatistics_.tryEmit(renderStatistics_.value.add(nanos, frameTime))
+        renderStatisticsMutable.tryEmit(renderStatisticsMutable.value.add(nanos, frameTime))
     }
 }

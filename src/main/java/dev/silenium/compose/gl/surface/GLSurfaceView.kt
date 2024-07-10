@@ -10,7 +10,6 @@ import dev.silenium.compose.gl.LocalWindow
 import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.fbo.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.onTimeout
 import kotlinx.coroutines.selects.select
 import org.jetbrains.skia.*
@@ -91,7 +90,6 @@ class GLSurfaceView internal constructor(
     private var renderContext: EGLContext? = null
     private var size: IntSize = IntSize.Zero
     private var fboPool: FBOPool? = null
-    private val updateRequest = Channel<Unit>(Channel.CONFLATED)
     private val executor = Executors.newSingleThreadExecutor {
         Thread(it, "GLSurfaceView-${index.getAndIncrement()}")
     }
@@ -104,7 +102,7 @@ class GLSurfaceView internal constructor(
         if (size == fboPool?.size) return
         this.size = size
         fboPool?.size = size
-        updateRequest.trySend(Unit)
+        state.requestUpdate()
     }
 
     fun display(canvas: Canvas, displayContext: DirectContext) {
@@ -165,9 +163,10 @@ class GLSurfaceView internal constructor(
             state.onRender(renderEnd, renderTime)
             lastFrame = renderStart
             try {
+                @Suppress("RemoveExplicitTypeArguments")
                 select<Unit> {
-                    updateRequest.onReceive { }
-                    onTimeout(waitTime - renderTime) { }
+                    state.onUpdate {}
+                    onTimeout(waitTime - renderTime) {}
                 }
             } catch (e: CancellationException) {
                 break

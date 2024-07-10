@@ -58,6 +58,12 @@ compose.desktop {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-receivers")
+    }
+}
+
 tasks {
 //    processResources {
 //        dependsOn(":native:build")

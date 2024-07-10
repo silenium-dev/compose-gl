@@ -45,13 +45,9 @@ fun ApplicationScope.App() {
                 presentMode = GLSurfaceView.PresentMode.MAILBOX,
             ) {
                 glClearColor(color.red, color.green, color.blue, color.alpha)
-//                glClearColor(1.0f, 0.2f, 0.6f, 0.5f)
                 glClear(GL_COLOR_BUFFER_BIT)
                 val wait = (1000.0 / 60).milliseconds
                 redrawAfter(wait)
-//                println("Delta time: $deltaTime")
-//                println("Wait: $wait")
-//                println("FPS: ${1_000_000.0 / deltaTime.inWholeMicroseconds}")
             }
             Column(modifier = Modifier.align(Alignment.TopStart).padding(4.dp)) {
                 val display by state.displayStatistics.collectAsState()
