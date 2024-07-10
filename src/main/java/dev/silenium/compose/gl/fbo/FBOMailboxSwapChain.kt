@@ -11,11 +11,11 @@ class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> F
     private val displayLock = ReentrantLock()
     private val waitingLock = ReentrantLock()
     private var waitingFBO: FBOPool.FBO? = null
-    private var toDisplay: FBOPool.FBO? = null
+    private var current: FBOPool.FBO? = null
     private val renderQueue = ArrayBlockingQueue<FBOPool.FBO>(capacity)
 
     override fun display(block: (FBOPool.FBO) -> Unit) = displayLock.withLock {
-        toDisplay?.let(block)
+        current?.let(block)
         waitingLock.withLock {
             val waiting = waitingFBO ?: return
             if (waiting.size != size) {
@@ -23,7 +23,7 @@ class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> F
                 waitingFBO = null
                 return
             }
-            toDisplay = waitingFBO
+            current = waitingFBO
             waitingFBO = null
         }
     }
@@ -36,14 +36,14 @@ class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> F
             return null
         }
         displayLock.withLock {
-            toDisplay?.let {
+            current?.let {
                 if (it.size != size) it.destroy()
                 else renderQueue.offer(it)
             }
-            toDisplay = fbo
+            current = fbo
         }
         if (displayLock.tryLock()) {
-            toDisplay = fbo
+            current = fbo
             displayLock.unlock()
         } else waitingLock.withLock {
             waitingFBO = fbo
@@ -60,8 +60,8 @@ class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> F
     override fun destroyFBOs() {
         renderQueue.onEach { it.destroy() }.clear()
         displayLock.withLock {
-            toDisplay?.destroy()
-            toDisplay = null
+            current?.destroy()
+            current = null
         }
         waitingLock.withLock {
             waitingFBO?.destroy()

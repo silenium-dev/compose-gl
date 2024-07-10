@@ -9,18 +9,18 @@ class FBOFifoSwapChain(capacity: Int, override val fboCreator: (IntSize) -> FBOP
     override var size: IntSize = IntSize.Zero
         private set
     private val displayLock = ReentrantLock()
-    private var toDisplay: FBOPool.FBO? = null
+    private var current: FBOPool.FBO? = null
     private val renderQueue = ArrayBlockingQueue<FBOPool.FBO>(capacity)
     private val displayQueue = ArrayBlockingQueue<FBOPool.FBO>(capacity)
 
     override fun display(block: (FBOPool.FBO) -> Unit) = displayLock.withLock {
-        toDisplay?.let(block)
+        current?.let(block)
         if (!displayQueue.isEmpty()) {
-            toDisplay?.let{
+            current?.let{
                 if (it.size != size) it.destroy()
                 else renderQueue.offer(it)
             }
-            toDisplay = displayQueue.poll()
+            current = displayQueue.poll()
         }
     }
 
@@ -46,8 +46,8 @@ class FBOFifoSwapChain(capacity: Int, override val fboCreator: (IntSize) -> FBOP
         renderQueue.onEach { it.destroy() }.clear()
         displayQueue.onEach { it.destroy() }.clear()
         displayLock.withLock {
-            toDisplay?.destroy()
-            toDisplay = null
+            current?.destroy()
+            current = null
         }
     }
 }
