@@ -20,7 +20,7 @@ You can add the dependency to your project as follows:
 ```kotlin
 repositories {
     maven("https://reposilite.silenium.dev/releases") {
-        name = "silenium-snapshots"
+        name = "silenium-releases"
     }
 }
 dependencies {
