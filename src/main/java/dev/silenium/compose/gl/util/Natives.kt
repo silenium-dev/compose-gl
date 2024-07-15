@@ -20,7 +20,7 @@ object Natives {
 
     // TODO: Support different os and architectures
     fun load(libFileName: String) {
-        val libFile = libs.getOrPut(libFileName) {
+        val libFile = libs.getOrPut(libFileName)     {
             val outputFile = dir.resolve(libFileName)
             Natives::class.java.getResourceAsStream("/natives/$libFileName")!!.use { input ->
                 outputFile.outputStream().use { output ->

@@ -29,7 +29,8 @@ fun GLSurfaceView(
     paint: Paint = Paint(),
     presentMode: GLSurfaceView.PresentMode = GLSurfaceView.PresentMode.FIFO,
     swapChainSize: Int = 10,
-    drawBlock: suspend GLDrawScope.() -> Unit,
+    cleanup: suspend () -> Unit = {},
+    draw: suspend GLDrawScope.() -> Unit,
 ) {
     var invalidations by remember { mutableStateOf(0) }
     val surfaceView = remember {
@@ -41,7 +42,8 @@ fun GLSurfaceView(
             paint = paint,
             presentMode = presentMode,
             swapChainSize = swapChainSize,
-            drawBlock = drawBlock,
+            cleanupBlock = cleanup,
+            drawBlock = draw,
         )
     }
     val window = LocalWindow.current
@@ -66,6 +68,7 @@ class GLSurfaceView internal constructor(
     private val state: GLSurfaceState,
     private val parentContext: EGLContext,
     private val drawBlock: suspend GLDrawScope.() -> Unit,
+    private val cleanupBlock: suspend () -> Unit = {},
     private val invalidate: () -> Unit = {},
     private val paint: Paint = Paint(),
     private val presentMode: PresentMode = PresentMode.MAILBOX,
@@ -172,6 +175,7 @@ class GLSurfaceView internal constructor(
                 break
             }
         }
+        cleanupBlock()
         fboPool?.destroy()
         fboPool = null
         directContext?.close()
