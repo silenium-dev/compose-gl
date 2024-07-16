@@ -58,6 +58,10 @@ compose.desktop {
     }
 }
 
+java {
+    withSourcesJar()
+}
+
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xcontext-receivers")
