@@ -1,6 +1,6 @@
 [versions]
 kotlinx-coroutines = "1.8.1"
-lwjgl = "3.3.3"
+lwjgl = "3.3.4"
 skiko = "0.8.10-egl"
 
 [libraries]
