@@ -2,10 +2,7 @@ package dev.silenium.compose.gl.util
 
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.outputStream
+import kotlin.io.path.*
 
 @OptIn(ExperimentalPathApi::class)
 object Natives {
@@ -20,8 +17,9 @@ object Natives {
 
     // TODO: Support different os and architectures
     fun load(libFileName: String) {
-        val libFile = libs.getOrPut(libFileName)     {
+        val libFile = libs.getOrPut(libFileName) {
             val outputFile = dir.resolve(libFileName)
+            outputFile.createParentDirectories()
             Natives::class.java.classLoader.getResourceAsStream("natives/$libFileName")!!.use { input ->
                 outputFile.outputStream().use { output ->
                     input.copyTo(output)
