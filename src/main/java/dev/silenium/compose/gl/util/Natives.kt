@@ -22,7 +22,7 @@ object Natives {
     fun load(libFileName: String) {
         val libFile = libs.getOrPut(libFileName)     {
             val outputFile = dir.resolve(libFileName)
-            Natives::class.java.getResourceAsStream("/natives/$libFileName")!!.use { input ->
+            Natives::class.java.getResourceAsStream("natives/$libFileName")!!.use { input ->
                 outputFile.outputStream().use { output ->
                     input.copyTo(output)
                 }
