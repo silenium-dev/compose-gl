@@ -1,13 +1,16 @@
 name: "Build and Test"
 on:
   push:
-    branches:
-      - main
+    tags-ignore:
+      - '*'
+  pull_request:
   workflow_dispatch:
+  release:
+    types: [ published ]
 env:
   REPOSILITE_USERNAME: ${{ secrets.REPOSILITE_USERNAME }}
   REPOSILITE_PASSWORD: ${{ secrets.REPOSILITE_PASSWORD }}
-  REPOSILITE_URL: "https://reposilite.silenium.dev/snapshots"
+  REPOSILITE_URL: ${{ github.event_name == 'release' && 'https://reposilite.silenium.dev/releases' || 'https://reposilite.silenium.dev/snapshots' }}
 permissions:
   contents: write
 jobs:
@@ -29,8 +32,17 @@ jobs:
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
           build-scan-terms-of-use-agree: "yes"
           add-job-summary-as-pr-comment: on-failure
-      - name: Build with Gradle
-        run: ./gradlew build publish --console=plain --info --build-cache --configure-on-demand --configuration-cache --parallel
+
+      - name: Publish release
+        shell: bash
+        if: "github.event_name == 'release'"
+        run: ./gradlew build publish -Pdeploy.version=${{ github.event.release.tag_name }} --console=plain --info --configure-on-demand --configuration-cache --parallel --build-cache
+
+      - name: Publish snapshot
+        shell: bash
+        if: "github.event_name != 'release'"
+        run: ./gradlew build publish --console=plain --info --configure-on-demand --configuration-cache --parallel --build-cache
+
       - uses: actions/upload-artifact@v4
         name: 'Upload reports'
         if: always()
