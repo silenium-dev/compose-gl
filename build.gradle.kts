@@ -7,7 +7,7 @@ plugins {
     `maven-publish`
 }
 
-group = "dev.silenium.compose.gl"
+group = "dev.silenium.compose"
 version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
 
 repositories {
@@ -21,7 +21,7 @@ repositories {
 
 val natives by configurations.creating
 
-val lwjglVersion = "3.3.4"
+val lwjglVersion = "3.3.3"
 val lwjglNatives = "natives-linux"
 
 dependencies {
