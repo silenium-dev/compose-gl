@@ -2,7 +2,7 @@ package dev.silenium.compose.gl.util
 
 import androidx.compose.ui.unit.IntSize
 import org.jetbrains.skia.*
-import org.lwjgl.opengles.GLES32.*
+import org.lwjgl.opengl.GL30.*
 import org.lwjgl.system.MemoryUtil
 import java.awt.image.BufferedImage
 import java.nio.file.Path

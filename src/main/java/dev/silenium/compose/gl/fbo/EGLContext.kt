@@ -3,7 +3,7 @@ package dev.silenium.compose.gl.fbo
 import org.lwjgl.egl.EGL
 import org.lwjgl.egl.EGL15.*
 import org.lwjgl.egl.EGLCapabilities
-import org.lwjgl.opengles.GLES
+import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryUtil
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -21,7 +21,7 @@ data class EGLContext(
         restorePrevious {
             makeCurrent()
             capabilities = EGL.createDisplayCapabilities(display)
-            GLES.createCapabilities()
+            GL.createCapabilities()
         }
     }
 
