@@ -7,7 +7,7 @@ plugins {
     `maven-publish`
 }
 
-group = "dev.silenium.compose"
+group = "dev.silenium.compose.gl"
 version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
 
 repositories {
