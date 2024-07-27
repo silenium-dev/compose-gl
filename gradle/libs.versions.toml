@@ -15,7 +15,7 @@ lwjgl-bom = { group = "org.lwjgl", name = "lwjgl-bom", version.ref = "lwjgl" }
 lwjgl-core = { group = "org.lwjgl", name = "lwjgl", version.ref = "lwjgl" }
 lwjgl-egl = { group = "org.lwjgl", name = "lwjgl-egl", version.ref = "lwjgl" }
 lwjgl-glfw = { group = "org.lwjgl", name = "lwjgl-glfw", version.ref = "lwjgl" }
-lwjgl-opengles = { group = "org.lwjgl", name = "lwjgl-opengles", version.ref = "lwjgl" }
+lwjgl-opengl = { group = "org.lwjgl", name = "lwjgl-opengl", version.ref = "lwjgl" }
 
 skiko-awt = { group = "org.jetbrains.skiko", name = "skiko-awt", version.ref = "skiko" }
 skiko-awt-runtime-linux-x64 = { group = "org.jetbrains.skiko", name = "skiko-awt-runtime-linux-x64", version.ref = "skiko" }
@@ -38,5 +38,5 @@ skiko = [
 lwjgl-natives = [
     "lwjgl-core",
     "lwjgl-glfw",
-    "lwjgl-opengles",
+    "lwjgl-opengl",
 ]

@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.onTimeout
 import kotlinx.coroutines.selects.select
 import org.jetbrains.skia.*
-import org.lwjgl.opengles.GLES32.GL_RGBA8
+import org.lwjgl.opengl.GL30.GL_RGBA8
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds

@@ -19,7 +19,7 @@ import dev.silenium.compose.gl.surface.GLSurfaceView
 import dev.silenium.compose.gl.surface.Stats
 import dev.silenium.compose.gl.surface.rememberGLSurfaceState
 import kotlinx.coroutines.delay
-import org.lwjgl.opengles.GLES30.*
+import org.lwjgl.opengl.GL30.*
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable

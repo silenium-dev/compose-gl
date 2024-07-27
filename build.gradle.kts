@@ -41,7 +41,11 @@ dependencies {
     }
 
     implementation(libs.bundles.kotlinx.coroutines)
-    api(libs.bundles.skiko)
+    api(libs.bundles.skiko) {
+        version {
+            strictly(libs.skiko.awt.runtime.linux.x64.get().version!!)
+        }
+    }
 
     testImplementation(compose.desktop.currentOs)
 }

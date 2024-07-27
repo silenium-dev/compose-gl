@@ -6,8 +6,8 @@ import dev.silenium.compose.gl.surface.GLDisplayScopeImpl
 import dev.silenium.compose.gl.surface.GLDrawScope
 import dev.silenium.compose.gl.surface.GLDrawScopeImpl
 import org.lwjgl.egl.EGL15.eglGetError
-import org.lwjgl.opengles.GLES
-import org.lwjgl.opengles.GLES32.*
+import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GL30.*
 import java.nio.IntBuffer
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -45,7 +45,7 @@ class FBOPool(
 
     init {
         ensureContext(ContextType.DISPLAY) {
-            GLES.createCapabilities()
+            GL.createCapabilities()
         }
     }
 
