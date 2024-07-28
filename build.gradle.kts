@@ -22,7 +22,7 @@ repositories {
 val deployNative = (findProperty("deploy.native") as String?)?.toBoolean() ?: true
 val deployKotlin = (findProperty("deploy.kotlin") as String?)?.toBoolean() ?: true
 
-val lwjglVersion = "3.3.3"
+val lwjglVersion = "3.3.4"
 val lwjglNatives = "natives-linux"
 
 dependencies {
@@ -86,11 +86,10 @@ allprojects {
             maven(System.getenv("REPOSILITE_URL") ?: "https://reposilite.silenium.dev/snapshots") {
                 name = "reposilite"
                 credentials {
-                    username =
-                        System.getenv("REPOSILITE_USERNAME") ?: project.findProperty("reposiliteUser") as String? ?: ""
-                    password =
-                        System.getenv("REPOSILITE_PASSWORD") ?: project.findProperty("reposilitePassword") as String?
-                                ?: ""
+                    username = System.getenv("REPOSILITE_USERNAME")
+                        ?: project.findProperty("reposiliteUser") as String? ?: ""
+                    password = System.getenv("REPOSILITE_PASSWORD")
+                        ?: project.findProperty("reposilitePassword") as String? ?: ""
                 }
             }
         }
