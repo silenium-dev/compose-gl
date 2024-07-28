@@ -149,7 +149,7 @@ class GLSurfaceView internal constructor(
         displayContext.resetGLAll()
     }
 
-    private fun initEGL() {
+    private fun initialize() {
         renderContext = parentContext.deriveOffscreenContext()
         renderContext!!.makeCurrent()
         directContext = DirectContext.makeGL()
@@ -162,7 +162,7 @@ class GLSurfaceView internal constructor(
     private suspend fun run() = coroutineScope {
         while (size == IntSize.Zero && isActive) delay(10.milliseconds)
         if (!isActive) return@coroutineScope
-        initEGL()
+        initialize()
         var lastFrame: Long? = null
         while (isActive) {
             val renderStart = System.nanoTime()

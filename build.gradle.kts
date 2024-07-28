@@ -7,9 +7,6 @@ plugins {
     `maven-publish`
 }
 
-group = "dev.silenium.compose.gl"
-version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
-
 repositories {
     maven("https://reposilite.silenium.dev/releases") {
         name = "reposilite"
@@ -78,7 +75,7 @@ allprojects {
     apply<MavenPublishPlugin>()
     apply<BasePlugin>()
 
-    group = "dev.silenium.libs.ffmpeg"
+    group = "dev.silenium.compose.gl"
     version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
 
     publishing {
