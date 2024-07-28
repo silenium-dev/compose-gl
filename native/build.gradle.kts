@@ -91,9 +91,11 @@ artifacts {
 
 publishing {
     publications {
-        create<MavenPublication>("natives${platform.capitalized}") {
-            artifact(jar)
-            artifactId = "$libName-natives-$platform"
+        if (deployNative) {
+            create<MavenPublication>("natives${platform.capitalized}") {
+                artifact(jar)
+                artifactId = "$libName-natives-$platform"
+            }
         }
     }
 }
