@@ -74,26 +74,6 @@ kotlin {
     }
 }
 
-tasks {
-//    processResources {
-//        dependsOn(":native:build")
-//        from(natives) {
-//            into("natives")
-//        }
-//    }
-
-//    compileKotlin {
-//        dependsOn(":native:build")
-//    }
-
-//    jar {
-//        dependsOn(":native:build")
-//        from(natives) {
-//            into("natives")
-//        }
-//    }
-}
-
 allprojects {
     apply<MavenPublishPlugin>()
     apply<BasePlugin>()
