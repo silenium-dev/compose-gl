@@ -1,4 +1,4 @@
-name: "Build and Test"
+name: "Generate dependency graph"
 on:
   pull_request:
 permissions:
