@@ -1,4 +1,4 @@
-name: "Build, test and publish"
+name: "default"
 on:
   push:
     tags-ignore:
