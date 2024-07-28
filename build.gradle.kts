@@ -92,22 +92,34 @@ tasks {
 //    }
 }
 
+allprojects {
+    apply<MavenPublishPlugin>()
+    apply<BasePlugin>()
+
+    group = "dev.silenium.libs.ffmpeg"
+    version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
+
+    publishing {
+        repositories {
+            maven(System.getenv("REPOSILITE_URL") ?: "https://reposilite.silenium.dev/snapshots") {
+                name = "reposilite"
+                credentials {
+                    username =
+                        System.getenv("REPOSILITE_USERNAME") ?: project.findProperty("reposiliteUser") as String? ?: ""
+                    password =
+                        System.getenv("REPOSILITE_PASSWORD") ?: project.findProperty("reposilitePassword") as String?
+                                ?: ""
+                }
+            }
+        }
+    }
+}
+
 publishing {
     publications {
         if (deployKotlin) {
             create<MavenPublication>("maven") {
                 from(components["java"])
-            }
-        }
-    }
-    repositories {
-        maven(System.getenv("REPOSILITE_URL") ?: "https://reposilite.silenium.dev/snapshots") {
-            name = "reposilite"
-            credentials {
-                username =
-                    System.getenv("REPOSILITE_USERNAME") ?: project.findProperty("reposiliteUser") as String? ?: ""
-                password =
-                    System.getenv("REPOSILITE_PASSWORD") ?: project.findProperty("reposilitePassword") as String? ?: ""
             }
         }
     }
