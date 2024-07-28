@@ -19,19 +19,20 @@ repositories {
     google()
 }
 
-val natives by configurations.creating
+val deployNative = (findProperty("deploy.native") as String?)?.toBoolean() ?: true
+val deployKotlin = (findProperty("deploy.kotlin") as String?)?.toBoolean() ?: true
 
-val lwjglVersion = "3.3.3"
+val lwjglVersion = "3.3.4"
 val lwjglNatives = "natives-linux"
 
 dependencies {
-    implementation(kotlin("reflect"))
-    // Note, if you develop a library, you should use compose.desktop.common.
-    // compose.desktop.currentOs should be used in launcher-sourceSet
-    // (in a separate module for demo project and in testMain).
-    // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.common)
-//    natives(project(":native", configuration = "main"))
+    implementation(libs.jni.utils)
+    implementation(libs.slf4j.api)
+    implementation(kotlin("reflect"))
+    if (deployNative) {
+        implementation(project(":native", configuration = "main"))
+    }
 
     api(platform(libs.lwjgl.bom))
     api(libs.lwjgl.egl)
@@ -41,13 +42,14 @@ dependencies {
     }
 
     implementation(libs.bundles.kotlinx.coroutines)
-    api(libs.bundles.skiko) {
-        version {
-            strictly(libs.skiko.awt.runtime.linux.x64.get().version!!)
-        }
-    }
+//    api(libs.bundles.skiko) {
+//        version {
+//            strictly(libs.skiko.awt.runtime.linux.x64.get().version!!)
+//        }
+//    }
 
     testImplementation(compose.desktop.currentOs)
+    testImplementation(libs.logback.classic)
 }
 
 compose.desktop {
@@ -72,38 +74,33 @@ kotlin {
     }
 }
 
-tasks {
-//    processResources {
-//        dependsOn(":native:build")
-//        from(natives) {
-//            into("natives")
-//        }
-//    }
+allprojects {
+    apply<MavenPublishPlugin>()
+    apply<BasePlugin>()
 
-//    compileKotlin {
-//        dependsOn(":native:build")
-//    }
+    group = "dev.silenium.libs.ffmpeg"
+    version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
 
-//    jar {
-//        dependsOn(":native:build")
-//        from(natives) {
-//            into("natives")
-//        }
-//    }
+    publishing {
+        repositories {
+            maven(System.getenv("REPOSILITE_URL") ?: "https://reposilite.silenium.dev/snapshots") {
+                name = "reposilite"
+                credentials {
+                    username = System.getenv("REPOSILITE_USERNAME")
+                        ?: project.findProperty("reposiliteUser") as String? ?: ""
+                    password = System.getenv("REPOSILITE_PASSWORD")
+                        ?: project.findProperty("reposilitePassword") as String? ?: ""
+                }
+            }
+        }
+    }
 }
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
-    }
-    repositories {
-        maven(System.getenv("REPOSILITE_URL") ?: "https://reposilite.silenium.dev/snapshots") {
-            name = "reposilite"
-            credentials {
-                username = System.getenv("REPOSILITE_USERNAME") ?: project.findProperty("reposiliteUser") as String? ?: ""
-                password = System.getenv("REPOSILITE_PASSWORD") ?: project.findProperty("reposilitePassword") as String? ?: ""
+        if (deployKotlin) {
+            create<MavenPublication>("maven") {
+                from(components["java"])
             }
         }
     }

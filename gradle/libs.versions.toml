@@ -2,6 +2,7 @@
 kotlinx-coroutines = "1.8.1"
 lwjgl = "3.3.4"
 skiko = "0.8.10-egl"
+jni-utils = "0.1.5"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -19,6 +20,10 @@ lwjgl-opengl = { group = "org.lwjgl", name = "lwjgl-opengl", version.ref = "lwjg
 
 skiko-awt = { group = "org.jetbrains.skiko", name = "skiko-awt", version.ref = "skiko" }
 skiko-awt-runtime-linux-x64 = { group = "org.jetbrains.skiko", name = "skiko-awt-runtime-linux-x64", version.ref = "skiko" }
+
+jni-utils = { group = "dev.silenium.libs.jni", name = "jni-utils", version.ref = "jni-utils" }
+slf4j-api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.13" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.6" }
 
 [bundles]
 kotlinx-coroutines = [

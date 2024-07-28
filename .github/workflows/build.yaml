@@ -1,26 +1,31 @@
-name: "Build, Test and Publish"
+name: "default"
 on:
   push:
-    branches:
-      - '*'
     tags-ignore:
       - '*'
+    branches:
+      - '*'
   workflow_dispatch:
+  pull_request:
   release:
     types: [ published ]
 env:
   REPOSILITE_USERNAME: ${{ secrets.REPOSILITE_USERNAME }}
   REPOSILITE_PASSWORD: ${{ secrets.REPOSILITE_PASSWORD }}
   REPOSILITE_URL: ${{ github.event_name == 'release' && 'https://reposilite.silenium.dev/releases' || 'https://reposilite.silenium.dev/snapshots' }}
+  CI_DEPLOY_PLATFORM: ${{ github.job }}
 permissions:
   contents: write
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  linux-x86_64:
+    runs-on: ubuntu-22.04
     steps:
-      - uses: silenium-dev/ffmpeg-static/.github/actions/deploy-kotlin@main
+      - uses: actions/checkout@v4
+      - uses: silenium-dev/ffmpeg-static/.github/actions/deploy-ubuntu@main
         with:
           tests: true
+          publish: ${{ github.event_name != 'pull_request' }}
+          disable-cache: ${{ github.event_name != 'pull_request' }}
           gradle-cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
       - uses: actions/upload-artifact@v4
         name: 'Upload reports'
@@ -29,9 +34,19 @@ jobs:
           name: reports
           path: ./build/reports
           retention-days: 5
+  kotlin:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: silenium-dev/ffmpeg-static/.github/actions/deploy-kotlin@main
+        with:
+          tests: false
+          publish: ${{ github.event_name != 'pull_request' }}
+          disable-cache: ${{ github.event_name != 'pull_request' }}
+          gradle-cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
   dependency-submission:
     runs-on: ubuntu-latest
-    if: "github.event_name != 'release'"
+    if: github.event_name != 'pull_request'
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v4

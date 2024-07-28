@@ -15,4 +15,9 @@ pluginManagement {
 
 rootProject.name = "compose-gl"
 
-//include(":native")
+val deployNative = if (extra.has("deploy.native")) {
+    extra.get("deploy.native")?.toString()?.toBoolean() ?: true
+} else true
+if (deployNative) {
+    include(":native")
+}

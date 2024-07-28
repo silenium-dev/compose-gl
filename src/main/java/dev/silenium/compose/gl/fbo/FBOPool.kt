@@ -1,12 +1,12 @@
 package dev.silenium.compose.gl.fbo
 
 import androidx.compose.ui.unit.IntSize
+import dev.silenium.compose.gl.context.GLContext
+import dev.silenium.compose.gl.context.GLXContext
 import dev.silenium.compose.gl.surface.GLDisplayScope
 import dev.silenium.compose.gl.surface.GLDisplayScopeImpl
 import dev.silenium.compose.gl.surface.GLDrawScope
 import dev.silenium.compose.gl.surface.GLDrawScopeImpl
-import org.lwjgl.egl.EGL15.eglGetError
-import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL30.*
 import java.nio.IntBuffer
 import kotlin.contracts.ExperimentalContracts
@@ -15,8 +15,8 @@ import kotlin.contracts.contract
 import kotlin.time.Duration
 
 class FBOPool(
-    private val render: EGLContext,
-    private val display: EGLContext,
+    private val render: GLContext<*>,
+    private val display: GLContext<*>,
     var size: IntSize,
     swapChainFactory: (Int, (IntSize) -> FBO) -> FBOSwapChain,
     swapChainSize: Int = 10,
@@ -38,14 +38,8 @@ class FBOPool(
 
         fun destroy() {
             glDeleteTextures(colorAttachment)
-            glDeleteRenderbuffers(depthStencilAttachment)
+            glDeleteTextures(depthStencilAttachment)
             glDeleteFramebuffers(id)
-        }
-    }
-
-    init {
-        ensureContext(ContextType.DISPLAY) {
-            GL.createCapabilities()
         }
     }
 
@@ -59,7 +53,7 @@ class FBOPool(
     @OptIn(ExperimentalContracts::class)
     private inline fun <R> ensureContext(contextType: ContextType, block: () -> R): R {
         contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
-        val previousContext = EGLContext.fromCurrent()
+        val previousContext = GLXContext.fromCurrent()
         val nextContext = when (contextType) {
             ContextType.RENDER -> render
             ContextType.DISPLAY -> display
@@ -95,13 +89,13 @@ class FBOPool(
 
         val depthStencilAttachment = glGenRenderbuffers()
         check(depthStencilAttachment != 0) {
-            "Failed to create depth/stencil attachment: 0x${eglGetError().toString(16).uppercase()}"
+            "Failed to create depth/stencil attachment: 0x${glGetError().toString(16).uppercase()}"
         }
         glBindRenderbuffer(GL_RENDERBUFFER, depthStencilAttachment)
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size.width, size.height)
 
         val fbId = glGenFramebuffers()
-        check(fbId != 0) { "Failed to create framebuffer: 0x${eglGetError().toString(16).uppercase()}" }
+        check(fbId != 0) { "Failed to create framebuffer: 0x${glGetError().toString(16).uppercase()}" }
         glBindFramebuffer(GL_FRAMEBUFFER, fbId)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorAttachment, 0)
         glFramebufferRenderbuffer(
@@ -120,7 +114,7 @@ class FBOPool(
     }
 
     private fun <R> restoreAfter(block: () -> R): R {
-        if (!EGLContext.isCurrent()) return block()
+        if (!GLXContext.isCurrent()) return block()
 
         val prevFb = glGetInteger(GL_FRAMEBUFFER_BINDING)
         val prevReadFb = glGetInteger(GL_READ_FRAMEBUFFER_BINDING)

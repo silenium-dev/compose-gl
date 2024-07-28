@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 /*.png
+*.log
 
 ### IntelliJ IDEA ###
 .idea/
