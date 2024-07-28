@@ -1,4 +1,4 @@
-package dev.silenium.compose.gl.fbo
+package dev.silenium.compose.gl.context
 
 import org.lwjgl.opengl.GLCapabilities
 

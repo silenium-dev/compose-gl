@@ -1,6 +1,8 @@
 package dev.silenium.compose.gl.fbo
 
 import androidx.compose.ui.unit.IntSize
+import dev.silenium.compose.gl.context.GLContext
+import dev.silenium.compose.gl.context.GLXContext
 import dev.silenium.compose.gl.surface.GLDisplayScope
 import dev.silenium.compose.gl.surface.GLDisplayScopeImpl
 import dev.silenium.compose.gl.surface.GLDrawScope

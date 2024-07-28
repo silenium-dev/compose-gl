@@ -1,4 +1,4 @@
-package dev.silenium.compose.gl.fbo
+package dev.silenium.compose.gl.context
 
 import dev.silenium.libs.jni.NativeLoader
 import org.lwjgl.egl.EGL15.*

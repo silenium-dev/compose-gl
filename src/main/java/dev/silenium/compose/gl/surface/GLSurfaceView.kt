@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.LocalWindow
+import dev.silenium.compose.gl.context.GLXContext
 import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.fbo.*
 import kotlinx.coroutines.*
