@@ -1,4 +1,4 @@
-name: Download and submit dependency graph
+name: pull-request
 
 on:
   workflow_run:
