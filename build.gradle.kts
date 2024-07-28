@@ -28,9 +28,10 @@ val lwjglNatives = "natives-linux"
 dependencies {
     implementation(compose.desktop.common)
     implementation(libs.jni.utils)
+    implementation(libs.slf4j.api)
     implementation(kotlin("reflect"))
     if (deployNative) {
-        implementation(project(":native"))
+        implementation(project(":native", configuration = "main"))
     }
 
     api(platform(libs.lwjgl.bom))
@@ -48,6 +49,7 @@ dependencies {
 //    }
 
     testImplementation(compose.desktop.currentOs)
+    testImplementation(libs.logback.classic)
 }
 
 compose.desktop {

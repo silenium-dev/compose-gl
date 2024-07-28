@@ -7,7 +7,9 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.LocalWindow
-import dev.silenium.compose.gl.context.GLXContext
+import dev.silenium.compose.gl.context.GLContext
+import dev.silenium.compose.gl.context.GLContextProvider
+import dev.silenium.compose.gl.context.GLContextProviderFactory
 import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.fbo.*
 import kotlinx.coroutines.*
@@ -29,6 +31,7 @@ fun GLSurfaceView(
     state: GLSurfaceState = rememberGLSurfaceState(),
     modifier: Modifier = Modifier,
     paint: Paint = Paint(),
+    glContextProvider: GLContextProvider<*> = GLContextProviderFactory.detected,
     presentMode: GLSurfaceView.PresentMode = GLSurfaceView.PresentMode.FIFO,
     swapChainSize: Int = 10,
     cleanup: suspend () -> Unit = {},
@@ -36,7 +39,7 @@ fun GLSurfaceView(
 ) {
     var invalidations by remember { mutableStateOf(0) }
     val surfaceView = remember {
-        val currentContext = GLXContext.fromCurrent() ?: error("No current EGL context")
+        val currentContext = glContextProvider.fromCurrent() ?: error("No current EGL context")
         GLSurfaceView(
             state = state,
             parentContext = currentContext,
@@ -68,7 +71,7 @@ fun GLSurfaceView(
 
 class GLSurfaceView internal constructor(
     private val state: GLSurfaceState,
-    private val parentContext: GLXContext,
+    private val parentContext: GLContext<*>,
     private val drawBlock: suspend GLDrawScope.() -> Unit,
     private val cleanupBlock: suspend () -> Unit = {},
     private val invalidate: () -> Unit = {},
@@ -92,7 +95,7 @@ class GLSurfaceView internal constructor(
     }
 
     private var directContext: DirectContext? = null
-    private var renderContext: GLXContext? = null
+    private var renderContext: GLContext<*>? = null
     private var size: IntSize = IntSize.Zero
     private var fboPool: FBOPool? = null
     private val executor = Executors.newSingleThreadExecutor {
@@ -147,7 +150,7 @@ class GLSurfaceView internal constructor(
     }
 
     private fun initEGL() {
-        renderContext = GLXContext.createOffscreen(parentContext)
+        renderContext = parentContext.deriveOffscreenContext()
         renderContext!!.makeCurrent()
         directContext = DirectContext.makeGL()
 

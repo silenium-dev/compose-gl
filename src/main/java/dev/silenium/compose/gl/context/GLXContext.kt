@@ -12,7 +12,9 @@ data class GLXContext(
     val drawable: Long,
     val context: Long,
     val xDrawable: Long? = null,
-) : GLContext {
+) : GLContext<GLXContext> {
+    override val provider = Companion
+
     lateinit var glxCapabilities: GLXCapabilities
         private set
     override lateinit var glCapabilities: GLCapabilities
@@ -44,9 +46,11 @@ data class GLXContext(
         destroyPixmapN(display, xDrawable ?: 0L, drawable)
     }
 
+    override fun deriveOffscreenContext() = provider.createOffscreen(this)
+
     companion object : GLContextProvider<GLXContext> {
         init {
-            NativeLoader.loadLibraryFromClasspath("compose-gl")
+            NativeLoader.loadLibraryFromClasspath("compose-gl").getOrThrow()
         }
 
         override fun <R> restorePrevious(block: () -> R): R {

@@ -15,8 +15,8 @@ import kotlin.contracts.contract
 import kotlin.time.Duration
 
 class FBOPool(
-    private val render: GLContext,
-    private val display: GLContext,
+    private val render: GLContext<*>,
+    private val display: GLContext<*>,
     var size: IntSize,
     swapChainFactory: (Int, (IntSize) -> FBO) -> FBOSwapChain,
     swapChainSize: Int = 10,

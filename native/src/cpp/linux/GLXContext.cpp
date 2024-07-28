@@ -53,21 +53,21 @@ static bool isExtensionSupported(const char *extList, const char *extension) {
 }
 
 extern "C" {
-JNIEXPORT jlong JNICALL Java_dev_silenium_compose_gl_fbo_GLXContextKt_getCurrentContextN(JNIEnv *env, jobject thiz) {
+JNIEXPORT jlong JNICALL Java_dev_silenium_compose_gl_context_GLXContextKt_getCurrentContextN(JNIEnv *env, jobject thiz) {
     return reinterpret_cast<jlong>(glXGetCurrentContext());
 }
 
-JNIEXPORT jlong JNICALL Java_dev_silenium_compose_gl_fbo_GLXContextKt_getCurrentDisplayN(JNIEnv *env, jobject thiz) {
+JNIEXPORT jlong JNICALL Java_dev_silenium_compose_gl_context_GLXContextKt_getCurrentDisplayN(JNIEnv *env, jobject thiz) {
     return reinterpret_cast<jlong>(glXGetCurrentDisplay());
 }
 
 JNIEXPORT jlong JNICALL
-Java_dev_silenium_compose_gl_fbo_GLXContextKt_getCurrentDrawableN(JNIEnv *env, jobject thiz) {
+Java_dev_silenium_compose_gl_context_GLXContextKt_getCurrentDrawableN(JNIEnv *env, jobject thiz) {
     return static_cast<jlong>(glXGetCurrentDrawable());
 }
 
 JNIEXPORT jlongArray JNICALL
-Java_dev_silenium_compose_gl_fbo_GLXContextKt_createContextN(JNIEnv *env, jobject thiz,
+Java_dev_silenium_compose_gl_context_GLXContextKt_createContextN(JNIEnv *env, jobject thiz,
                                                              const jlong _display, const jlong share) {
     auto result = env->NewLongArray(3);
 
@@ -152,7 +152,7 @@ Java_dev_silenium_compose_gl_fbo_GLXContextKt_createContextN(JNIEnv *env, jobjec
 }
 
 JNIEXPORT void JNICALL
-Java_dev_silenium_compose_gl_fbo_GLXContextKt_destroyPixmapN(JNIEnv *env, jobject thiz,
+Java_dev_silenium_compose_gl_context_GLXContextKt_destroyPixmapN(JNIEnv *env, jobject thiz,
                                                              const jlong _display, const jlong xPixmap,
                                                              const jlong glxPixmap) {
     const auto display = reinterpret_cast<Display *>(_display);

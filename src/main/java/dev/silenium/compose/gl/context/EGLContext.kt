@@ -11,7 +11,9 @@ data class EGLContext(
     val display: Long,
     val context: Long,
     val surface: Long,
-) : GLContext {
+) : GLContext<EGLContext> {
+    override val provider = Companion
+
     lateinit var eglCapabilities: EGLCapabilities
         private set
     override lateinit var glCapabilities: GLCapabilities
@@ -38,6 +40,8 @@ data class EGLContext(
         eglDestroyContext(display, context)
         eglDestroySurface(display, surface)
     }
+
+    override fun deriveOffscreenContext() = provider.createOffscreen(this)
 
     companion object : GLContextProvider<EGLContext> {
         override fun <R> restorePrevious(block: () -> R): R {
