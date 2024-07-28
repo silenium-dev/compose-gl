@@ -15,4 +15,4 @@ pluginManagement {
 
 rootProject.name = "compose-gl"
 
-//include(":native")
+include(":native")

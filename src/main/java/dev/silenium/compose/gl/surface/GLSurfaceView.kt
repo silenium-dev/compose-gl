@@ -13,6 +13,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.onTimeout
 import kotlinx.coroutines.selects.select
 import org.jetbrains.skia.*
+import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL30.GL_RGBA8
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
@@ -34,7 +35,7 @@ fun GLSurfaceView(
 ) {
     var invalidations by remember { mutableStateOf(0) }
     val surfaceView = remember {
-        val currentContext = EGLContext.fromCurrent() ?: error("No current EGL context")
+        val currentContext = GLXContext.fromCurrent() ?: error("No current EGL context")
         GLSurfaceView(
             state = state,
             parentContext = currentContext,
@@ -66,7 +67,7 @@ fun GLSurfaceView(
 
 class GLSurfaceView internal constructor(
     private val state: GLSurfaceState,
-    private val parentContext: EGLContext,
+    private val parentContext: GLXContext,
     private val drawBlock: suspend GLDrawScope.() -> Unit,
     private val cleanupBlock: suspend () -> Unit = {},
     private val invalidate: () -> Unit = {},
@@ -90,15 +91,18 @@ class GLSurfaceView internal constructor(
     }
 
     private var directContext: DirectContext? = null
-    private var renderContext: EGLContext? = null
+    private var renderContext: GLXContext? = null
     private var size: IntSize = IntSize.Zero
     private var fboPool: FBOPool? = null
     private val executor = Executors.newSingleThreadExecutor {
         Thread(it, "GLSurfaceView-${index.getAndIncrement()}")
     }
 
-    fun launch() = CoroutineScope(executor.asCoroutineDispatcher()).launch { run() }.also {
-        it.invokeOnCompletion { executor.shutdown() }
+    fun launch(): Job {
+        GL.createCapabilities()
+        return CoroutineScope(executor.asCoroutineDispatcher()).launch { run() }.also {
+            it.invokeOnCompletion { executor.shutdown() }
+        }
     }
 
     fun resize(size: IntSize) {
@@ -142,7 +146,7 @@ class GLSurfaceView internal constructor(
     }
 
     private fun initEGL() {
-        renderContext = EGLContext.createOffscreen(parentContext)
+        renderContext = GLXContext.createOffscreen(parentContext)
         renderContext!!.makeCurrent()
         directContext = DirectContext.makeGL()
 

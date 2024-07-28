@@ -19,19 +19,19 @@ repositories {
     google()
 }
 
-val natives by configurations.creating
+val deployNative = (findProperty("deploy.native") as String?)?.toBoolean() ?: true
+val deployKotlin = (findProperty("deploy.kotlin") as String?)?.toBoolean() ?: true
 
 val lwjglVersion = "3.3.3"
 val lwjglNatives = "natives-linux"
 
 dependencies {
-    implementation(kotlin("reflect"))
-    // Note, if you develop a library, you should use compose.desktop.common.
-    // compose.desktop.currentOs should be used in launcher-sourceSet
-    // (in a separate module for demo project and in testMain).
-    // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.common)
-//    natives(project(":native", configuration = "main"))
+    implementation(libs.jni.utils)
+    implementation(kotlin("reflect"))
+    if (deployNative) {
+        implementation(project(":native"))
+    }
 
     api(platform(libs.lwjgl.bom))
     api(libs.lwjgl.egl)
@@ -41,11 +41,11 @@ dependencies {
     }
 
     implementation(libs.bundles.kotlinx.coroutines)
-    api(libs.bundles.skiko) {
-        version {
-            strictly(libs.skiko.awt.runtime.linux.x64.get().version!!)
-        }
-    }
+//    api(libs.bundles.skiko) {
+//        version {
+//            strictly(libs.skiko.awt.runtime.linux.x64.get().version!!)
+//        }
+//    }
 
     testImplementation(compose.desktop.currentOs)
 }
@@ -94,16 +94,20 @@ tasks {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
+        if (deployKotlin) {
+            create<MavenPublication>("maven") {
+                from(components["java"])
+            }
         }
     }
     repositories {
         maven(System.getenv("REPOSILITE_URL") ?: "https://reposilite.silenium.dev/snapshots") {
             name = "reposilite"
             credentials {
-                username = System.getenv("REPOSILITE_USERNAME") ?: project.findProperty("reposiliteUser") as String? ?: ""
-                password = System.getenv("REPOSILITE_PASSWORD") ?: project.findProperty("reposilitePassword") as String? ?: ""
+                username =
+                    System.getenv("REPOSILITE_USERNAME") ?: project.findProperty("reposiliteUser") as String? ?: ""
+                password =
+                    System.getenv("REPOSILITE_PASSWORD") ?: project.findProperty("reposilitePassword") as String? ?: ""
             }
         }
     }
