@@ -1,59 +1,44 @@
-name: "default"
+name: "Build and Test"
 on:
   push:
-    tags-ignore:
-      - '*'
     branches:
       - '*'
-  workflow_dispatch:
+    tags-ignore:
+      - '*'
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
   pull_request:
+  workflow_dispatch:
   release:
     types: [ published ]
-env:
-  REPOSILITE_USERNAME: ${{ secrets.REPOSILITE_USERNAME }}
-  REPOSILITE_PASSWORD: ${{ secrets.REPOSILITE_PASSWORD }}
-  REPOSILITE_URL: ${{ github.event_name == 'release' && 'https://reposilite.silenium.dev/releases' || 'https://reposilite.silenium.dev/snapshots' }}
-  CI_DEPLOY_PLATFORM: ${{ github.job }}
 permissions:
+  pull-requests: write
   contents: write
 jobs:
   linux-x86_64:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: silenium-dev/ffmpeg-static/.github/actions/deploy-ubuntu@main
+      - uses: silenium-dev/actions/jni-natives/ubuntu@main
         with:
-          tests: true
-          publish: ${{ github.event_name != 'pull_request' }}
-          disable-cache: ${{ github.event_name != 'pull_request' }}
           gradle-cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
-      - uses: actions/upload-artifact@v4
-        name: 'Upload reports'
-        if: always()
-        with:
-          name: reports
-          path: ./build/reports
-          retention-days: 5
+          snapshot-repo-url: "https://reposilite.silenium.dev/snapshots"
+          release-repo-url: "https://reposilite.silenium.dev/releases"
+          repo-username: ${{ secrets.REPOSILITE_USERNAME }}
+          repo-password: ${{ secrets.REPOSILITE_PASSWORD }}
+          tests: false
+          java-version: 11
+          platform: ${{ github.job }}
   kotlin:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: silenium-dev/ffmpeg-static/.github/actions/deploy-kotlin@main
+      - uses: silenium-dev/actions/kotlin@main
         with:
-          tests: false
-          publish: ${{ github.event_name != 'pull_request' }}
-          disable-cache: ${{ github.event_name != 'pull_request' }}
           gradle-cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
-  dependency-submission:
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
-    steps:
-      - name: Checkout project sources
-        uses: actions/checkout@v4
-      - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v3
-        with:
-          cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
-          build-scan-publish: true
-          build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
-          build-scan-terms-of-use-agree: "yes"
+          snapshot-repo-url: "https://reposilite.silenium.dev/snapshots"
+          release-repo-url: "https://reposilite.silenium.dev/releases"
+          repo-username: ${{ secrets.REPOSILITE_USERNAME }}
+          repo-password: ${{ secrets.REPOSILITE_PASSWORD }}
+          tests: false
+          java-version: 11
+          platform: ${{ github.job }}
