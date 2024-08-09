@@ -41,4 +41,3 @@ jobs:
           repo-password: ${{ secrets.REPOSILITE_PASSWORD }}
           tests: false
           java-version: 11
-          platform: ${{ github.job }}
