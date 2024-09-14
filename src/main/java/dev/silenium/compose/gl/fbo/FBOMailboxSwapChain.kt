@@ -35,17 +35,15 @@ class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> F
             fbo.destroy()
             return null
         }
-        displayLock.withLock {
+        if (displayLock.tryLock()) {
             current?.let {
                 if (it.size != size) it.destroy()
                 else renderQueue.offer(it)
             }
             current = fbo
-        }
-        if (displayLock.tryLock()) {
-            current = fbo
             displayLock.unlock()
         } else waitingLock.withLock {
+            waitingFBO?.destroy()
             waitingFBO = fbo
         }
         return result
