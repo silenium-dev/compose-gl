@@ -2,7 +2,6 @@ package dev.silenium.compose.gl.fbo
 
 import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.context.GLContext
-import dev.silenium.compose.gl.context.GLXContext
 import dev.silenium.compose.gl.surface.GLDisplayScope
 import dev.silenium.compose.gl.surface.GLDisplayScopeImpl
 import dev.silenium.compose.gl.surface.GLDrawScope
@@ -53,7 +52,7 @@ class FBOPool(
     @OptIn(ExperimentalContracts::class)
     private inline fun <R> ensureContext(contextType: ContextType, block: () -> R): R {
         contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
-        val previousContext = GLXContext.fromCurrent()
+        val previousContext = render.provider.fromCurrent()
         val nextContext = when (contextType) {
             ContextType.RENDER -> render
             ContextType.DISPLAY -> display
@@ -113,8 +112,10 @@ class FBOPool(
         FBO(fbId, colorAttachment, depthStencilAttachment, size)
     }
 
-    private fun <R> restoreAfter(block: () -> R): R {
-        if (!GLXContext.isCurrent()) return block()
+    @OptIn(ExperimentalContracts::class)
+    private inline fun <R> restoreAfter(block: () -> R): R {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+        if (!render.provider.isCurrent()) return block()
 
         val prevFb = glGetInteger(GL_FRAMEBUFFER_BINDING)
         val prevReadFb = glGetInteger(GL_READ_FRAMEBUFFER_BINDING)
@@ -148,17 +149,19 @@ class FBOPool(
      */
     suspend fun render(deltaTime: Duration, block: suspend GLDrawScope.() -> Unit): Duration? =
         ensureContext(ContextType.RENDER) {
-            if (swapChain.size != size) {
-                swapChain.resize(size)
-            }
-            swapChain.render { fbo ->
-                fbo.bind()
-                val drawScope = GLDrawScopeImpl(fbo, deltaTime)
-                drawScope.block()
-                glFinish()
-                fbo.unbind()
+//            if (swapChain.size != size) {
+//                swapChain.resize(size)
+//            }
+            restoreAfter {
+                swapChain.render { fbo ->
+                    fbo.bind()
+                    val drawScope = GLDrawScopeImpl(fbo, deltaTime)
+                    drawScope.block()
+                    glFinish()
+                    fbo.unbind()
 
-                drawScope.redrawAfter
+                    drawScope.redrawAfter
+                }
             }
         }
 
