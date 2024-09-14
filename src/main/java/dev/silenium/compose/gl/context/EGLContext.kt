@@ -1,30 +1,39 @@
 package dev.silenium.compose.gl.context
 
+import dev.silenium.libs.jni.NativeLoader
 import org.lwjgl.egl.EGL
 import org.lwjgl.egl.EGL15.*
 import org.lwjgl.egl.EGLCapabilities
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GLCapabilities
 import org.lwjgl.system.MemoryUtil
+import java.util.concurrent.ConcurrentHashMap
 
 data class EGLContext(
     val display: Long,
     val context: Long,
     val surface: Long,
 ) : GLContext<EGLContext> {
+    @Transient
     override val provider = Companion
 
-    lateinit var eglCapabilities: EGLCapabilities
-        private set
-    override lateinit var glCapabilities: GLCapabilities
-        private set
+    @Transient
+    val eglCapabilities: EGLCapabilities
+
+    @Transient
+    override val glCapabilities: GLCapabilities
 
     init {
-        restorePrevious {
-            makeCurrent()
-            eglCapabilities = EGL.createDisplayCapabilities(display)
-            glCapabilities = GL.createCapabilities()
-        }
+        val (eglCap, glCap) = contextCapabilities.compute(this) { key, value ->
+            value?.let {
+                it.copy(refCount = it.refCount + 1)
+            } ?: restorePrevious {
+                key.makeCurrent()
+                ContextCapabilities(EGL.createDisplayCapabilities(key.display), GL.createCapabilities(), 1)
+            }
+        }!!
+        eglCapabilities = eglCap
+        glCapabilities = glCap
     }
 
     override fun unbindCurrent() {
@@ -36,14 +45,39 @@ data class EGLContext(
     }
 
     override fun destroy() {
-        eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)
-        eglDestroyContext(display, context)
-        eglDestroySurface(display, surface)
+        contextCapabilities.compute(this) { key, value ->
+            if (value == null) {
+                eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)
+                eglDestroyContext(display, context)
+                eglDestroySurface(display, surface)
+                return@compute null
+            }
+            val refCount = value.refCount - 1
+            if (refCount == 0) {
+                eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)
+                eglDestroyContext(display, context)
+                eglDestroySurface(display, surface)
+                return@compute null
+            }
+            value.copy(refCount = refCount)
+        }
     }
 
     override fun deriveOffscreenContext() = provider.createOffscreen(this)
 
     companion object : GLContextProvider<EGLContext> {
+        private data class ContextCapabilities(
+            val egl: EGLCapabilities,
+            val gl: GLCapabilities,
+            val refCount: Int,
+        )
+
+        private val contextCapabilities = ConcurrentHashMap<EGLContext, ContextCapabilities>()
+
+        init {
+            NativeLoader.loadLibraryFromClasspath("compose-gl").getOrThrow()
+        }
+
         override fun <R> restorePrevious(block: () -> R): R {
             val display = eglGetCurrentDisplay()
             val context = eglGetCurrentContext()

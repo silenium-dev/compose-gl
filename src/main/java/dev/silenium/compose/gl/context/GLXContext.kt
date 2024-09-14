@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GLCapabilities
 import org.lwjgl.opengl.GLX
 import org.lwjgl.opengl.GLXCapabilities
+import java.util.concurrent.ConcurrentHashMap
 
 data class GLXContext(
     val display: Long,
@@ -15,17 +16,23 @@ data class GLXContext(
 ) : GLContext<GLXContext> {
     override val provider = Companion
 
-    lateinit var glxCapabilities: GLXCapabilities
-        private set
-    override lateinit var glCapabilities: GLCapabilities
-        private set
+    @Transient
+    val glxCapabilities: GLXCapabilities
+
+    @Transient
+    override val glCapabilities: GLCapabilities
 
     init {
-        restorePrevious {
-            makeCurrent()
-            glxCapabilities = GL.createCapabilitiesGLX(display)
-            glCapabilities = GL.createCapabilities()
-        }
+        val (glxCap, glCap) = contextCapabilities.compute(this) { key, value ->
+            value?.let {
+                it.copy(refCount = it.refCount + 1)
+            } ?: restorePrevious {
+                key.makeCurrent()
+                ContextCapabilities(GL.createCapabilitiesGLX(key.display), GL.createCapabilities(), 1)
+            }
+        }!!
+        glxCapabilities = glxCap
+        glCapabilities = glCap
     }
 
     override fun makeCurrent() {
@@ -41,14 +48,35 @@ data class GLXContext(
     }
 
     override fun destroy() {
-        unbindCurrent()
-        GLX.glXDestroyContext(display, context)
-        destroyPixmapN(display, xDrawable ?: 0L, drawable)
+        contextCapabilities.compute(this) { key, value ->
+            if (value == null) {
+                unbindCurrent()
+                GLX.glXDestroyContext(key.display, key.context)
+                destroyPixmapN(key.display, key.xDrawable ?: 0L, key.drawable)
+                return@compute null
+            }
+            val refCount = value.refCount - 1
+            if (refCount == 0) {
+                unbindCurrent()
+                GLX.glXDestroyContext(key.display, key.context)
+                destroyPixmapN(key.display, key.xDrawable ?: 0L, key.drawable)
+                return@compute null
+            }
+            value.copy(refCount = refCount)
+        }
     }
 
     override fun deriveOffscreenContext() = provider.createOffscreen(this)
 
     companion object : GLContextProvider<GLXContext> {
+        private data class ContextCapabilities(
+            val glx: GLXCapabilities,
+            val gl: GLCapabilities,
+            val refCount: Int,
+        )
+
+        private val contextCapabilities = ConcurrentHashMap<GLXContext, ContextCapabilities>()
+
         init {
             NativeLoader.loadLibraryFromClasspath("compose-gl").getOrThrow()
         }
