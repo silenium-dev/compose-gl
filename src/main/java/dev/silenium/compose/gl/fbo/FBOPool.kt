@@ -37,7 +37,7 @@ class FBOPool(
 
         fun destroy() {
             glDeleteTextures(colorAttachment)
-            glDeleteTextures(depthStencilAttachment)
+            glDeleteRenderbuffers(depthStencilAttachment)
             glDeleteFramebuffers(id)
         }
     }
@@ -149,9 +149,9 @@ class FBOPool(
      */
     suspend fun render(deltaTime: Duration, block: suspend GLDrawScope.() -> Unit): Duration? =
         ensureContext(ContextType.RENDER) {
-//            if (swapChain.size != size) {
-//                swapChain.resize(size)
-//            }
+            if (swapChain.size != size) {
+                swapChain.resize(size)
+            }
             restoreAfter {
                 swapChain.render { fbo ->
                     fbo.bind()
