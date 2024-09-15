@@ -8,7 +8,8 @@ Render OpenGL content onto a Compose Canvas.
 
 ## Dependencies
 
-This library uses a custom skiko+skia build which uses EGL and GLES instead of GLX and Desktop GL on Linux:
+This library works with the default skiko and skia builds, 
+but also supports a custom skiko+skia build using EGL and GLES instead of GLX and Desktop GL on Linux:
 
 - Skiko: https://github.com/silenium-dev/skiko
 - Skia: https://github.com/silenium-dev/skia-pack
@@ -24,7 +25,7 @@ repositories {
     }
 }
 dependencies {
-    implementation("dev.silenium.compose:compose-gl:0.1.0")
+    implementation("dev.silenium.compose:compose-gl:0.3.3")
 }
 ```
 
@@ -34,16 +35,21 @@ dependencies {
 @Composable
 fun App() {
     Box(contentAlignment = Alignment.TopStart) {
-        // Button behind the GLSurfaceView -> Alpha works, clicks will be passed through
+        // Button behind the GLSurfaceView -> Alpha works, clicks will be passed through, as long as the GLSurfaceView is not clickable
         Button(onClick = {}) {
             Text("Click me!")
         }
         // Size needs to be specified, as the  default size is 0x0
         // Internally uses a Compose Canvas, so it can be used like any other Composable
-        GLSurfaceView(modifier = Modifier.size(100.dp)) {
+        GLSurfaceView(
+            modifier = Modifier.size(100.dp),
+            presentMode = GLSurfaceView.PresentMode.MAILBOX, // Present mode is based on the Vulkan present modes
+            swapChainSize = 2,
+        ) {
             // Translucent grey
-            GLES30.glClearColor(0.5f, 0.5f, 0.5f, 0.5f)
-            GLES30.glClear(GL_COLOR_BUFFER_BIT)
+            // Use GLES or GL, depending on the skiko variant you are using
+            GL30.glClearColor(0.5f, 0.5f, 0.5f, 0.5f)
+            GL30.glClear(GL_COLOR_BUFFER_BIT)
             // Render with 30 FPS, this should be the time from start of frame n to frame n+1, the internal logic subtracts render time and other delays
             // Defaults to 60 FPS
             // Will be replaced with a better solution in the future
@@ -53,7 +59,7 @@ fun App() {
 }
 
 // awaitApplication{} is required for now. For some reason, the JVM gets stuck on shutdown, when using application{}.
-suspend fun main() = awaitApplication {
+fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         App()
     }
