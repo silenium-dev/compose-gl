@@ -117,7 +117,10 @@ fun GLSurfaceView(
     DisposableEffect(surfaceView) {
         val job = surfaceView.launch()
         onDispose {
-            job.cancel()
+            runBlocking {
+                println("Cancelling GLSurfaceView job")
+                job.cancelAndJoin()
+            }
         }
     }
     LaunchedEffect(fboSizeOverride) {
@@ -168,6 +171,9 @@ class GLSurfaceView internal constructor(
     internal fun resize(size: IntSize) {
         if (size == fboPool?.size) return
         this.size = size
+        if (renderContext == null) {
+            renderContext = parentContext.deriveOffscreenContext()
+        }
         fboPool?.size = size
         state.requestUpdate()
     }
@@ -206,7 +212,6 @@ class GLSurfaceView internal constructor(
     }
 
     private fun initialize() {
-        renderContext = parentContext.deriveOffscreenContext()
         renderContext!!.makeCurrent()
         directContext = DirectContext.makeGL()
 
@@ -216,13 +221,14 @@ class GLSurfaceView internal constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun run() = coroutineScope {
-        while (size == IntSize.Zero && isActive) delay(10.milliseconds)
+        while (renderContext == null && isActive) delay(10.milliseconds)
         if (!isActive) return@coroutineScope
         initialize()
         var lastFrame: Long? = null
         while (isActive) {
             val renderStart = System.nanoTime()
             val deltaTime = lastFrame?.let { renderStart - it } ?: 0
+            println("Rendering frame with delta time $deltaTime")
             val waitTime = fboPool!!.render(deltaTime.nanoseconds, drawBlock) ?: continue
             invalidate()
             val renderEnd = System.nanoTime()
@@ -240,12 +246,17 @@ class GLSurfaceView internal constructor(
             }
         }
         cleanupBlock()
+        println("GLSurfaceView job cancelled")
         fboPool?.destroy()
         fboPool = null
+        println("FBO pool destroyed")
         directContext?.close()
         directContext = null
+        println("Direct context closed")
+        renderContext?.unbindCurrent()
         renderContext?.destroy()
         renderContext = null
+        println("Render context destroyed")
     }
 
     companion object {

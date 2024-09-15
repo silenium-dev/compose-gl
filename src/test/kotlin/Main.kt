@@ -78,6 +78,7 @@ fun ApplicationScope.App() {
 }
 
 suspend fun main() = awaitApplication {
+    System.setProperty("skiko.renderApi", "OPENGL")
     Window(onCloseRequest = ::exitApplication) {
         App()
     }
