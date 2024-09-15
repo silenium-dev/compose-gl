@@ -5,16 +5,16 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> FBOPool.FBO) : FBOSwapChain() {
+class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> FBO) : FBOSwapChain() {
     override var size: IntSize = IntSize.Zero
         private set
     private val displayLock = ReentrantLock()
     private val waitingLock = ReentrantLock()
-    private var waitingFBO: FBOPool.FBO? = null
-    private var current: FBOPool.FBO? = null
-    private val renderQueue = ArrayBlockingQueue<FBOPool.FBO>(capacity)
+    private var waitingFBO: FBO? = null
+    private var current: FBO? = null
+    private val renderQueue = ArrayBlockingQueue<FBO>(capacity)
 
-    override fun display(block: (FBOPool.FBO) -> Unit) = displayLock.withLock {
+    override fun display(block: (FBO) -> Unit) = displayLock.withLock {
         current?.let(block)
         waitingLock.withLock {
             val waiting = waitingFBO ?: return
@@ -28,7 +28,7 @@ class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> F
         }
     }
 
-    override suspend fun <R> render(block: suspend (FBOPool.FBO) -> R): R? {
+    override suspend fun <R> render(block: suspend (FBO) -> R): R? {
         val fbo = renderQueue.poll() ?: return null
         val result = block(fbo)
         if (fbo.size != size) {

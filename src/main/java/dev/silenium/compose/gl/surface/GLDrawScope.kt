@@ -1,7 +1,7 @@
 package dev.silenium.compose.gl.surface
 
 import androidx.compose.ui.unit.IntSize
-import dev.silenium.compose.gl.fbo.FBOPool
+import dev.silenium.compose.gl.fbo.FBO
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -12,7 +12,7 @@ interface GLDrawScope {
 }
 
 internal class GLDrawScopeImpl(
-    private val fbo: FBOPool.FBO,
+    private val fbo: FBO,
     override val deltaTime: Duration,
 ) : GLDrawScope {
     override val size: IntSize by fbo::size

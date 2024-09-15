@@ -1,11 +1,11 @@
 package dev.silenium.compose.gl.surface
 
-import dev.silenium.compose.gl.fbo.FBOPool
+import dev.silenium.compose.gl.fbo.FBO
 
 interface GLDisplayScope {
-    val fbo: FBOPool.FBO
+    val fbo: FBO
 }
 
 internal class GLDisplayScopeImpl(
-    override val fbo: FBOPool.FBO
+    override val fbo: FBO
 ) : GLDisplayScope

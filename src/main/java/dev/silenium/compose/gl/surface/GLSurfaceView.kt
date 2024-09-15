@@ -79,7 +79,7 @@ class GLSurfaceView internal constructor(
     private val presentMode: PresentMode = PresentMode.MAILBOX,
     private val swapChainSize: Int = 10,
 ) {
-    enum class PresentMode(internal val impl: (Int, (IntSize) -> FBOPool.FBO) -> FBOSwapChain) {
+    enum class PresentMode(internal val impl: (Int, (IntSize) -> FBO) -> FBOSwapChain) {
         /**
          * Renders the latest frame and discards all the previous frames.
          * Results in the lowest latency.
