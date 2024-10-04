@@ -11,10 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.awaitApplication
+import dev.silenium.compose.gl.surface.FBOSizeOverride
 import dev.silenium.compose.gl.surface.GLSurfaceView
 import dev.silenium.compose.gl.surface.Stats
 import dev.silenium.compose.gl.surface.rememberGLSurfaceState
@@ -41,8 +43,9 @@ fun ApplicationScope.App() {
             }
             GLSurfaceView(
                 state = state,
-                modifier = Modifier.aspectRatio(1f).fillMaxSize(),
+                modifier = Modifier.aspectRatio(1f).align(Alignment.Center),
                 presentMode = GLSurfaceView.PresentMode.MAILBOX,
+//                fboSizeOverride = FBOSizeOverride(512, 512, TransformOrigin.Center),
             ) {
                 glClearColor(color.red, color.green, color.blue, color.alpha)
                 glClear(GL_COLOR_BUFFER_BIT)

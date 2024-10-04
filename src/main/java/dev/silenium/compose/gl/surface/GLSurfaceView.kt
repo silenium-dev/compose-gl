@@ -1,8 +1,14 @@
 package dev.silenium.compose.gl.surface
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
@@ -26,6 +32,14 @@ import kotlin.time.Duration.Companion.nanoseconds
 @Composable
 fun rememberGLSurfaceState() = remember { GLSurfaceState() }
 
+data class FBOSizeOverride(
+    val width: Int,
+    val height: Int,
+    val transformOrigin: TransformOrigin = TransformOrigin.Center,
+) {
+    val size get() = IntSize(width, height)
+}
+
 @Composable
 fun GLSurfaceView(
     state: GLSurfaceState = rememberGLSurfaceState(),
@@ -34,6 +48,7 @@ fun GLSurfaceView(
     glContextProvider: GLContextProvider<*> = GLContextProviderFactory.detected,
     presentMode: GLSurfaceView.PresentMode = GLSurfaceView.PresentMode.FIFO,
     swapChainSize: Int = 10,
+    fboSizeOverride: FBOSizeOverride? = null,
     cleanup: suspend () -> Unit = {},
     draw: suspend GLDrawScope.() -> Unit,
 ) {
@@ -52,12 +67,38 @@ fun GLSurfaceView(
         )
     }
     val window = LocalWindow.current
-    Canvas(
-        modifier = modifier.onSizeChanged(surfaceView::resize)
-    ) {
-        invalidations.let {
-            window?.directContext()?.let { directContext ->
-                surfaceView.display(drawContext.canvas.nativeCanvas, directContext)
+    BoxWithConstraints(modifier) {
+        Canvas(
+            modifier = Modifier
+                .onSizeChanged {
+                    if (fboSizeOverride == null) {
+                        surfaceView.resize(it)
+                    }
+                }.let {
+                    if (fboSizeOverride != null) {
+                        it.matchParentSize()
+                            .drawWithContent {
+                                val xScale = size.width / fboSizeOverride.width
+                                val yScale = size.height / fboSizeOverride.height
+                                val scale = minOf(xScale, yScale)
+                                translate(
+                                    (size.width - fboSizeOverride.width * scale) * fboSizeOverride.transformOrigin.pivotFractionX,
+                                    (size.height - fboSizeOverride.height * scale) * fboSizeOverride.transformOrigin.pivotFractionY,
+                                ) {
+                                    scale(scale, Offset.Zero) {
+                                        this@drawWithContent.drawContent()
+                                    }
+                                }
+                            }
+                    } else {
+                        it.matchParentSize()
+                    }
+                }
+        ) {
+            invalidations.let {
+                window?.directContext()?.let { directContext ->
+                    surfaceView.display(drawContext.canvas.nativeCanvas, directContext)
+                }
             }
         }
     }
@@ -66,6 +107,9 @@ fun GLSurfaceView(
         onDispose {
             job.cancel()
         }
+    }
+    LaunchedEffect(fboSizeOverride) {
+        fboSizeOverride?.size?.let(surfaceView::resize)
     }
 }
 
@@ -126,7 +170,7 @@ class GLSurfaceView internal constructor(
 
     private fun GLDisplayScope.displayImpl(
         canvas: Canvas,
-        displayContext: DirectContext
+        displayContext: DirectContext,
     ) {
         val rt = BackendRenderTarget.makeGL(
             fbo.size.width,
