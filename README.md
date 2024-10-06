@@ -25,7 +25,7 @@ repositories {
     }
 }
 dependencies {
-    implementation("dev.silenium.compose:compose-gl:0.3.3")
+    implementation("dev.silenium.compose:compose-gl:0.4.1")
 }
 ```
 
@@ -39,7 +39,7 @@ fun App() {
         Button(onClick = {}) {
             Text("Click me!")
         }
-        // Size needs to be specified, as the  default size is 0x0
+        // Size needs to be specified, as the default size is 0x0
         // Internally uses a Compose Canvas, so it can be used like any other Composable
         GLSurfaceView(
             modifier = Modifier.size(100.dp),
