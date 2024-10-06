@@ -25,7 +25,7 @@ repositories {
     }
 }
 dependencies {
-    implementation("dev.silenium.compose:compose-gl:0.4.1")
+    implementation("dev.silenium.compose:compose-gl:0.5.0")
 }
 ```
 
