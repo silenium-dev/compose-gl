@@ -34,7 +34,7 @@ data class Texture(
         if (destroyed.compareAndExchange(false, true)) {
             glDeleteTextures(id)
         } else {
-            logger.warn("Texture $id is already destroyed")
+            logger.trace("Texture $id is already destroyed")
         }
     }
 

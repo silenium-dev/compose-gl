@@ -5,6 +5,8 @@ import dev.silenium.compose.gl.objects.Renderbuffer
 import dev.silenium.compose.gl.objects.Texture
 import dev.silenium.compose.gl.util.checkGLError
 import org.lwjgl.opengl.GL30.*
+import org.slf4j.LoggerFactory
+import java.util.concurrent.atomic.AtomicBoolean
 
 data class FBO(
     val id: Int,
@@ -23,13 +25,20 @@ data class FBO(
         checkGLError("glBindFramebuffer")
     }
 
+    private val destroyed = AtomicBoolean(false)
     fun destroy() {
-        colorAttachment.destroy()
-        depthStencilAttachment.destroy()
-        glDeleteFramebuffers(id)
+        if (destroyed.compareAndExchange(false, true)) {
+            glDeleteFramebuffers(id)
+            colorAttachment.destroy()
+            depthStencilAttachment.destroy()
+        } else {
+            logger.trace("FBO $id is already destroyed", Exception())
+        }
     }
 
     companion object {
+        private val logger = LoggerFactory.getLogger(FBO::class.java)
+
         fun create(
             colorAttachment: Texture,
             depthStencilAttachment: Renderbuffer,
