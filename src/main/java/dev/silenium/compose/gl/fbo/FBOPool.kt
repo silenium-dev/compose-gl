@@ -2,12 +2,13 @@ package dev.silenium.compose.gl.fbo
 
 import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.context.GLContext
+import dev.silenium.compose.gl.objects.Renderbuffer
+import dev.silenium.compose.gl.objects.Texture
 import dev.silenium.compose.gl.surface.GLDisplayScope
 import dev.silenium.compose.gl.surface.GLDisplayScopeImpl
 import dev.silenium.compose.gl.surface.GLDrawScope
 import dev.silenium.compose.gl.surface.GLDrawScopeImpl
 import org.lwjgl.opengl.GL30.*
-import java.nio.IntBuffer
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -41,7 +42,7 @@ class FBOPool(
         size: IntSize,
         swapChainFactory: (Int, (IntSize) -> FBO) -> FBOSwapChain,
         swapChainSize: Int = 10,
-    ): this(render, display, size, swapChainFactory(swapChainSize, ::createFBO))
+    ) : this(render, display, size, swapChainFactory(swapChainSize, ::createFBO))
 
     private enum class ContextType {
         RENDER,
@@ -116,47 +117,13 @@ class FBOPool(
 
     companion object {
         private fun createFBO(size: IntSize) = restoreAfter {
-            val colorAttachment = glGenTextures()
-            check(colorAttachment != 0) { "Failed to create color attachment: 0x${glGetError().toString(16).uppercase()}" }
-            glBindTexture(GL_TEXTURE_2D, colorAttachment)
-            glTexImage2D(
-                GL_TEXTURE_2D,
-                0,
-                GL_RGBA8,
-                size.width,
-                size.height,
-                0,
-                GL_RGBA,
-                GL_UNSIGNED_BYTE,
-                null as IntBuffer?
+            val colorAttachment = Texture.create(
+                GL_TEXTURE_2D, size, GL_RGBA8,
+                GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_LINEAR,
             )
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            val depthStencilAttachment = Renderbuffer.create(size, GL_DEPTH24_STENCIL8)
 
-            val depthStencilAttachment = glGenRenderbuffers()
-            check(depthStencilAttachment != 0) {
-                "Failed to create depth/stencil attachment: 0x${glGetError().toString(16).uppercase()}"
-            }
-            glBindRenderbuffer(GL_RENDERBUFFER, depthStencilAttachment)
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size.width, size.height)
-
-            val fbId = glGenFramebuffers()
-            check(fbId != 0) { "Failed to create framebuffer: 0x${glGetError().toString(16).uppercase()}" }
-            glBindFramebuffer(GL_FRAMEBUFFER, fbId)
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorAttachment, 0)
-            glFramebufferRenderbuffer(
-                GL_FRAMEBUFFER,
-                GL_DEPTH_STENCIL_ATTACHMENT,
-                GL_RENDERBUFFER,
-                depthStencilAttachment
-            )
-
-            val status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
-            require(status == GL_FRAMEBUFFER_COMPLETE) {
-                "Framebuffer is not complete: 0x${status.toString(16).uppercase()}"
-            }
-
-            FBO(fbId, colorAttachment, depthStencilAttachment, size)
+            FBO.create(colorAttachment, depthStencilAttachment)
         }
 
         @OptIn(ExperimentalContracts::class)
