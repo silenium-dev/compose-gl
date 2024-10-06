@@ -3,6 +3,8 @@ package dev.silenium.compose.gl.objects
 import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.util.checkGLError
 import org.lwjgl.opengl.GL30.*
+import org.slf4j.LoggerFactory
+import java.util.concurrent.atomic.AtomicBoolean
 
 data class Renderbuffer(
     override val id: Int,
@@ -22,11 +24,18 @@ data class Renderbuffer(
         checkGLError("glBindRenderbuffer")
     }
 
+    private val destroyed = AtomicBoolean(false)
     override fun destroy() {
-        glDeleteRenderbuffers(id)
+        if (destroyed.compareAndExchange(false, true)) {
+            glDeleteRenderbuffers(id)
+        } else {
+            logger.warn("Texture $id is already destroyed")
+        }
     }
 
     companion object {
+        private val logger = LoggerFactory.getLogger(Renderbuffer::class.java)
+
         fun create(size: IntSize, internalFormat: Int): Renderbuffer {
             val id = glGenRenderbuffers()
             checkGLError("glGenRenderbuffers")

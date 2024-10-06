@@ -4,6 +4,8 @@ import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.objects.TextureOrRenderbuffer.Companion.textureTargetBindings
 import dev.silenium.compose.gl.util.checkGLError
 import org.lwjgl.opengl.GL11.*
+import org.slf4j.LoggerFactory
+import java.util.concurrent.atomic.AtomicBoolean
 
 data class Texture(
     override val id: Int,
@@ -27,11 +29,18 @@ data class Texture(
         checkGLError("glBindTexture")
     }
 
+    private val destroyed = AtomicBoolean(false)
     override fun destroy() {
-        glDeleteTextures(id)
+        if (destroyed.compareAndExchange(false, true)) {
+            glDeleteTextures(id)
+        } else {
+            logger.warn("Texture $id is already destroyed")
+        }
     }
 
     companion object {
+        private val logger = LoggerFactory.getLogger(Texture::class.java)
+
         fun create(
             target: Int,
             size: IntSize,
