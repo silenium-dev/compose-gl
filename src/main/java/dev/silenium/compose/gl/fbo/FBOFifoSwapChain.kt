@@ -13,15 +13,16 @@ class FBOFifoSwapChain(capacity: Int, override val fboCreator: (IntSize) -> FBO)
     private val renderQueue = ArrayBlockingQueue<FBO>(capacity)
     private val displayQueue = ArrayBlockingQueue<FBO>(capacity)
 
-    override fun display(block: (FBO) -> Unit) = displayLock.withLock {
-        current?.let(block)
+    override fun <R> display(block: (FBO) -> R) = displayLock.withLock {
+        val result = current?.let(block)
         if (!displayQueue.isEmpty()) {
-            current?.let{
+            current?.let {
                 if (it.size != size) it.destroy()
                 else renderQueue.offer(it)
             }
             current = displayQueue.poll()
         }
+        return@withLock result
     }
 
     override suspend fun <R> render(block: suspend (FBO) -> R): R? {

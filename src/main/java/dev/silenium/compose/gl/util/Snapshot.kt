@@ -1,6 +1,6 @@
 package dev.silenium.compose.gl.util
 
-import androidx.compose.ui.unit.IntSize
+import dev.silenium.compose.gl.fbo.FBO
 import org.jetbrains.skia.*
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.system.MemoryUtil
@@ -9,10 +9,10 @@ import java.nio.file.Path
 import javax.imageio.ImageIO
 import kotlin.io.path.outputStream
 
-fun snapshot(fbo: Int, size: IntSize, target: Path) {
+fun FBO.snapshot(target: Path) {
     val prevReadFbo = glGetInteger(GL_READ_FRAMEBUFFER_BINDING)
 
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo)
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, id)
     val pixels = MemoryUtil.memAlloc(size.width * size.height * 4)
     glReadPixels(0, 0, size.width, size.height, GL_RGBA, GL_UNSIGNED_BYTE, pixels)
     glFinish()
@@ -27,17 +27,17 @@ fun snapshot(fbo: Int, size: IntSize, target: Path) {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, prevReadFbo)
 }
 
-fun snapshot(bitmap: Bitmap, target: Path) {
-    val image = BufferedImage(bitmap.width, bitmap.height, BufferedImage.TYPE_INT_ARGB)
-    val pixelArr = bitmap.readPixels() ?: error("Failed to read pixels")
-    image.raster.setPixels(0, 0, bitmap.width, bitmap.height, pixelArr.map { it.toInt() }.toIntArray())
+fun Bitmap.snapshot(target: Path) {
+    val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+    val pixelArr = readPixels() ?: error("Failed to read pixels")
+    image.raster.setPixels(0, 0, width, height, pixelArr.map { it.toInt() }.toIntArray())
     target.outputStream().use { ImageIO.write(image, "png", it) }
 }
 
-fun snapshot(surface: Surface, target: Path) {
+fun Surface.snapshot(target: Path) {
     val bitmap = Bitmap()
-    bitmap.allocPixels(ImageInfo(surface.width, surface.height, ColorType.RGBA_8888, ColorAlphaType.OPAQUE))
-    surface.readPixels(bitmap, 0, 0)
-    snapshot(bitmap, target)
+    bitmap.allocPixels(ImageInfo(width, height, ColorType.RGBA_8888, ColorAlphaType.PREMUL))
+    readPixels(bitmap, 0, 0)
+    bitmap.snapshot(target)
     bitmap.close()
 }

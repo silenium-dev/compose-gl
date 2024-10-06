@@ -1,5 +1,7 @@
 package dev.silenium.compose.gl.surface
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -120,3 +122,6 @@ class GLSurfaceState {
         renderStatisticsMutable.tryEmit(renderStatisticsMutable.value.add(nanos, frameTime))
     }
 }
+
+@Composable
+fun rememberGLSurfaceState() = remember { GLSurfaceState() }

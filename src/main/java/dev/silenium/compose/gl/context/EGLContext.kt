@@ -36,12 +36,12 @@ data class EGLContext(
         glCapabilities = glCap
     }
 
-    override fun unbindCurrent() {
-        eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)
+    override fun makeCurrent() {
+        check(eglMakeCurrent(display, surface, surface, context)) { "Failed to make context current" }
     }
 
-    override fun makeCurrent() {
-        eglMakeCurrent(display, surface, surface, context)
+    override fun unbindCurrent() {
+        check(eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) { "Failed to unbind context" }
     }
 
     override fun destroy() {

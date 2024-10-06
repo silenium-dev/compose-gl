@@ -13,6 +13,10 @@ object GLContextProviderFactory {
             ?.let { enumValueOf<GLContextProviderType>(it) }
     }
 
+    /**
+     * The detected GL context provider.
+     * @see detect
+     */
     val detected: GLContextProvider<*> by lazy(::detect)
 
     private enum class GLContextProviderType(val provider: GLContextProvider<*>) {
@@ -24,6 +28,14 @@ object GLContextProviderFactory {
         Platform.OS.LINUX to listOf(GLContextProviderType.EGL, GLContextProviderType.GLX),
     )
 
+    /**
+     * Detects the GL context provider.
+     *
+     * The provider is detected based on the current platform.
+     * The detection order is defined by the [osOrder] map.
+     *
+     * @return The detected GL context provider.
+     */
     fun detect(): GLContextProvider<*> {
         override?.let {
             log.info("Using overridden GL context provider: {}", it)

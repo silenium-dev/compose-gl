@@ -5,7 +5,13 @@ import org.lwjgl.opengl.GL30.*
 
 data class FBO(
     val id: Int,
+    /**
+     * The color attachment texture
+     */
     val colorAttachment: Int,
+    /**
+     * The depth/stencil attachment renderbuffer
+     */
     val depthStencilAttachment: Int,
     val size: IntSize,
 ) {

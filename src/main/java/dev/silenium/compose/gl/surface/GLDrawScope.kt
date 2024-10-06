@@ -6,8 +6,19 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 interface GLDrawScope {
+    /**
+     * Size of the current FBO.
+     */
     val size: IntSize
+
+    /**
+     * Time since the last frame.
+     */
     val deltaTime: Duration
+
+    /**
+     * Redraw after the given duration.
+     */
     fun redrawAfter(duration: Duration)
 }
 

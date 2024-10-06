@@ -14,18 +14,19 @@ class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> F
     private var current: FBO? = null
     private val renderQueue = ArrayBlockingQueue<FBO>(capacity)
 
-    override fun display(block: (FBO) -> Unit) = displayLock.withLock {
-        current?.let(block)
+    override fun <R> display(block: (FBO) -> R) = displayLock.withLock displayLock@{
+        val result = current?.let(block)
         waitingLock.withLock {
-            val waiting = waitingFBO ?: return
+            val waiting = waitingFBO ?: return@displayLock result
             if (waiting.size != size) {
                 waiting.destroy()
                 waitingFBO = null
-                return
+                return@displayLock result
             }
             current = waitingFBO
             waitingFBO = null
         }
+        return@displayLock result
     }
 
     override suspend fun <R> render(block: suspend (FBO) -> R): R? {

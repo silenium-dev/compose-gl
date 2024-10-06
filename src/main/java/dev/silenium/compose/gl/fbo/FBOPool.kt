@@ -13,12 +13,28 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.time.Duration
 
+/**
+ * A pool of framebuffers.
+ * @param render The OpenGL context for rendering.
+ * @param display The OpenGL context for displaying.
+ * @param size The initial size of the framebuffers.
+ * @param swapChain The swap chain for the framebuffers.
+ */
 class FBOPool(
     private val render: GLContext<*>,
     private val display: GLContext<*>,
     var size: IntSize,
     private val swapChain: FBOSwapChain,
 ) {
+
+    /**
+     * A pool of framebuffers.
+     * @param render The OpenGL context for rendering.
+     * @param display The OpenGL context for displaying.
+     * @param size The initial size of the framebuffers.
+     * @param swapChainFactory The factory for creating the swap chain.
+     * @param swapChainSize The size of the swap chain.
+     */
     constructor(
         render: GLContext<*>,
         display: GLContext<*>,
@@ -47,12 +63,18 @@ class FBOPool(
         }
     }
 
+    /**
+     * Initialize the framebuffers, has to be called once in the render context before it can be used.
+     */
     fun initialize() = ensureContext(ContextType.RENDER) {
         swapChain.resize(size)
     }
 
     /**
-     * @return wait time for the next frame
+     * Render the next frame, has to be called in the render context.
+     * @param deltaTime The time since the last frame.
+     * @param block The block to render the frame.
+     * @return wait time for the next frame, or null, if there was no frame rendered due to no framebuffers being available.
      */
     suspend fun render(deltaTime: Duration, block: suspend GLDrawScope.() -> Unit): Duration? =
         ensureContext(ContextType.RENDER) {
@@ -72,6 +94,10 @@ class FBOPool(
             }
         }
 
+    /**
+     * Display the next frame, has to be called in the display context.
+     * @param block The block to display the frame.
+     */
     fun display(block: GLDisplayScope.() -> Unit) = swapChain.display { fbo ->
         ensureContext(ContextType.DISPLAY) {
             val displayScope = GLDisplayScopeImpl(fbo)
@@ -79,6 +105,11 @@ class FBOPool(
         }
     }
 
+    /**
+     * Destroy the framebuffers, has to be called once in the render context after it is no longer needed.
+     * This will destroy all framebuffers.
+     * @see [FBOSwapChain.destroyFBOs]
+     */
     fun destroy() = ensureContext(ContextType.RENDER) {
         swapChain.destroyFBOs()
     }

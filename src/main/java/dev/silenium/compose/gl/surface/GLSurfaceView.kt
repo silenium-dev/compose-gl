@@ -25,13 +25,16 @@ import org.jetbrains.skia.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL30.GL_RGBA8
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 
-@Composable
-fun rememberGLSurfaceState() = remember { GLSurfaceState() }
-
+/**
+ * Override the size of the FBO.
+ * @param width The width of the FBO.
+ * @param height The height of the FBO.
+ * @param transformOrigin The transform origin for scaling the FBO to the size of the GLSurfaceView (default: [TransformOrigin.Center]).
+ */
 data class FBOSizeOverride(
     val width: Int,
     val height: Int,
@@ -40,6 +43,15 @@ data class FBOSizeOverride(
     val size get() = IntSize(width, height)
 }
 
+/**
+ * A composable that displays OpenGL content.
+ * @param state The state of the GLSurfaceView.
+ * @param modifier The modifier to apply to the GLSurfaceView.
+ * @param paint The paint to draw the contents on the compose scene.
+ * @param glContextProvider The provider of the OpenGL context (default: [GLContextProviderFactory.detected]).
+ * @param presentMode The present mode of the GLSurfaceView (default: [GLSurfaceView.PresentMode.FIFO]).
+ *
+ */
 @Composable
 fun GLSurfaceView(
     state: GLSurfaceState = rememberGLSurfaceState(),
@@ -146,21 +158,21 @@ class GLSurfaceView internal constructor(
         Thread(it, "GLSurfaceView-${index.getAndIncrement()}")
     }
 
-    fun launch(): Job {
+    internal fun launch(): Job {
         GL.createCapabilities()
         return CoroutineScope(executor.asCoroutineDispatcher()).launch { run() }.also {
             it.invokeOnCompletion { executor.shutdown() }
         }
     }
 
-    fun resize(size: IntSize) {
+    internal fun resize(size: IntSize) {
         if (size == fboPool?.size) return
         this.size = size
         fboPool?.size = size
         state.requestUpdate()
     }
 
-    fun display(canvas: Canvas, displayContext: DirectContext) {
+    internal fun display(canvas: Canvas, displayContext: DirectContext) {
         val t1 = System.nanoTime()
         fboPool?.display { displayImpl(canvas, displayContext) }
         invalidate()
@@ -237,6 +249,6 @@ class GLSurfaceView internal constructor(
     }
 
     companion object {
-        private val index = AtomicInteger(0)
+        private val index = AtomicLong(0L)
     }
 }
