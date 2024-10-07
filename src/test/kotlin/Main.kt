@@ -21,6 +21,9 @@ import dev.silenium.compose.gl.surface.GLSurfaceView
 import dev.silenium.compose.gl.surface.Stats
 import dev.silenium.compose.gl.surface.rememberGLSurfaceState
 import kotlinx.coroutines.delay
+import me.saket.telephoto.zoomable.ZoomSpec
+import me.saket.telephoto.zoomable.rememberZoomableState
+import me.saket.telephoto.zoomable.zoomable
 import org.lwjgl.opengl.GL30.*
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -43,12 +46,27 @@ fun ApplicationScope.App() {
             }
             GLSurfaceView(
                 state = state,
-                modifier = Modifier.aspectRatio(1f).align(Alignment.Center),
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .zoomable(rememberZoomableState(ZoomSpec(6f)))
+                    .align(Alignment.Center),
                 presentMode = GLSurfaceView.PresentMode.MAILBOX,
-//                fboSizeOverride = FBOSizeOverride(512, 512, TransformOrigin.Center),
+                fboSizeOverride = FBOSizeOverride(4096, 4096, TransformOrigin.Center),
             ) {
                 glClearColor(color.red, color.green, color.blue, color.alpha)
                 glClear(GL_COLOR_BUFFER_BIT)
+                glBegin(GL_QUADS)
+                // fat rectangle from top left to bottom right
+                glColor3f(1f, 0f, 0f)
+                glVertex2f(-1f, 0f)
+                glColor3f(0f, 1f, 0f)
+                glVertex2f(0f, -1f)
+                glColor3f(0f, 0f, 1f)
+                glVertex2f(1f, 0f)
+                glColor3f(1f, 1f, 1f)
+                glVertex2f(0f, 1f)
+                glEnd()
+
                 val wait = (1000.0 / 60).milliseconds
                 redrawAfter(wait)
             }
