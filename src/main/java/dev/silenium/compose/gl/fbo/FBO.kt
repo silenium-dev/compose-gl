@@ -3,17 +3,18 @@ package dev.silenium.compose.gl.fbo
 import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.objects.Renderbuffer
 import dev.silenium.compose.gl.objects.Texture
+import dev.silenium.compose.gl.util.DoubleDestructionProtection
 import dev.silenium.compose.gl.util.checkGLError
 import org.lwjgl.opengl.GL30.*
 import org.slf4j.LoggerFactory
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 data class FBO(
-    val id: Int,
+    override val id: Int,
     val size: IntSize,
     val colorAttachment: Texture,
     val depthStencilAttachment: Renderbuffer,
-) {
+) : DoubleDestructionProtection<Int>() {
     fun bind() {
         glBindFramebuffer(GL_FRAMEBUFFER, id)
         checkGLError("glBindFramebuffer")
@@ -25,20 +26,13 @@ data class FBO(
         checkGLError("glBindFramebuffer")
     }
 
-    private val destroyed = AtomicBoolean(false)
-    fun destroy() {
-        if (destroyed.compareAndExchange(false, true)) {
-            glDeleteFramebuffers(id)
-            colorAttachment.destroy()
-            depthStencilAttachment.destroy()
-        } else {
-            logger.trace("FBO $id is already destroyed", Exception())
-        }
+    override fun destroyInternal() {
+        glDeleteFramebuffers(id)
+        colorAttachment.destroy()
+        depthStencilAttachment.destroy()
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(FBO::class.java)
-
         fun create(
             colorAttachment: Texture,
             depthStencilAttachment: Renderbuffer,

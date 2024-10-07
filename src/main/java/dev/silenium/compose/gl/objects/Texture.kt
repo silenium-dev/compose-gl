@@ -2,17 +2,16 @@ package dev.silenium.compose.gl.objects
 
 import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.objects.TextureOrRenderbuffer.Companion.textureTargetBindings
+import dev.silenium.compose.gl.util.DoubleDestructionProtection
 import dev.silenium.compose.gl.util.checkGLError
 import org.lwjgl.opengl.GL11.*
-import org.slf4j.LoggerFactory
-import java.util.concurrent.atomic.AtomicBoolean
 
 data class Texture(
     override val id: Int,
     override val size: IntSize,
     override val target: Int,
     override val internalFormat: Int,
-) : TextureOrRenderbuffer {
+) : TextureOrRenderbuffer, DoubleDestructionProtection<Int>() {
     init {
         require(target in textureTargetBindings) { "Unsupported texture target: $target" }
     }
@@ -29,18 +28,11 @@ data class Texture(
         checkGLError("glBindTexture")
     }
 
-    private val destroyed = AtomicBoolean(false)
-    override fun destroy() {
-        if (destroyed.compareAndExchange(false, true)) {
-            glDeleteTextures(id)
-        } else {
-            logger.trace("Texture $id is already destroyed")
-        }
+    override fun destroyInternal() {
+        glDeleteTextures(id)
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(Texture::class.java)
-
         fun create(
             target: Int,
             size: IntSize,
