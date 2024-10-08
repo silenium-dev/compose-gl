@@ -19,7 +19,7 @@ class FBOMailboxSwapChain(private val capacity: Int, override val fboCreator: (I
         return@stateLock result
     }
 
-    override suspend fun <R> render(block: suspend (FBO) -> R): R? = stateLock.read {
+    override fun <R> render(block: (FBO) -> R): R? = stateLock.read {
         val fbos = fbos ?: return null
         val next = (current + 1) % fbos.size
         if (fbos[next].size != size) {

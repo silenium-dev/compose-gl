@@ -18,7 +18,10 @@ import dev.silenium.compose.gl.context.GLContextProvider
 import dev.silenium.compose.gl.context.GLContextProviderFactory
 import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.fbo.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL30.GL_RGBA8
@@ -60,8 +63,8 @@ fun GLSurfaceView(
     presentMode: GLSurfaceView.PresentMode = GLSurfaceView.PresentMode.FIFO,
     swapChainSize: Int = 10,
     fboSizeOverride: FBOSizeOverride? = null,
-    cleanup: suspend () -> Unit = {},
-    draw: suspend GLDrawScope.() -> Unit,
+    cleanup: () -> Unit = {},
+    draw: GLDrawScope.() -> Unit,
 ) {
     var invalidations by remember { mutableStateOf(0) }
     val surfaceView = remember {
@@ -139,8 +142,8 @@ fun GLSurfaceView(
 class GLSurfaceView internal constructor(
     private val state: GLSurfaceState,
     private val parentContext: GLContext<*>,
-    private val drawBlock: suspend GLDrawScope.() -> Unit,
-    private val cleanupBlock: suspend () -> Unit = {},
+    private val drawBlock: GLDrawScope.() -> Unit,
+    private val cleanupBlock: () -> Unit = {},
     private val invalidate: () -> Unit = {},
     private val paint: Paint = Paint(),
     private val presentMode: PresentMode = PresentMode.MAILBOX,
@@ -232,10 +235,8 @@ class GLSurfaceView internal constructor(
         var lastFrame: Long? = null
         while (!isInterrupted) {
             val renderStart = System.nanoTime()
-            val renderResult = runBlocking {
-                val deltaTime = lastFrame?.let { renderStart - it } ?: 0
-                fboPool!!.render(deltaTime.nanoseconds, drawBlock)
-            }
+            val deltaTime = lastFrame?.let { renderStart - it } ?: 0
+            val renderResult = fboPool!!.render(deltaTime.nanoseconds, drawBlock)
             val e = renderResult.exceptionOrNull()
             if (e is NoRenderFBOAvailable) {
                 logger.debug("No FBO available, waiting for the next frame")
@@ -266,7 +267,7 @@ class GLSurfaceView internal constructor(
             }
         }
         logger.debug("GLSurfaceView stopped")
-        runBlocking { cleanupBlock() }
+        cleanupBlock()
         fboPool?.destroy()
         fboPool = null
         directContext?.close()

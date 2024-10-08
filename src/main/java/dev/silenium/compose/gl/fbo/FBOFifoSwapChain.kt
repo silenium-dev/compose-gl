@@ -25,7 +25,7 @@ class FBOFifoSwapChain(capacity: Int, override val fboCreator: (IntSize) -> FBO)
         return@withLock result
     }
 
-    override suspend fun <R> render(block: suspend (FBO) -> R): R? {
+    override fun <R> render(block: (FBO) -> R): R? {
         val fbo = renderQueue.poll() ?: return null
         if (fbo.size != size) {
             fbo.destroy()

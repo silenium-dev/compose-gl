@@ -79,7 +79,7 @@ class FBOPool(
      * @param block The block to render the frame.
      * @return wait time for the next frame, or null, if there was no frame rendered due to no framebuffers being available.
      */
-    suspend fun render(deltaTime: Duration, block: suspend GLDrawScope.() -> Unit): Result<Duration?> = try {
+    fun render(deltaTime: Duration, block: GLDrawScope.() -> Unit): Result<Duration?> = try {
         ensureContext(ContextType.RENDER) {
             if (swapChain.size != size) {
                 swapChain.resize(size)

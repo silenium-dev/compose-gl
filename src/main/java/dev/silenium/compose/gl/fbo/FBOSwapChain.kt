@@ -26,7 +26,7 @@ abstract class FBOSwapChain {
      * @param block The block to run with the current FBO for rendering
      * @return The result of the block
      */
-    abstract suspend fun <R> render(block: suspend (FBO) -> R): R?
+    abstract fun <R> render(block: (FBO) -> R): R?
     abstract fun resize(size: IntSize)
     abstract fun destroyFBOs()
 }
