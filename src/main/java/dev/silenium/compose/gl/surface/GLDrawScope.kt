@@ -17,18 +17,19 @@ interface GLDrawScope {
 
     /**
      * Redraw after the given duration.
+     * @param duration The duration to redraw after. If null, a call to [GLSurfaceState.requestUpdate] is required to redraw.
      */
-    fun redrawAfter(duration: Duration)
+    fun redrawAfter(duration: Duration?)
 }
 
 internal class GLDrawScopeImpl(
     override val fbo: FBO,
     override val deltaTime: Duration,
 ) : GLDrawScope {
-    internal var redrawAfter = (1000 / 60).milliseconds
+    internal var redrawAfter: Duration? = (1000 / 60).milliseconds
         private set
 
-    override fun redrawAfter(duration: Duration) {
+    override fun redrawAfter(duration: Duration?) {
         redrawAfter = duration
     }
 }

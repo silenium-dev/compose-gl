@@ -2,11 +2,10 @@ package dev.silenium.compose.gl.surface
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.selects.SelectBuilder
+import java.util.concurrent.ArrayBlockingQueue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -102,17 +101,14 @@ data class RollingWindowStatistics(
 class GLSurfaceState {
     private val renderStatisticsMutable = MutableStateFlow(RollingWindowStatistics())
     private val displayStatisticsMutable = MutableStateFlow(RollingWindowStatistics())
-    private val updateRequested = Channel<Unit>(Channel.CONFLATED)
+    internal val updateRequested = ArrayBlockingQueue<Unit>(1)
 
     val renderStatistics: StateFlow<RollingWindowStatistics> get() = renderStatisticsMutable.asStateFlow()
     val displayStatistics: StateFlow<RollingWindowStatistics> get() = displayStatisticsMutable.asStateFlow()
 
     fun requestUpdate() {
-        updateRequested.trySend(Unit)
+        updateRequested.offer(Unit)
     }
-
-    context(SelectBuilder<R>)
-    internal fun <R> onUpdate(block: suspend (Unit) -> R) = updateRequested.onReceive(block)
 
     internal fun onDisplay(nanos: Long, frameTime: Duration) {
         displayStatisticsMutable.tryEmit(displayStatisticsMutable.value.add(nanos, frameTime))

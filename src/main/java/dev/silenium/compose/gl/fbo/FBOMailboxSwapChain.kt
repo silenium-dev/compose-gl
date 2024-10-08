@@ -1,70 +1,47 @@
 package dev.silenium.compose.gl.fbo
 
 import androidx.compose.ui.unit.IntSize
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
-class FBOMailboxSwapChain(capacity: Int, override val fboCreator: (IntSize) -> FBO) : FBOSwapChain() {
+class FBOMailboxSwapChain(private val capacity: Int, override val fboCreator: (IntSize) -> FBO) : FBOSwapChain() {
     override var size: IntSize = IntSize.Zero
         private set
-    private val displayLock = ReentrantLock()
-    private val waitingLock = ReentrantLock()
-    private var waitingFBO: FBO? = null
-    private var current: FBO? = null
-    private val renderQueue = ArrayBlockingQueue<FBO>(capacity)
+    private val stateLock = ReentrantReadWriteLock()
+    private var fbos: Array<FBO>? = null
+    private var current: Int = -1
 
-    override fun <R> display(block: (FBO) -> R) = displayLock.withLock displayLock@{
-        val result = current?.let(block)
-        waitingLock.withLock {
-            val waiting = waitingFBO ?: return@displayLock result
-            if (waiting.size != size) {
-                waiting.destroy()
-                waitingFBO = null
-                return@displayLock result
-            }
-            current = waitingFBO
-            waitingFBO = null
-        }
-        return@displayLock result
-    }
-
-    override suspend fun <R> render(block: suspend (FBO) -> R): R? {
-        val fbo = renderQueue.poll() ?: return null
+    override fun <R> display(block: (FBO) -> R): R? = stateLock.read stateLock@{
+        if (current == -1) return@stateLock null
+        val fbo = fbos?.get(current) ?: return@stateLock null
         val result = block(fbo)
-        if (fbo.size != size) {
-            fbo.destroy()
-            return null
-        }
-        if (displayLock.tryLock()) {
-            current?.let {
-                if (it.size != size) it.destroy()
-                else renderQueue.offer(it)
-            }
-            current = fbo
-            displayLock.unlock()
-        } else waitingLock.withLock {
-            waitingFBO?.destroy()
-            waitingFBO = fbo
-        }
-        return result
+        return@stateLock result
     }
 
-    override fun resize(size: IntSize) {
+    override suspend fun <R> render(block: suspend (FBO) -> R): R? = stateLock.read {
+        val fbos = fbos ?: return null
+        val next = (current + 1) % fbos.size
+        if (fbos[next].size != size) {
+            fbos[next].destroy()
+            fbos[next] = fboCreator(size)
+        }
+        try {
+            val result = block(fbos[next])
+            current = next
+            return result
+        } catch (e: Throwable) {
+            throw e
+        }
+    }
+
+    override fun resize(size: IntSize): Unit = stateLock.write {
         this.size = size
-        renderQueue.onEach { it.destroy() }.clear()
-        renderQueue.fillRenderQueue(fboCreator, size)
+        fbos?.forEach(FBO::destroy)
+        fbos = Array(capacity) { fboCreator(size) }
     }
 
-    override fun destroyFBOs() {
-        renderQueue.onEach { it.destroy() }.clear()
-        displayLock.withLock {
-            current?.destroy()
-            current = null
-        }
-        waitingLock.withLock {
-            waitingFBO?.destroy()
-            waitingFBO = null
-        }
+    override fun destroyFBOs(): Unit = stateLock.write {
+        fbos?.forEach(FBO::destroy)
     }
 }

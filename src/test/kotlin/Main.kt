@@ -44,6 +44,12 @@ fun ApplicationScope.App() {
                     delay(200)
                 }
             }
+            LaunchedEffect(Unit) {
+                while (true) {
+                    delay(300.milliseconds)
+                    state.requestUpdate()
+                }
+            }
             GLSurfaceView(
                 state = state,
                 modifier = Modifier
@@ -68,7 +74,7 @@ fun ApplicationScope.App() {
                 glEnd()
 
                 val wait = (1000.0 / 60).milliseconds
-                redrawAfter(wait)
+                redrawAfter(null)
             }
             Column(modifier = Modifier.align(Alignment.TopStart).padding(4.dp)) {
                 val display by state.displayStatistics.collectAsState()

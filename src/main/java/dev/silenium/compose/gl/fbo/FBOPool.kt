@@ -59,7 +59,9 @@ class FBOPool(
         }
 
         nextContext.makeCurrent()
-        return block().also {
+        try {
+            return block()
+        } finally {
             previousContext?.makeCurrent()
         }
     }
@@ -77,7 +79,7 @@ class FBOPool(
      * @param block The block to render the frame.
      * @return wait time for the next frame, or null, if there was no frame rendered due to no framebuffers being available.
      */
-    suspend fun render(deltaTime: Duration, block: suspend GLDrawScope.() -> Unit): Duration? =
+    suspend fun render(deltaTime: Duration, block: suspend GLDrawScope.() -> Unit): Result<Duration?> = try {
         ensureContext(ContextType.RENDER) {
             if (swapChain.size != size) {
                 swapChain.resize(size)
@@ -87,13 +89,16 @@ class FBOPool(
                     fbo.bind()
                     val drawScope = GLDrawScopeImpl(fbo, deltaTime)
                     drawScope.block()
-                    glFinish()
+                    glFlush()
                     fbo.unbind()
 
-                    drawScope.redrawAfter
+                    Result.success(drawScope.redrawAfter)
                 }
-            }
+            } ?: Result.failure(NoRenderFBOAvailable())
         }
+    } catch (t: Throwable) {
+        Result.failure(t)
+    }
 
     /**
      * Display the next frame, has to be called in the display context.
@@ -142,19 +147,19 @@ class FBOPool(
             val prevDepthTest = glIsEnabled(GL_DEPTH_TEST)
             val prevStencilTest = glIsEnabled(GL_STENCIL_TEST)
 
-            val result = block()
-
-            glBindFramebuffer(GL_FRAMEBUFFER, prevFb)
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, prevReadFb)
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, prevDrawFb)
-            glBindRenderbuffer(GL_RENDERBUFFER, prevRb)
-            glBindTexture(GL_TEXTURE_2D, prevTex)
-            glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3])
-            glScissor(prevScissor[0], prevScissor[1], prevScissor[2], prevScissor[3])
-            if (prevDepthTest) glEnable(GL_DEPTH_TEST) else glDisable(GL_DEPTH_TEST)
-            if (prevStencilTest) glEnable(GL_STENCIL_TEST) else glDisable(GL_STENCIL_TEST)
-
-            return result
+            try {
+                return block()
+            } finally {
+                glBindFramebuffer(GL_FRAMEBUFFER, prevFb)
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, prevReadFb)
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, prevDrawFb)
+                glBindRenderbuffer(GL_RENDERBUFFER, prevRb)
+                glBindTexture(GL_TEXTURE_2D, prevTex)
+                glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3])
+                glScissor(prevScissor[0], prevScissor[1], prevScissor[2], prevScissor[3])
+                if (prevDepthTest) glEnable(GL_DEPTH_TEST) else glDisable(GL_DEPTH_TEST)
+                if (prevStencilTest) glEnable(GL_STENCIL_TEST) else glDisable(GL_STENCIL_TEST)
+            }
         }
     }
 }

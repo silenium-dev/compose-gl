@@ -19,15 +19,14 @@ import dev.silenium.compose.gl.context.GLContextProviderFactory
 import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.fbo.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.selects.onTimeout
-import kotlinx.coroutines.selects.select
 import org.jetbrains.skia.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL30.GL_RGBA8
-import java.util.concurrent.Executors
+import org.slf4j.LoggerFactory
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.toJavaDuration
 
 /**
  * Override the size of the FBO.
@@ -64,13 +63,11 @@ fun GLSurfaceView(
     cleanup: suspend () -> Unit = {},
     draw: suspend GLDrawScope.() -> Unit,
 ) {
-    var invalidations by remember { mutableStateOf(0) }
     val surfaceView = remember {
         val currentContext = glContextProvider.fromCurrent() ?: error("No current EGL context")
         GLSurfaceView(
             state = state,
             parentContext = currentContext,
-            invalidate = { invalidations++ },
             paint = paint,
             presentMode = presentMode,
             swapChainSize = swapChainSize,
@@ -79,6 +76,17 @@ fun GLSurfaceView(
         )
     }
     val window = LocalWindow.current
+    var directContext by remember { mutableStateOf<DirectContext?>(null) }
+    LaunchedEffect(window) {
+        withContext(Dispatchers.IO) {
+            while (isActive) {
+                window?.directContext()?.let {
+                    directContext = it
+                    return@withContext
+                }
+            }
+        }
+    }
     BoxWithConstraints(modifier) {
         Canvas(
             modifier = Modifier
@@ -107,17 +115,16 @@ fun GLSurfaceView(
                     }
                 }
         ) {
-            invalidations.let {
-                window?.directContext()?.let { directContext ->
+                directContext?.let { directContext ->
                     surfaceView.display(drawContext.canvas.nativeCanvas, directContext)
                 }
-            }
         }
     }
     DisposableEffect(surfaceView) {
-        val job = surfaceView.launch()
+        surfaceView.launch()
         onDispose {
-            job.cancel()
+            surfaceView.interrupt()
+//            surfaceView.join()
         }
     }
     LaunchedEffect(fboSizeOverride) {
@@ -130,11 +137,10 @@ class GLSurfaceView internal constructor(
     private val parentContext: GLContext<*>,
     private val drawBlock: suspend GLDrawScope.() -> Unit,
     private val cleanupBlock: suspend () -> Unit = {},
-    private val invalidate: () -> Unit = {},
     private val paint: Paint = Paint(),
     private val presentMode: PresentMode = PresentMode.MAILBOX,
     private val swapChainSize: Int = 10,
-) {
+) : Thread("GLSurfaceView-${index.getAndIncrement()}") {
     enum class PresentMode(internal val impl: (Int, (IntSize) -> FBO) -> FBOSwapChain) {
         /**
          * Renders the latest frame and discards all the previous frames.
@@ -154,15 +160,15 @@ class GLSurfaceView internal constructor(
     private var renderContext: GLContext<*>? = null
     private var size: IntSize = IntSize.Zero
     private var fboPool: FBOPool? = null
-    private val executor = Executors.newSingleThreadExecutor {
-        Thread(it, "GLSurfaceView-${index.getAndIncrement()}")
-    }
 
-    internal fun launch(): Job {
+    internal fun launch() {
         GL.createCapabilities()
-        return CoroutineScope(executor.asCoroutineDispatcher()).launch { run() }.also {
-            it.invokeOnCompletion { executor.shutdown() }
-        }
+        start()
+//        return CoroutineScope(executor.asCoroutineDispatcher()).launch {
+//            run()
+//        }.also {
+//            it.invokeOnCompletion { executor.shutdown() }
+//        }
     }
 
     internal fun resize(size: IntSize) {
@@ -175,7 +181,6 @@ class GLSurfaceView internal constructor(
     internal fun display(canvas: Canvas, displayContext: DirectContext) {
         val t1 = System.nanoTime()
         fboPool?.display { displayImpl(canvas, displayContext) }
-        invalidate()
         val t2 = System.nanoTime()
         state.onDisplay(t2, (t2 - t1).nanoseconds)
     }
@@ -214,32 +219,47 @@ class GLSurfaceView internal constructor(
             .apply(FBOPool::initialize)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun run() = coroutineScope {
-        while (size == IntSize.Zero && isActive) delay(10.milliseconds)
-        if (!isActive) return@coroutineScope
+    override fun run() {
+        while (size == IntSize.Zero && !isInterrupted) sleep(10)
+        if (isInterrupted) return
         initialize()
         var lastFrame: Long? = null
-        while (isActive) {
+        while (!isInterrupted) {
             val renderStart = System.nanoTime()
-            val deltaTime = lastFrame?.let { renderStart - it } ?: 0
-            val waitTime = fboPool!!.render(deltaTime.nanoseconds, drawBlock) ?: continue
-            invalidate()
+            val renderResult = runBlocking {
+                val deltaTime = lastFrame?.let { renderStart - it } ?: 0
+                fboPool!!.render(deltaTime.nanoseconds, drawBlock)
+            }
+            val e = renderResult.exceptionOrNull()
+            if (e is NoRenderFBOAvailable) {
+                logger.debug("No FBO available, waiting for the next frame")
+                sleep(1)
+                continue
+            } else if (e is CancellationException) {
+                break
+            } else if (e != null) {
+                logger.error("Failed to render frame", e)
+                break
+            }
+            val waitTime = renderResult.getOrNull()
             val renderEnd = System.nanoTime()
-            val renderTime = (renderEnd - renderStart).nanoseconds
-            state.onRender(renderEnd, renderTime)
+            state.onRender(renderEnd, (renderEnd - renderStart).nanoseconds)
             lastFrame = renderStart
             try {
-                @Suppress("RemoveExplicitTypeArguments")
-                select<Unit> {
-                    state.onUpdate {}
-                    onTimeout(waitTime - renderTime) {}
+                if (waitTime != null) {
+                    val toWait = (waitTime - (System.nanoTime() - renderStart).nanoseconds).toJavaDuration()
+                    if (!toWait.isZero) {
+                        state.updateRequested.poll(toWait.toNanos(), TimeUnit.NANOSECONDS)
+                    }
+                } else {
+                    state.updateRequested.take()
                 }
-            } catch (e: CancellationException) {
+            } catch (e: InterruptedException) {
                 break
             }
         }
-        cleanupBlock()
+        logger.debug("GLSurfaceView stopped")
+        runBlocking { cleanupBlock() }
         fboPool?.destroy()
         fboPool = null
         directContext?.close()
@@ -249,6 +269,7 @@ class GLSurfaceView internal constructor(
     }
 
     companion object {
+        private val logger = LoggerFactory.getLogger(GLSurfaceView::class.java)
         private val index = AtomicLong(0L)
     }
 }
