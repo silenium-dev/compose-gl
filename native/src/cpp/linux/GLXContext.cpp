@@ -106,6 +106,7 @@ Java_dev_silenium_compose_gl_context_GLXContextKt_createContextN(JNIEnv *env, jo
     if (glxPixmap == None) {
         std::cerr << "Failed to create PBuffer" << std::endl;
         env->DeleteLocalRef(result);
+        XFreePixmap(display, xPixmap);
         return nullptr;
     }
     const jlong xPixmapLong = *reinterpret_cast<const jlong *>(&xPixmap);
@@ -117,6 +118,8 @@ Java_dev_silenium_compose_gl_context_GLXContextKt_createContextN(JNIEnv *env, jo
     if (visual == nullptr) {
         std::cerr << "Failed to get Visual" << std::endl;
         env->DeleteLocalRef(result);
+        glXDestroyPixmap(display, glxPixmap);
+        XFreePixmap(display, xPixmap);
         return nullptr;
     }
 
@@ -143,6 +146,9 @@ Java_dev_silenium_compose_gl_context_GLXContextKt_createContextN(JNIEnv *env, jo
     if (ctx == nullptr) {
         std::cerr << "Failed to create Context" << std::endl;
         env->DeleteLocalRef(result);
+        glXDestroyPixmap(display, glxPixmap);
+        XFreePixmap(display, xPixmap);
+        XFree(visual);
         return nullptr;
     }
     const auto ctxLong = reinterpret_cast<jlong>(ctx);
