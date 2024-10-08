@@ -8,6 +8,7 @@ import dev.silenium.compose.gl.surface.GLDisplayScope
 import dev.silenium.compose.gl.surface.GLDisplayScopeImpl
 import dev.silenium.compose.gl.surface.GLDrawScope
 import dev.silenium.compose.gl.surface.GLDrawScopeImpl
+import kotlinx.coroutines.CancellationException
 import org.lwjgl.opengl.GL30.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -92,7 +93,11 @@ class FBOPool(
                     glFlush()
                     fbo.unbind()
 
-                    Result.success(drawScope.redrawAfter)
+                    if (drawScope.terminate) {
+                        Result.failure(CancellationException("Rendering terminated"))
+                    } else {
+                        Result.success(drawScope.redrawAfter)
+                    }
                 }
             } ?: Result.failure(NoRenderFBOAvailable())
         }

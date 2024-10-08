@@ -12,12 +12,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.awaitApplication
-import dev.silenium.compose.gl.surface.FBOSizeOverride
 import dev.silenium.compose.gl.surface.GLSurfaceView
 import dev.silenium.compose.gl.surface.Stats
 import dev.silenium.compose.gl.surface.rememberGLSurfaceState
@@ -32,7 +30,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @Preview
 fun ApplicationScope.App() {
     MaterialTheme {
-        Box(contentAlignment = Alignment.TopStart, modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        Box(contentAlignment = Alignment.TopStart, modifier = Modifier.fillMaxSize().background(Color.White)) {
             val state = rememberGLSurfaceState()
             var targetHue by remember { mutableStateOf(0f) }
             val color by animateColorAsState(
@@ -58,10 +56,16 @@ fun ApplicationScope.App() {
                     .zoomable(rememberZoomableState(ZoomSpec(6f)))
                     .align(Alignment.Center),
                 presentMode = GLSurfaceView.PresentMode.MAILBOX,
-                fboSizeOverride = FBOSizeOverride(4096, 4096, TransformOrigin.Center),
+//                fboSizeOverride = FBOSizeOverride(4096, 4096, TransformOrigin.Center),
             ) {
                 glClearColor(color.red, color.green, color.blue, color.alpha)
                 glClear(GL_COLOR_BUFFER_BIT)
+                try {
+                    Thread.sleep(33, 333)
+                } catch (e: InterruptedException) {
+                    terminate()
+                    return@GLSurfaceView
+                }
                 glBegin(GL_QUADS)
                 glColor3f(1f, 0f, 0f)
                 glVertex2f(-1f, 0f)

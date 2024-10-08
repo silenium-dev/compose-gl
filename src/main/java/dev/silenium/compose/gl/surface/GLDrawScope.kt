@@ -20,6 +20,11 @@ interface GLDrawScope {
      * @param duration The duration to redraw after. If null, a call to [GLSurfaceState.requestUpdate] is required to redraw.
      */
     fun redrawAfter(duration: Duration?)
+
+    /**
+     * Terminate the rendering thread.
+     */
+    fun terminate()
 }
 
 internal class GLDrawScopeImpl(
@@ -28,6 +33,12 @@ internal class GLDrawScopeImpl(
 ) : GLDrawScope {
     internal var redrawAfter: Duration? = (1000 / 60).milliseconds
         private set
+    internal var terminate = false
+        private set
+
+    override fun terminate() {
+        terminate = true
+    }
 
     override fun redrawAfter(duration: Duration?) {
         redrawAfter = duration

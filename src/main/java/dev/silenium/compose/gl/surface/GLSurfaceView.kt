@@ -239,10 +239,13 @@ class GLSurfaceView internal constructor(
             val renderResult = fboPool!!.render(deltaTime.nanoseconds, drawBlock)
             val e = renderResult.exceptionOrNull()
             if (e is NoRenderFBOAvailable) {
-                logger.debug("No FBO available, waiting for the next frame")
-                sleep(1)
+                try {
+                    sleep(1)
+                } catch (e: InterruptedException) {
+                    break
+                }
                 continue
-            } else if (e is CancellationException) {
+            } else if (e is CancellationException || e is InterruptedException) {
                 break
             } else if (e != null) {
                 logger.error("Failed to render frame", e)
