@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -62,7 +63,6 @@ fun ApplicationScope.App() {
                 glClearColor(color.red, color.green, color.blue, color.alpha)
                 glClear(GL_COLOR_BUFFER_BIT)
                 glBegin(GL_QUADS)
-                // fat rectangle from top left to bottom right
                 glColor3f(1f, 0f, 0f)
                 glVertex2f(-1f, 0f)
                 glColor3f(0f, 1f, 0f)
@@ -76,20 +76,22 @@ fun ApplicationScope.App() {
                 val wait = (1000.0 / 60).milliseconds
                 redrawAfter(null)
             }
-            Column(modifier = Modifier.align(Alignment.TopStart).padding(4.dp)) {
-                val display by state.displayStatistics.collectAsState()
-                Text("Display datapoints: ${display.frameTimes.values.size}")
-                Text("Display frame time: ${display.frameTimes.median.inWholeMicroseconds / 1000.0} ms")
-                Text("Display frame time (99th): ${display.frameTimes.percentile(0.99).inWholeMicroseconds / 1000.0} ms")
-                Text("Display FPS: ${display.fps.median}")
-                Text("Display FPS (99th): ${display.fps.percentile(0.99, Stats.Percentile.LOWEST)}")
+            Surface(modifier = Modifier.align(Alignment.TopStart).padding(4.dp)) {
+                Column(modifier = Modifier.padding(4.dp).width(400.dp)) {
+                    val display by state.displayStatistics.collectAsState()
+                    Text("Display datapoints: ${display.frameTimes.values.size}")
+                    Text("Display frame time: ${display.frameTimes.median.inWholeMicroseconds / 1000.0} ms")
+                    Text("Display frame time (99th): ${display.frameTimes.percentile(0.99).inWholeMicroseconds / 1000.0} ms")
+                    Text("Display FPS: ${display.fps.median}")
+                    Text("Display FPS (99th): ${display.fps.percentile(0.99, Stats.Percentile.LOWEST)}")
 
-                val render by state.renderStatistics.collectAsState()
-                Text("Render datapoints: ${render.frameTimes.values.size}")
-                Text("Render frame time: ${render.frameTimes.median.inWholeMicroseconds / 1000.0} ms")
-                Text("Render frame time (99th): ${render.frameTimes.percentile(0.99).inWholeMicroseconds / 1000.0} ms")
-                Text("Render FPS: ${render.fps.median} ms")
-                Text("Render FPS (99th): ${render.fps.percentile(0.99, Stats.Percentile.LOWEST)}")
+                    val render by state.renderStatistics.collectAsState()
+                    Text("Render datapoints: ${render.frameTimes.values.size}")
+                    Text("Render frame time: ${render.frameTimes.median.inWholeMicroseconds / 1000.0} ms")
+                    Text("Render frame time (99th): ${render.frameTimes.percentile(0.99).inWholeMicroseconds / 1000.0} ms")
+                    Text("Render FPS: ${render.fps.median} ms")
+                    Text("Render FPS (99th): ${render.fps.percentile(0.99, Stats.Percentile.LOWEST)}")
+                }
             }
             Button(
                 onClick = ::exitApplication,

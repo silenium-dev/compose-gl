@@ -63,11 +63,13 @@ fun GLSurfaceView(
     cleanup: suspend () -> Unit = {},
     draw: suspend GLDrawScope.() -> Unit,
 ) {
+    var invalidations by remember { mutableStateOf(0) }
     val surfaceView = remember {
         val currentContext = glContextProvider.fromCurrent() ?: error("No current EGL context")
         GLSurfaceView(
             state = state,
             parentContext = currentContext,
+            invalidate = { invalidations++ },
             paint = paint,
             presentMode = presentMode,
             swapChainSize = swapChainSize,
@@ -115,9 +117,11 @@ fun GLSurfaceView(
                     }
                 }
         ) {
+            invalidations.let {
                 directContext?.let { directContext ->
                     surfaceView.display(drawContext.canvas.nativeCanvas, directContext)
                 }
+            }
         }
     }
     DisposableEffect(surfaceView) {
@@ -137,6 +141,7 @@ class GLSurfaceView internal constructor(
     private val parentContext: GLContext<*>,
     private val drawBlock: suspend GLDrawScope.() -> Unit,
     private val cleanupBlock: suspend () -> Unit = {},
+    private val invalidate: () -> Unit = {},
     private val paint: Paint = Paint(),
     private val presentMode: PresentMode = PresentMode.MAILBOX,
     private val swapChainSize: Int = 10,
@@ -181,6 +186,7 @@ class GLSurfaceView internal constructor(
     internal fun display(canvas: Canvas, displayContext: DirectContext) {
         val t1 = System.nanoTime()
         fboPool?.display { displayImpl(canvas, displayContext) }
+        invalidate()
         val t2 = System.nanoTime()
         state.onDisplay(t2, (t2 - t1).nanoseconds)
     }
@@ -242,6 +248,7 @@ class GLSurfaceView internal constructor(
                 break
             }
             val waitTime = renderResult.getOrNull()
+            invalidate()
             val renderEnd = System.nanoTime()
             state.onRender(renderEnd, (renderEnd - renderStart).nanoseconds)
             lastFrame = renderStart
