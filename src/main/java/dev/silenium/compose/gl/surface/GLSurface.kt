@@ -47,12 +47,16 @@ data class FBOSizeOverride(
 
 /**
  * A composable that displays OpenGL content.
- * @param state The state of the GLSurfaceView.
- * @param modifier The modifier to apply to the GLSurfaceView.
+ * @param state The state of the [GLSurface].
+ * @param modifier The modifier to apply to the [GLSurface].
  * @param paint The paint to draw the contents on the compose scene.
  * @param glContextProvider The provider of the OpenGL context (default: [GLContextProviderFactory.detected]).
- * @param presentMode The present mode of the GLSurfaceView (default: [GLSurfaceView.PresentMode.FIFO]).
- *
+ * @param presentMode The present mode of the GLSurfaceView (default: [GLSurface.PresentMode.FIFO]).
+ * @param swapChainSize The size of the swap chain (default: 10).
+ * @param fboSizeOverride The size override of the FBO (default: null).
+ * @param cleanup The cleanup block to run when the [GLSurface] is destroyed (default: {}).
+ * @param draw The draw block to render the OpenGL content.
+ * @see [GLDrawScope]
  */
 @Composable
 fun GLSurfaceView(
@@ -60,26 +64,82 @@ fun GLSurfaceView(
     modifier: Modifier = Modifier,
     paint: Paint = Paint(),
     glContextProvider: GLContextProvider<*> = GLContextProviderFactory.detected,
-    presentMode: GLSurfaceView.PresentMode = GLSurfaceView.PresentMode.FIFO,
+    presentMode: GLSurface.PresentMode = GLSurface.PresentMode.FIFO,
     swapChainSize: Int = 10,
     fboSizeOverride: FBOSizeOverride? = null,
     cleanup: () -> Unit = {},
     draw: GLDrawScope.() -> Unit,
 ) {
-    var invalidations by remember { mutableStateOf(0) }
-    val surfaceView = remember {
+    val surfaceView = rememberGLSurface(
+        state = state,
+        glContextProvider = glContextProvider,
+        presentMode = presentMode,
+        swapChainSize = swapChainSize,
+        fboSizeOverride = fboSizeOverride,
+        cleanup = cleanup,
+        draw = draw,
+    )
+    GLSurfaceView(surfaceView, modifier, paint)
+}
+
+/**
+ * A composable that remembers a [GLSurface].
+ * @param state The state of the [GLSurface].
+ * @param glContextProvider The provider of the OpenGL context (default: [GLContextProviderFactory.detected]).
+ * @param presentMode The present mode of the GLSurfaceView (default: [GLSurface.PresentMode.FIFO]).
+ * @param swapChainSize The size of the swap chain (default: 10).
+ * @param fboSizeOverride The size override of the FBO (default: null).
+ * @param cleanup The cleanup block to run when the [GLSurface] is destroyed (default: {}).
+ * @param draw The draw block to render the OpenGL content.
+ */
+@Composable
+fun rememberGLSurface(
+    state: GLSurfaceState = rememberGLSurfaceState(),
+    glContextProvider: GLContextProvider<*> = GLContextProviderFactory.detected,
+    presentMode: GLSurface.PresentMode = GLSurface.PresentMode.FIFO,
+    swapChainSize: Int = 10,
+    fboSizeOverride: FBOSizeOverride? = null,
+    cleanup: () -> Unit = {},
+    draw: GLDrawScope.() -> Unit,
+): GLSurface {
+    val surfaceView = remember(state, glContextProvider, presentMode, swapChainSize, cleanup, draw) {
         val currentContext = glContextProvider.fromCurrent() ?: error("No current EGL context")
-        GLSurfaceView(
+        GLSurface(
             state = state,
             parentContext = currentContext,
-            invalidate = { invalidations++ },
-            paint = paint,
             presentMode = presentMode,
             swapChainSize = swapChainSize,
             cleanupBlock = cleanup,
             drawBlock = draw,
+            fboSizeOverride = fboSizeOverride,
         )
     }
+    DisposableEffect(surfaceView) {
+        surfaceView.launch()
+        onDispose {
+            surfaceView.interrupt()
+        }
+    }
+    LaunchedEffect(fboSizeOverride) {
+        surfaceView.fboSizeOverride = fboSizeOverride
+        fboSizeOverride?.size?.let(surfaceView::resize)
+    }
+
+    return surfaceView
+}
+
+/**
+ * A composable that displays OpenGL content.
+ * @param surface The [GLSurface] to display.
+ * @param modifier The modifier to apply to the [GLSurface].
+ * @param paint The paint to draw the contents on the compose scene.
+ */
+@Composable
+fun GLSurfaceView(
+    surface: GLSurface,
+    modifier: Modifier = Modifier,
+    paint: Paint = Paint(),
+) {
     val window = LocalWindow.current
     var directContext by remember { mutableStateOf<DirectContext?>(null) }
     LaunchedEffect(window) {
@@ -96,19 +156,20 @@ fun GLSurfaceView(
         Canvas(
             modifier = Modifier
                 .onSizeChanged {
-                    if (fboSizeOverride == null) {
-                        surfaceView.resize(it)
+                    if (surface.fboSizeOverride == null) {
+                        surface.resize(it)
                     }
                 }.let {
-                    if (fboSizeOverride != null) {
+                    val override = surface.fboSizeOverride
+                    if (override != null) {
                         it.matchParentSize()
                             .drawWithContent {
-                                val xScale = size.width / fboSizeOverride.width
-                                val yScale = size.height / fboSizeOverride.height
+                                val xScale = size.width / override.width
+                                val yScale = size.height / override.height
                                 val scale = minOf(xScale, yScale)
                                 translate(
-                                    (size.width - fboSizeOverride.width * scale) * fboSizeOverride.transformOrigin.pivotFractionX,
-                                    (size.height - fboSizeOverride.height * scale) * fboSizeOverride.transformOrigin.pivotFractionY,
+                                    (size.width - override.width * scale) * override.transformOrigin.pivotFractionX,
+                                    (size.height - override.height * scale) * override.transformOrigin.pivotFractionY,
                                 ) {
                                     scale(scale, Offset.Zero) {
                                         this@drawWithContent.drawContent()
@@ -120,34 +181,23 @@ fun GLSurfaceView(
                     }
                 }
         ) {
-            invalidations.let {
+            surface.invalidations.let {
                 directContext?.let { directContext ->
-                    surfaceView.display(drawContext.canvas.nativeCanvas, directContext)
+                    surface.display(drawContext.canvas.nativeCanvas, directContext, paint)
                 }
             }
         }
     }
-    DisposableEffect(surfaceView) {
-        surfaceView.launch()
-        onDispose {
-            surfaceView.interrupt()
-//            surfaceView.join()
-        }
-    }
-    LaunchedEffect(fboSizeOverride) {
-        fboSizeOverride?.size?.let(surfaceView::resize)
-    }
 }
 
-class GLSurfaceView internal constructor(
+class GLSurface internal constructor(
     private val state: GLSurfaceState,
     private val parentContext: GLContext<*>,
     private val drawBlock: GLDrawScope.() -> Unit,
     private val cleanupBlock: () -> Unit = {},
-    private val invalidate: () -> Unit = {},
-    private val paint: Paint = Paint(),
     private val presentMode: PresentMode = PresentMode.MAILBOX,
     private val swapChainSize: Int = 10,
+    internal var fboSizeOverride: FBOSizeOverride? = null,
 ) : Thread("GLSurfaceView-${index.getAndIncrement()}") {
     enum class PresentMode(internal val impl: (Int, (IntSize) -> FBO) -> FBOSwapChain) {
         /**
@@ -168,6 +218,7 @@ class GLSurfaceView internal constructor(
     private var renderContext: GLContext<*>? = null
     private var size: IntSize = IntSize.Zero
     private var fboPool: FBOPool? = null
+    internal var invalidations by mutableStateOf(0L)
 
     internal fun launch() {
         GL.createCapabilities()
@@ -186,10 +237,10 @@ class GLSurfaceView internal constructor(
         state.requestUpdate()
     }
 
-    internal fun display(canvas: Canvas, displayContext: DirectContext) {
+    internal fun display(canvas: Canvas, displayContext: DirectContext, paint: Paint) {
         val t1 = System.nanoTime()
-        fboPool?.display { displayImpl(canvas, displayContext) }
-        invalidate()
+        fboPool?.display { displayImpl(canvas, displayContext, paint) }
+        invalidations = t1
         val t2 = System.nanoTime()
         state.onDisplay(t2, (t2 - t1).nanoseconds)
     }
@@ -197,6 +248,7 @@ class GLSurfaceView internal constructor(
     private fun GLDisplayScope.displayImpl(
         canvas: Canvas,
         displayContext: DirectContext,
+        paint: Paint,
     ) {
         val rt = BackendRenderTarget.makeGL(
             fbo.size.width,
@@ -252,8 +304,8 @@ class GLSurfaceView internal constructor(
                 break
             }
             val waitTime = renderResult.getOrNull()
-            invalidate()
             val renderEnd = System.nanoTime()
+            invalidations = renderEnd
             state.onRender(renderEnd, (renderEnd - renderStart).nanoseconds)
             lastFrame = renderStart
             try {
@@ -280,7 +332,7 @@ class GLSurfaceView internal constructor(
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(GLSurfaceView::class.java)
+        private val logger = LoggerFactory.getLogger(GLSurface::class.java)
         private val index = AtomicLong(0L)
     }
 }
