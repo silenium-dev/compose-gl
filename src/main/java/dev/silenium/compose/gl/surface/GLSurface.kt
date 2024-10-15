@@ -197,7 +197,7 @@ class GLSurface internal constructor(
     private val cleanupBlock: () -> Unit = {},
     private val presentMode: PresentMode = PresentMode.MAILBOX,
     private val swapChainSize: Int = 10,
-    internal var fboSizeOverride: FBOSizeOverride? = null,
+    fboSizeOverride: FBOSizeOverride? = null,
 ) : Thread("GLSurfaceView-${index.getAndIncrement()}") {
     enum class PresentMode(internal val impl: (Int, (IntSize) -> FBO) -> FBOSwapChain) {
         /**
@@ -213,12 +213,12 @@ class GLSurface internal constructor(
          */
         FIFO(::FBOFifoSwapChain),
     }
-
     private var directContext: DirectContext? = null
     private var renderContext: GLContext<*>? = null
     private var size: IntSize = IntSize.Zero
     private var fboPool: FBOPool? = null
     internal var invalidations by mutableStateOf(0L)
+    internal var fboSizeOverride: FBOSizeOverride? by mutableStateOf(fboSizeOverride)
 
     internal fun launch() {
         GL.createCapabilities()
