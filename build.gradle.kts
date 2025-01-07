@@ -1,9 +1,9 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.compose)
     `maven-publish`
 }
 
