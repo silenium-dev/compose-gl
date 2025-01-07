@@ -2,9 +2,15 @@ package dev.silenium.compose.gl.context
 
 import dev.silenium.libs.jni.NativePlatform
 import dev.silenium.libs.jni.Platform
+import org.lwjgl.system.Configuration
 import org.slf4j.LoggerFactory
 
 object GLContextProviderFactory {
+    init {
+        Configuration.OPENGL_CONTEXT_API.set("native")
+        Configuration.OPENGLES_CONTEXT_API.set("native")
+    }
+
     private val log = LoggerFactory.getLogger(GLContextProviderFactory::class.java)
 
     private val override by lazy {

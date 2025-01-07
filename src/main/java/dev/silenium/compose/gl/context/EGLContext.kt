@@ -109,7 +109,7 @@ data class EGLContext(
 
         override fun createOffscreen(parent: EGLContext): EGLContext {
             val display = parent.display
-            check(eglBindAPI(EGL_OPENGL_ES_API)) { "Failed to bind API: 0x${eglGetError().toString(16).uppercase()}" }
+            check(eglBindAPI(EGL_OPENGL_API)) { "Failed to bind API: 0x${eglGetError().toString(16).uppercase()}" }
 
             val attribList = intArrayOf(
                 EGL_RED_SIZE,
@@ -121,7 +121,7 @@ data class EGLContext(
                 EGL_ALPHA_SIZE,
                 8,
                 EGL_RENDERABLE_TYPE,
-                EGL_OPENGL_ES3_BIT,
+                EGL_OPENGL_BIT,
                 EGL_NONE
             )
             val config = MemoryUtil.memAllocPointer(1)
@@ -135,7 +135,6 @@ data class EGLContext(
                 parent.context,
                 intArrayOf(
                     EGL_CONTEXT_MAJOR_VERSION, 3,
-                    EGL_CONTEXT_MINOR_VERSION, 2,
                     EGL_NONE
                 )
             )

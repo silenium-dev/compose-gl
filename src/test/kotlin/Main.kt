@@ -18,14 +18,11 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.awaitApplication
 import dev.silenium.compose.gl.surface.*
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 import org.jetbrains.skia.Paint
 import org.lwjgl.opengl.GL30.*
-import kotlin.random.Random
-import kotlin.random.nextInt
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -103,7 +100,7 @@ fun ApplicationScope.Content() {
 
             redrawAfter(null)
         }
-        val modifier =  Modifier
+        val modifier = Modifier
             .aspectRatio(1f)
             .zoomable(rememberZoomableState(ZoomSpec(6f)))
             .align(Alignment.Center)
@@ -120,7 +117,12 @@ fun ApplicationScope.Content() {
                 modifier = modifier,
                 contentAlignment = Alignment.Center,
             ) {
-                Text("Surface is not visible", style = MaterialTheme.typography.h6, color = MaterialTheme.colors.onBackground, modifier = Modifier.align(Alignment.Center))
+                Text(
+                    "Surface is not visible",
+                    style = MaterialTheme.typography.h6,
+                    color = MaterialTheme.colors.onBackground,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
         }
         Surface(modifier = Modifier.align(Alignment.TopStart).padding(4.dp)) {
