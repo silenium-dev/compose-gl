@@ -19,7 +19,6 @@ repositories {
 val deployNative = (findProperty("deploy.native") as String?)?.toBoolean() ?: true
 val deployKotlin = (findProperty("deploy.kotlin") as String?)?.toBoolean() ?: true
 
-val lwjglVersion = "3.3.4"
 val lwjglNatives = "natives-linux"
 
 dependencies {
