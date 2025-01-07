@@ -1,6 +1,6 @@
 [versions]
 kotlinx-coroutines = "1.10.1"
-lwjgl = "3.3.5"
+lwjgl = "3.3.6"
 skiko = "0.8.12-egl"
 jni-utils = "0.1.5"
 
@@ -23,7 +23,7 @@ skiko-awt-runtime-linux-x64 = { group = "org.jetbrains.skiko", name = "skiko-awt
 
 jni-utils = { group = "dev.silenium.libs.jni", name = "jni-utils", version.ref = "jni-utils" }
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.16" }
-logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.12" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.16" }
 
 [bundles]
 kotlinx-coroutines = [
