@@ -15,6 +15,7 @@ val LocalWindow: CompositionLocal<Window?> by lazy {
     method.invoke(null) as CompositionLocal<Window?>
 }
 
+@Suppress("UNCHECKED_CAST")
 internal fun Window.directContext(): DirectContext? {
     val composePanelProp = this::class.memberProperties.first { it.name == "composePanel" } as KProperty1<Any, Any>
     composePanelProp.isAccessible = true

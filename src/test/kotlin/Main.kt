@@ -101,7 +101,6 @@ fun ApplicationScope.Content() {
             glVertex2f(0f, 1f)
             glEnd()
 
-            val wait = (1000.0 / 60).milliseconds
             redrawAfter(null)
         }
         val modifier =  Modifier

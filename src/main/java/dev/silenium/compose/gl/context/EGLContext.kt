@@ -45,7 +45,7 @@ data class EGLContext(
     }
 
     override fun destroy() {
-        contextCapabilities.compute(this) { key, value ->
+        contextCapabilities.compute(this) { _, value ->
             if (value == null) {
                 eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)
                 eglDestroyContext(display, context)
