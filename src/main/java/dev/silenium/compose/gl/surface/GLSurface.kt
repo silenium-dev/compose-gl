@@ -122,7 +122,6 @@ fun rememberGLSurface(
     }
     LaunchedEffect(fboSizeOverride) {
         surfaceView.fboSizeOverride = fboSizeOverride
-        fboSizeOverride?.size?.let(surfaceView::resize)
     }
 
     return surfaceView
@@ -142,6 +141,7 @@ fun GLSurfaceView(
 ) {
     val window = LocalWindow.current
     var directContext by remember { mutableStateOf<DirectContext?>(null) }
+    var componentSize by remember { mutableStateOf(IntSize.Zero) }
     LaunchedEffect(window) {
         withContext(Dispatchers.IO) {
             while (isActive) {
@@ -156,6 +156,7 @@ fun GLSurfaceView(
         Canvas(
             modifier = Modifier
                 .onSizeChanged {
+                    componentSize = it
                     if (surface.fboSizeOverride == null) {
                         surface.resize(it)
                     }
@@ -188,6 +189,14 @@ fun GLSurfaceView(
             }
         }
     }
+    LaunchedEffect(surface.fboSizeOverride) {
+        val fboSizeOverride = surface.fboSizeOverride
+        if (fboSizeOverride != null) {
+            surface.resize(fboSizeOverride.size)
+        } else {
+            surface.resize(componentSize)
+        }
+    }
 }
 
 class GLSurface internal constructor(
@@ -213,6 +222,7 @@ class GLSurface internal constructor(
          */
         FIFO(::FBOFifoSwapChain),
     }
+
     private var directContext: DirectContext? = null
     private var renderContext: GLContext<*>? = null
     private var size: IntSize = IntSize.Zero
