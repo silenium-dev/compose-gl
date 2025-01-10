@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
@@ -64,11 +65,15 @@ compose.desktop {
 
 java {
     withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 kotlin {
+    jvmToolchain(11)
     compilerOptions {
         languageVersion = KotlinVersion.KOTLIN_1_8
+        jvmTarget = JvmTarget.JVM_11
     }
 }
 
