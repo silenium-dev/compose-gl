@@ -3,7 +3,7 @@ kotlinx-coroutines = "1.10.1"
 lwjgl = "3.3.6"
 skiko = "0.8.19-egl"
 jni-utils = "0.1.6"
-compose = "1.7.3"
+compose = "1.8.0+dev2134"
 kotlin = "2.1.0"
 
 [libraries]
