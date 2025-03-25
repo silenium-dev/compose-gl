@@ -25,7 +25,7 @@ skiko-awt-runtime-linux-x64 = { group = "org.jetbrains.skiko", name = "skiko-awt
 
 jni-utils = { group = "dev.silenium.libs.jni", name = "jni-utils", version.ref = "jni-utils" }
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.16" }
-logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.16" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.18" }
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
