@@ -83,3 +83,15 @@ data class FBO(
         }
     }
 }
+
+data class FBODrawScope(val fbo: FBO)
+
+inline fun <T> FBO.draw(block: FBODrawScope.() -> T): T {
+    bind()
+    try {
+        val scope = FBODrawScope(this)
+        return scope.block()
+    } finally {
+        unbind()
+    }
+}
