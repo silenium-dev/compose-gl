@@ -21,7 +21,7 @@ repositories {
 val deployNative = (findProperty("deploy.native") as String?)?.toBoolean() ?: true
 val deployKotlin = (findProperty("deploy.kotlin") as String?)?.toBoolean() ?: true
 
-val lwjglNatives = "natives-linux"
+val lwjglNatives = arrayOf("natives-linux", "natives-windows")
 
 dependencies {
     implementation(compose.desktop.common)
@@ -36,7 +36,9 @@ dependencies {
     api(libs.lwjgl.egl)
     libs.bundles.lwjgl.natives.get().forEach {
         api(it)
-        runtimeOnly(variantOf(provider { it }) { classifier(lwjglNatives) })
+        lwjglNatives.forEach { native ->
+            runtimeOnly(variantOf(provider { it }) { classifier(native) })
+        }
     }
 
     implementation(libs.bundles.kotlinx.coroutines)

@@ -14,9 +14,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(SOURCES
-
-)
+set(SOURCES)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if (NOT DEFINED JAVA_HOME)
@@ -27,6 +25,9 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
             src/cpp/linux/GLXContext.cpp
     )
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    list(APPEND SOURCES
+            src/cpp/windows/WGLContext.cpp
+    )
 endif ()
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})

@@ -27,11 +27,13 @@ object GLContextProviderFactory {
 
     private enum class GLContextProviderType(val provider: GLContextProvider<*>) {
         EGL(EGLContext),
-        GLX(GLXContext);
+        GLX(GLXContext),
+        WGL(WGLContext),
     }
 
     private val osOrder = mapOf(
         Platform.OS.LINUX to listOf(GLContextProviderType.EGL, GLContextProviderType.GLX),
+        Platform.OS.WINDOWS to listOf(GLContextProviderType.WGL),
     )
 
     /**
