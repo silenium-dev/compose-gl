@@ -1,4 +1,4 @@
-set(SKIA_VERSION "m132-a00c390e98-1")
+set(SKIA_VERSION "m132-a00c390e98-1" CACHE STRING "Skia version")
 set(SKIA_OS "linux")
 set(SKIA_ARCH "x64")
 set(SKIA_VARIANT "Debug")

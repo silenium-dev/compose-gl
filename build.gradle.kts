@@ -1,11 +1,15 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import java.net.URLClassLoader
+import kotlin.reflect.full.functions
+import kotlin.reflect.jvm.isAccessible
 
 plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.compose)
+    alias(libs.plugins.bytebuddy)
     `maven-publish`
 }
 
@@ -16,6 +20,27 @@ repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
+}
+
+allprojects {
+    apply<MavenPublishPlugin>()
+    apply<BasePlugin>()
+
+    this.group = "dev.silenium.compose.gl"
+    this.version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
+
+    publishing {
+        repositories {
+            val url = System.getenv("MAVEN_REPO_URL") ?: return@repositories
+            maven(url) {
+                name = "reposilite"
+                credentials {
+                    username = System.getenv("MAVEN_REPO_USERNAME") ?: ""
+                    password = System.getenv("MAVEN_REPO_PASSWORD") ?: ""
+                }
+            }
+        }
+    }
 }
 
 val deployNative = (findProperty("deploy.native") as String?)?.toBoolean() ?: true
@@ -43,27 +68,11 @@ dependencies {
 
     implementation(libs.bundles.kotlinx.coroutines)
     implementation("net.java.dev.jna:jna")
-//    api(libs.bundles.skiko) {
-//        version {
-//            strictly(libs.skiko.awt.runtime.linux.x64.get().version!!)
-//        }
-//    }
+    api(libs.bundles.skiko)
 
     testImplementation(compose.desktop.currentOs)
     testImplementation(libs.logback.classic)
     testImplementation("me.saket.telephoto:zoomable:0.14.0")
-}
-
-compose.desktop {
-    application {
-        mainClass = "MainKt"
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "compose-gl"
-            packageVersion = "1.0.0"
-        }
-    }
 }
 
 java {
@@ -80,23 +89,31 @@ kotlin {
     }
 }
 
-allprojects {
-    apply<MavenPublishPlugin>()
-    apply<BasePlugin>()
+val skiaVersion = configurations.compileClasspath.map {
+    it.filter { it.name.matches(Regex("skiko-awt-\\d.+.jar")) }.singleFile
+}.get().let {
+    val loader = URLClassLoader(arrayOf(it.toURI().toURL()))
+    val clazz = loader.loadClass("org.jetbrains.skiko.Version").kotlin
+    val getSkikoVersion = clazz.functions.single { it.name == "getSkiko" }
+    val getSkiaVersion = clazz.functions.single { it.name == "getSkia" }
+    val constructor = clazz.constructors.single()
+    constructor.isAccessible = true
+    val instance = constructor.call()
+    val skikoVersion = getSkikoVersion.call(instance)
+    val skiaVersion = getSkiaVersion.call(instance)
+    println("skiko version: $skikoVersion")
+    println("skia version: $skiaVersion")
+    rootProject.ext.set("skia.version", skiaVersion)
+}
 
-    group = "dev.silenium.compose.gl"
-    version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
+compose.desktop {
+    application {
+        mainClass = "MainKt"
 
-    publishing {
-        repositories {
-            val url = System.getenv("MAVEN_REPO_URL") ?: return@repositories
-            maven(url) {
-                name = "reposilite"
-                credentials {
-                    username = System.getenv("MAVEN_REPO_USERNAME") ?: ""
-                    password = System.getenv("MAVEN_REPO_PASSWORD") ?: ""
-                }
-            }
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "compose-gl"
+            packageVersion = "1.0.0"
         }
     }
 }

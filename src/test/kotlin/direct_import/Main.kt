@@ -42,6 +42,7 @@ import org.lwjgl.system.MemoryUtil
 import java.io.File
 import javax.imageio.ImageIO
 
+
 //language=glsl
 const val VERTEX_SHADER_SOURCE = """
 #version 330 core
@@ -86,6 +87,13 @@ void main(){
 @OptIn(ExperimentalUnsignedTypes::class, InternalComposeUiApi::class)
 fun main() = application {
     System.setProperty("skiko.renderApi", "DIRECT3D")
+
+    val classpath = System.getProperty("java.class.path")
+    val classPathValues: Array<String> =
+        classpath.split(File.pathSeparator.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+    for (cpv in classPathValues) {
+        println(cpv)
+    }
 
     var directContext: DirectContext? by mutableStateOf(null)
 
@@ -150,7 +158,7 @@ fun main() = application {
                     GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE)
 
                     glfwWindow = GLFW.glfwCreateWindow(128, 128, "", MemoryUtil.NULL, MemoryUtil.NULL)
-                    println("glfwWindow: $glfwWindow")
+//                    println("glfwWindow: $glfwWindow")
                     if (glfwWindow == MemoryUtil.NULL) {
                         throw RuntimeException("Failed to create GLFW window")
                     }
