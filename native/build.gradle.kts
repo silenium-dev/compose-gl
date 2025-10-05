@@ -32,7 +32,7 @@ val generateMakefile = tasks.register<Exec>("generateMakefile") {
     val additionalFlags = listOfNotNull(
         "JAVA_HOME" to System.getProperty("java.home"),
         "PROJECT_NAME" to libName,
-        "CMAKE_BUILD_TYPE" to "Release",
+        "CMAKE_BUILD_TYPE" to "Debug",
         rootProject.ext.get("skia.version")?.let { "SKIA_VERSION" to it },
     )
     commandLine(

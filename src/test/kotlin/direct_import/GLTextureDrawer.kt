@@ -1,57 +1,12 @@
 package direct_import
 
-import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11.GL_BLEND
-import org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT
-import org.lwjgl.opengl.GL11.GL_FALSE
-import org.lwjgl.opengl.GL11.GL_FLOAT
-import org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA
-import org.lwjgl.opengl.GL11.GL_SRC_ALPHA
-import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
-import org.lwjgl.opengl.GL11.GL_TRIANGLES
-import org.lwjgl.opengl.GL11.GL_UNSIGNED_INT
-import org.lwjgl.opengl.GL11.glBindTexture
-import org.lwjgl.opengl.GL11.glBlendFunc
-import org.lwjgl.opengl.GL11.glClear
-import org.lwjgl.opengl.GL11.glClearColor
-import org.lwjgl.opengl.GL11.glDeleteTextures
-import org.lwjgl.opengl.GL11.glDisable
-import org.lwjgl.opengl.GL11.glDrawElements
-import org.lwjgl.opengl.GL11.glEnable
+import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL13.GL_TEXTURE0
 import org.lwjgl.opengl.GL13.glActiveTexture
-import org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER
-import org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER
-import org.lwjgl.opengl.GL15.GL_STATIC_DRAW
-import org.lwjgl.opengl.GL15.glBindBuffer
-import org.lwjgl.opengl.GL15.glBufferData
-import org.lwjgl.opengl.GL15.glDeleteBuffers
-import org.lwjgl.opengl.GL15.glGenBuffers
-import org.lwjgl.opengl.GL20.GL_COMPILE_STATUS
-import org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER
-import org.lwjgl.opengl.GL20.GL_LINK_STATUS
-import org.lwjgl.opengl.GL20.GL_VERTEX_SHADER
-import org.lwjgl.opengl.GL20.glAttachShader
-import org.lwjgl.opengl.GL20.glCompileShader
-import org.lwjgl.opengl.GL20.glCreateProgram
-import org.lwjgl.opengl.GL20.glCreateShader
-import org.lwjgl.opengl.GL20.glDeleteProgram
-import org.lwjgl.opengl.GL20.glEnableVertexAttribArray
-import org.lwjgl.opengl.GL20.glGetProgramInfoLog
-import org.lwjgl.opengl.GL20.glGetProgrami
-import org.lwjgl.opengl.GL20.glGetShaderInfoLog
-import org.lwjgl.opengl.GL20.glGetShaderi
-import org.lwjgl.opengl.GL20.glGetUniformLocation
-import org.lwjgl.opengl.GL20.glLinkProgram
-import org.lwjgl.opengl.GL20.glShaderSource
-import org.lwjgl.opengl.GL20.glUniform1i
-import org.lwjgl.opengl.GL20.glUseProgram
-import org.lwjgl.opengl.GL20.glVertexAttribPointer
-import org.lwjgl.opengl.GL30.glBindVertexArray
-import org.lwjgl.opengl.GL30.glDeleteVertexArrays
-import org.lwjgl.opengl.GL30.glGenVertexArrays
+import org.lwjgl.opengl.GL15.*
+import org.lwjgl.opengl.GL20.*
+import org.lwjgl.opengl.GL30.*
 import java.io.File
-import kotlin.random.Random
 
 class GLTextureDrawer {
     private var textureId = 0
@@ -65,7 +20,7 @@ class GLTextureDrawer {
         if (initialized) return
 
         val img = "image.png"
-        val (id, size) = loadTexture(File(img))
+        val (id, _) = loadTexture(File(img))
         textureId = id
 
         shaderProgram = glCreateProgram()

@@ -26,7 +26,7 @@ object D3DInterop {
     }
 
     fun makeBackendTexture(texture: NativePointer): BackendTexture {
-        return Compat.create(makeD3DBackendTextureN(texture))
+        return SkikoCompat.create(makeD3DBackendTextureN(texture))
     }
 
     init {

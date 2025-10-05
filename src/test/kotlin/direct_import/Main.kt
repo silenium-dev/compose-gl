@@ -279,7 +279,7 @@ fun main() = application {
                     Text("Skia Graphics API: ${window.graphicsApi()}")
                     Text("Skia Version: ${Version.skia}")
                     Text("Skiko Version: ${Version.skiko}")
-                    Button(onClick = { print("button pressed") }) {
+                    Button(onClick = { println("button pressed") }) {
                         Text("Button")
                     }
                 }
