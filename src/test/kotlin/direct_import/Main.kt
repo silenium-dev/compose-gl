@@ -29,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.*
+import org.jetbrains.skiko.Version
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.EXTMemoryObject
@@ -260,7 +261,7 @@ fun main() = application {
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 color = MaterialTheme.colors.surface,
-                modifier = Modifier.padding(8.dp).width(200.dp),
+                modifier = Modifier.padding(8.dp).wrapContentWidth(),
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -268,6 +269,8 @@ fun main() = application {
                     modifier = Modifier.padding(8.dp),
                 ) {
                     Text("Skia Graphics API: ${window.graphicsApi()}")
+                    Text("Skia Version: ${Version.skia}")
+                    Text("Skiko Version: ${Version.skiko}")
                     Button(onClick = { print("button pressed") }) {
                         Text("Button")
                     }
