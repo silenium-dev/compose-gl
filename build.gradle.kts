@@ -42,6 +42,7 @@ dependencies {
     }
 
     implementation(libs.bundles.kotlinx.coroutines)
+    implementation("net.java.dev.jna:jna")
 //    api(libs.bundles.skiko) {
 //        version {
 //            strictly(libs.skiko.awt.runtime.linux.x64.get().version!!)
