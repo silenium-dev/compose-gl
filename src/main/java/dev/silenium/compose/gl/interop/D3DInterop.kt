@@ -3,7 +3,6 @@ package dev.silenium.compose.gl.interop
 import dev.silenium.compose.gl.directX12Device
 import dev.silenium.libs.jni.NativeLoader
 import org.jetbrains.skia.BackendTexture
-import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.impl.NativePointer
 import java.awt.Window
 
@@ -12,21 +11,22 @@ object D3DInterop {
         val device = window.directX12Device() ?: throw IllegalStateException("No D3D12 device found")
         return createD3DTextureN(device, width, height)
     }
+
     fun destroyTexture(texture: NativePointer) {
         destroyD3DTextureN(texture)
     }
+
     fun exportSharedHandle(window: Window, texture: NativePointer): NativePointer {
         val device = window.directX12Device() ?: throw IllegalStateException("No D3D12 device found")
         return exportSharedHandleN(device, texture)
     }
+
     fun closeSharedHandle(handle: NativePointer) {
         closeSharedHandleN(handle)
     }
+
     fun makeBackendTexture(texture: NativePointer): BackendTexture {
         return Compat.create(makeD3DBackendTextureN(texture))
-    }
-    fun getDirectContextApi(context: DirectContext) {
-        getDirectContextApiN(context)
     }
 
     init {
@@ -39,4 +39,3 @@ private external fun exportSharedHandleN(device: NativePointer, texture: NativeP
 private external fun makeD3DBackendTextureN(texture: NativePointer): NativePointer
 private external fun destroyD3DTextureN(texture: NativePointer)
 private external fun closeSharedHandleN(handle: NativePointer)
-private external fun getDirectContextApiN(context: DirectContext)

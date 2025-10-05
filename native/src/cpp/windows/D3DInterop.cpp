@@ -5,7 +5,7 @@
 #include <gpu/ganesh/d3d/GrD3DBackendContext.h>
 #include <gpu/ganesh/d3d/GrD3DTypes.h>
 
-#define SK_DIRECT3D // for some reason, the d3d headers undefine this macro
+#define SK_DIRECT3D// for some reason, the d3d headers undefine this macro
 #include <gpu/ganesh/GrBackendSurface.h>
 #include <gpu/ganesh/GrDirectContext.h>
 
@@ -113,27 +113,5 @@ JNIEXPORT void JNICALL Java_dev_silenium_compose_gl_interop_D3DInteropKt_destroy
 JNIEXPORT void JNICALL Java_dev_silenium_compose_gl_interop_D3DInteropKt_closeSharedHandleN(JNIEnv *env, jobject thiz, const jlong _handle) {
     const auto handle = reinterpret_cast<HANDLE>(_handle);
     CloseHandle(handle);
-}
-JNIEXPORT jstring JNICALL Java_dev_silenium_compose_gl_interop_D3DInteropKt_getDirectContextApiN(JNIEnv *env, jobject thiz, jobject _directContext) {
-    const auto clazz = env->GetObjectClass(_directContext);
-    const auto ptrField = env->GetFieldID(clazz, "_ptr", "J");
-    const auto ptr = env->GetLongField(_directContext, ptrField);
-    const auto directContext = reinterpret_cast<GrDirectContext *>(ptr);
-    switch (directContext->backend()) {
-        case GrBackendApi::kOpenGL:
-            return env->NewStringUTF("kOpenGL");
-        case GrBackendApi::kVulkan:
-            return env->NewStringUTF("kVulkan");
-        case GrBackendApi::kMetal:
-            return env->NewStringUTF("kMetal");
-        case GrBackendApi::kDirect3D:
-            return env->NewStringUTF("kDirect3D");
-        case GrBackendApi::kMock:
-            return env->NewStringUTF("kMock");
-        case GrBackendApi::kUnsupported:
-            return env->NewStringUTF("kUnsupported");
-        default:
-            return nullptr;
-    }
 }
 }
