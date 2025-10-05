@@ -1,4 +1,4 @@
-package dev.silenium.compose.gl.direct
+package dev.silenium.compose.gl.canvas
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +27,7 @@ import org.lwjgl.system.MemoryUtil
 import org.slf4j.LoggerFactory
 import java.awt.Window
 
-class D3DCanvasInterface(private val window: Window) : CanvasInterface {
+class D3DCanvasDriver(private val window: Window) : CanvasDriver {
     private var d3dDirectContext: DirectContext? by mutableStateOf(null)
     var d3dTexture: Long? = null
     var sharedHandle: Long? = null
@@ -61,12 +61,21 @@ class D3DCanvasInterface(private val window: Window) : CanvasInterface {
 
     override fun render(
         scope: DrawScope,
+        userResizeHandler: GLDrawScope.(old: IntSize?, new: IntSize) -> Unit,
         block: GLDrawScope.() -> Unit
     ) {
         val d3dCtx = d3dDirectContext ?: return
         ensureInitialized()
         GLFW.glfwMakeContextCurrent(glfwWindow)
+
+        val oldSize = fbo?.size
+        val newSize = scope.size.toIntSize()
         ensureFBO(scope.size.toIntSize(), d3dCtx)
+
+        if (oldSize != newSize) {
+            GLDrawScope(fbo!!).userResizeHandler(oldSize, newSize)
+        }
+
         GLDrawScope(fbo!!).block()
         glFlush()
         GLFW.glfwMakeContextCurrent(MemoryUtil.NULL)
@@ -79,8 +88,11 @@ class D3DCanvasInterface(private val window: Window) : CanvasInterface {
         scope.drawContext.canvas.nativeCanvas.drawImage(img, 0f, 0f)
     }
 
-    override fun dispose() {
+    override fun dispose(userDisposeHandler: () -> Unit) {
         GLFW.glfwMakeContextCurrent(glfwWindow)
+
+        userDisposeHandler()
+
         fbo?.destroy()
         image?.close()
         glMemory?.let(EXTMemoryObject::glDeleteMemoryObjectsEXT)
@@ -88,7 +100,6 @@ class D3DCanvasInterface(private val window: Window) : CanvasInterface {
         sharedHandle?.let(D3DInterop::closeSharedHandle)
         GLFW.glfwMakeContextCurrent(MemoryUtil.NULL)
         glfwWindow.let(GLFW::glfwDestroyWindow)
-        println("Disposed")
     }
 
     private fun ensureFBO(size: IntSize, d3dContext: DirectContext) {
@@ -150,10 +161,10 @@ class D3DCanvasInterface(private val window: Window) : CanvasInterface {
         }
     }
 
-    companion object : CanvasInterfaceFactory<D3DCanvasInterface> {
-        private val log = LoggerFactory.getLogger(D3DCanvasInterface::class.java)
+    companion object : CanvasDriverFactory<D3DCanvasDriver> {
+        private val log = LoggerFactory.getLogger(D3DCanvasDriver::class.java)
 
-        override fun create(window: Window) = D3DCanvasInterface(window)
+        override fun create(window: Window) = D3DCanvasDriver(window)
 
         init {
             GLFW.glfwInitHint(GLFW.GLFW_COCOA_MENUBAR, GLFW.GLFW_FALSE)

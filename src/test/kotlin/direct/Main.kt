@@ -5,7 +5,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -13,9 +12,8 @@ import androidx.compose.ui.scene.PlatformLayersComposeScene
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import dev.silenium.compose.gl.direct.GLCanvas
+import dev.silenium.compose.gl.canvas.GLCanvas
 import dev.silenium.compose.gl.graphicsApi
-import direct_import.GLTextureDrawer
 import org.jetbrains.skiko.Version
 
 @OptIn(InternalComposeUiApi::class)
@@ -25,16 +23,20 @@ fun main() = application {
         Text("Hello from Skia on OpenGL", style = MaterialTheme.typography.h2)
     }
 
-    val drawer = GLTextureDrawer()
+    val renderer = SampleRenderer()
     Window(onCloseRequest = ::exitApplication, title = "Test") {
         Box(Modifier.fillMaxSize()) {
-            DisposableEffect(Unit) {
-                onDispose {
-                    drawer.destroy()
-                }
-            }
-            GLCanvas(modifier = Modifier.fillMaxSize()) {
-                drawer.render()
+            GLCanvas(
+                modifier = Modifier.fillMaxSize(),
+                onDispose = {
+                    renderer.destroy()
+                    println("Disposed")
+                },
+                onResize = { old, new ->
+                    println("Resized from $old to $new, new fbo: ${fbo.id}")
+                },
+            ) {
+                renderer.draw()
             }
             Surface(
                 shape = MaterialTheme.shapes.medium,

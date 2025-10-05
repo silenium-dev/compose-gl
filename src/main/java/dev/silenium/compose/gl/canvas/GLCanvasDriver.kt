@@ -1,11 +1,11 @@
-package dev.silenium.compose.gl.direct
+package dev.silenium.compose.gl.canvas
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toIntSize
 import dev.silenium.compose.gl.fbo.FBO
 import dev.silenium.compose.gl.objects.Renderbuffer
@@ -19,14 +19,14 @@ import org.lwjgl.opengl.GLCapabilities
 import org.slf4j.LoggerFactory
 import java.awt.Window
 
-class GLCanvasInterface : CanvasInterface {
+class GLCanvasDriver : CanvasDriver {
     var fbo: FBO? = null
     var image: Image? = null
     var texture: BackendTexture? = null
     var initialized = false
     lateinit var glCapabilities: GLCapabilities
     var directContext: DirectContext? by mutableStateOf(null)
-    var size: Size = Size.Zero
+    var size: IntSize = IntSize.Zero
 
     override fun setup(directContext: DirectContext) {
         this.directContext = directContext
@@ -39,26 +39,31 @@ class GLCanvasInterface : CanvasInterface {
         }
     }
 
-    override fun dispose() {
+    override fun dispose(userDisposeHandler: () -> Unit) {
+        userDisposeHandler()
         texture?.close()
         fbo?.destroy()
     }
 
     override fun render(
         scope: DrawScope,
+        userResizeHandler: GLDrawScope.(old: IntSize?, new: IntSize) -> Unit,
         block: GLDrawScope.() -> Unit
     ) {
         val ctx = directContext ?: return
         ctx.submit(syncCpu = true)
         ensureInitialized()
-        log.trace("Ensuring FBO")
-        ensureFBO(scope.size, ctx)
-        log.trace("Drawing to FBO")
+
+        val oldSize = fbo?.size
+        val newSize = scope.size.toIntSize()
+        ensureFBO(newSize, ctx)
+        if (oldSize != newSize) {
+            GLDrawScope(fbo!!).userResizeHandler(oldSize, newSize)
+        }
+
         GLDrawScope(fbo!!).block()
-        log.trace("Flushing")
         glFlush()
         ctx.resetGLAll()
-        log.trace("Rendering done")
     }
 
     override fun display(scope: DrawScope) {
@@ -68,7 +73,7 @@ class GLCanvasInterface : CanvasInterface {
         scope.drawContext.canvas.nativeCanvas.drawImage(img, 0f, 0f)
     }
 
-    private fun ensureFBO(size: Size, ctx: DirectContext) {
+    private fun ensureFBO(size: IntSize, ctx: DirectContext) {
         if (size != this.size) {
             texture?.close()
             fbo?.destroy()
@@ -92,18 +97,18 @@ class GLCanvasInterface : CanvasInterface {
         }
     }
 
-    private fun createFBO(size: Size): FBO {
+    private fun createFBO(size: IntSize): FBO {
         val colorAttachment = Texture.create(
-            target = GL11.GL_TEXTURE_2D, size = size.toIntSize(), internalFormat = GL11.GL_RGBA8,
+            target = GL11.GL_TEXTURE_2D, size = size, internalFormat = GL11.GL_RGBA8,
             wrapS = GL33.GL_CLAMP_TO_EDGE, wrapT = GL33.GL_CLAMP_TO_EDGE,
             minFilter = GL33.GL_NEAREST, magFilter = GL33.GL_NEAREST,
         )
-        val depthStencil = Renderbuffer.create(size.toIntSize(), GL33.GL_DEPTH24_STENCIL8)
+        val depthStencil = Renderbuffer.create(size, GL33.GL_DEPTH24_STENCIL8)
         return FBO.create(colorAttachment, depthStencil)
     }
 
-    companion object : CanvasInterfaceFactory<GLCanvasInterface> {
-        private val log = LoggerFactory.getLogger(GLCanvasInterface::class.java)
-        override fun create(window: Window) = GLCanvasInterface()
+    companion object : CanvasDriverFactory<GLCanvasDriver> {
+        private val log = LoggerFactory.getLogger(GLCanvasDriver::class.java)
+        override fun create(window: Window) = GLCanvasDriver()
     }
 }

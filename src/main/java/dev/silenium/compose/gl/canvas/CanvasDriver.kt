@@ -1,19 +1,25 @@
-package dev.silenium.compose.gl.direct
+package dev.silenium.compose.gl.canvas
 
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.fbo.FBO
 import org.jetbrains.skia.DirectContext
 import org.lwjgl.opengl.GL11.glFlush
 import java.awt.Window
 
-interface CanvasInterface {
+interface CanvasDriver {
     fun setup(directContext: DirectContext)
-    fun render(scope: DrawScope, block: GLDrawScope.() -> Unit)
+    fun render(
+        scope: DrawScope,
+        userResizeHandler: GLDrawScope.(old: IntSize?, new: IntSize) -> Unit = { _, _ -> },
+        block: GLDrawScope.() -> Unit,
+    )
+
     fun display(scope: DrawScope)
-    fun dispose()
+    fun dispose(userDisposeHandler: () -> Unit)
 }
 
-fun interface CanvasInterfaceFactory<T : CanvasInterface> {
+fun interface CanvasDriverFactory<T : CanvasDriver> {
     fun create(window: Window): T
 }
 

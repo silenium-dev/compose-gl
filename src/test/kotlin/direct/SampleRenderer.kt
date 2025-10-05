@@ -1,14 +1,40 @@
-package direct_import
+package direct
 
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL13.GL_TEXTURE0
-import org.lwjgl.opengl.GL13.glActiveTexture
-import org.lwjgl.opengl.GL15.*
-import org.lwjgl.opengl.GL20.*
+import org.lwjgl.BufferUtils
+import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL30.*
 import java.io.File
+import javax.imageio.ImageIO
 
-class GLTextureDrawer {
+//language=glsl
+const val VERTEX_SHADER_SOURCE = """#version 330 core
+
+layout(location = 0) in vec3 vertexPosition;
+layout(location = 1) in vec2 vertexUV;
+
+out vec2 UV;
+
+void main() {
+    gl_Position = vec4(vertexPosition, 1);
+    UV = vertexUV;
+}
+"""
+
+//language=glsl
+const val FRAGMENT_SHADER_SOURCE = """#version 330 core
+
+in vec2 UV;
+out vec4 color;
+
+uniform sampler2D myTextureSampler;
+
+void main() {
+    color = vec4(texture(myTextureSampler, UV).rgb, 1.0);
+    //color = vec4(UV.xy, 0.0, 1.0);
+}
+"""
+
+class SampleRenderer {
     private var textureId = 0
     private var initialized = false
     private var shaderProgram = 0
@@ -16,7 +42,7 @@ class GLTextureDrawer {
     private var vbo = 0
     private var ibo = 0
 
-    fun initialize() {
+    private fun initialize() {
         if (initialized) return
 
         val img = "image.png"
@@ -80,13 +106,13 @@ class GLTextureDrawer {
         initialized = true
     }
 
-    fun render() {
+    fun draw() {
         initialize()
 
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        glClearColor(0f, .5f, .5f, 1f)
+        glClearColor(0f, .8f, .4f, 1f)
         glClear(GL_COLOR_BUFFER_BIT)
 
         glBindVertexArray(vao)
@@ -115,4 +141,54 @@ class GLTextureDrawer {
         ibo = 0
         textureId = 0
     }
+}
+
+fun loadTexture(file: File): Pair<Int, Pair<Int, Int>> {
+    val image = ImageIO.read(file)
+
+    val width = image.width
+    val height = image.height
+
+    // Convert image to RGBA
+    val pixels = IntArray(width * height)
+    image.getRGB(0, 0, width, height, pixels, 0, width)
+
+    val buffer = BufferUtils.createByteBuffer(width * height * 4)
+
+    // OpenGL expects bottom-to-top, so flip vertically
+    for (y in 0..<height) {
+        for (x in 0..<width) {
+            val pixel = pixels[y * width + x]
+            buffer.put(((pixel shr 16) and 0xFF).toByte()) // Red
+            buffer.put(((pixel shr 8) and 0xFF).toByte()) // Green
+            buffer.put((pixel and 0xFF).toByte()) // Blue
+            buffer.put(((pixel shr 24) and 0xFF).toByte()) // Alpha
+        }
+    }
+
+    buffer.flip()
+
+    GL.createCapabilities()
+    val textureID = glGenTextures()
+    glBindTexture(GL_TEXTURE_2D, textureID)
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RGBA8,
+        width,
+        height,
+        0,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        buffer
+    )
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+    return textureID to (width to height)
 }
