@@ -21,12 +21,12 @@ data class WGLContext(
     override lateinit var glCapabilities: GLCapabilities
 
     override fun unbindCurrent() {
-        WGL.wglMakeCurrent(0L, 0L)
+        WGL.wglMakeCurrent(null, 0L, 0L)
     }
 
     override fun makeCurrent() {
         if (provider.fromCurrent() != this) {
-            check(WGL.wglMakeCurrent(deviceContext, renderingContext)) {
+            check(WGL.wglMakeCurrent(null, deviceContext, renderingContext)) {
                 "Failed to make context current"
             }
         }
@@ -44,14 +44,14 @@ data class WGLContext(
     override fun destroy() {
         contextCapabilities.compute(this) { key, value ->
             if (value == null) {
-                WGL.wglMakeCurrent(0L, 0L)
-                WGL.wglDeleteContext(key.renderingContext)
+                WGL.wglMakeCurrent(null, 0L, 0L)
+                WGL.wglDeleteContext(null, key.renderingContext)
                 return@compute null
             }
             val refCount = value.refCount - 1
             if (refCount == 0) {
-                WGL.wglMakeCurrent(0L, 0L)
-                WGL.wglDeleteContext(key.renderingContext)
+                WGL.wglMakeCurrent(null, 0L, 0L)
+                WGL.wglDeleteContext(null, key.renderingContext)
                 return@compute null
             }
             value.copy(refCount = refCount)
@@ -75,15 +75,15 @@ data class WGLContext(
 
         override fun <R> restorePrevious(block: () -> R): R {
             val displayContext = WGL.wglGetCurrentDC()
-            val renderingContext = WGL.wglGetCurrentContext()
+            val renderingContext = WGL.wglGetCurrentContext(null)
             return block().also {
-                WGL.wglMakeCurrent(displayContext, renderingContext)
+                WGL.wglMakeCurrent(null, displayContext, renderingContext)
             }
         }
 
         override fun fromCurrent(): WGLContext? {
             val deviceContext = WGL.wglGetCurrentDC()
-            val renderingContext = WGL.wglGetCurrentContext()
+            val renderingContext = WGL.wglGetCurrentContext(null)
             return if (deviceContext != 0L && renderingContext != 0L) {
                 WGLContext(deviceContext, renderingContext)
             } else {
@@ -93,14 +93,14 @@ data class WGLContext(
 
         override fun isCurrent(): Boolean {
             val deviceContext = WGL.wglGetCurrentDC()
-            val renderingContext = WGL.wglGetCurrentContext()
+            val renderingContext = WGL.wglGetCurrentContext(null)
             return deviceContext != 0L && renderingContext != 0L
         }
 
         override fun createOffscreen(parent: WGLContext): WGLContext {
             val deviceContext = parent.deviceContext
-            val renderingContext = WGL.wglCreateContext(deviceContext)
-            check(WGL.wglShareLists(parent.renderingContext, renderingContext)) {
+            val renderingContext = WGL.wglCreateContext(null, deviceContext)
+            check(WGL.wglShareLists(null, parent.renderingContext, renderingContext)) {
                 "Failed to share context lists"
             }
             return WGLContext(deviceContext, renderingContext)

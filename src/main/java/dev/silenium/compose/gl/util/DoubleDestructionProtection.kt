@@ -23,6 +23,20 @@ abstract class DoubleDestructionProtection<ID> {
         }
     }
 
+    fun abandon() {
+        if (destroyed.compareAndSet(false, true)) {
+            destructionPoint = Exception("Abandoned")
+        } else {
+            logger.trace(
+                "{} {} was already destroyed at: {}",
+                javaClass.simpleName,
+                id,
+                destroyed.get(),
+                Exception(),
+            )
+        }
+    }
+
     protected abstract fun destroyInternal()
 
     companion object {
