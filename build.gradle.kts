@@ -68,11 +68,7 @@ dependencies {
 
     implementation(libs.bundles.kotlinx.coroutines)
     implementation("net.java.dev.jna:jna")
-    api(libs.bundles.skiko) {
-        version {
-            strictly(libs.versions.skiko.get())
-        }
-    }
+    api(libs.bundles.skiko)
 
     testImplementation(compose.desktop.currentOs)
     testImplementation(libs.logback.classic)
