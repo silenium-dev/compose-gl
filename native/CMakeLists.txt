@@ -21,10 +21,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-include(cmake/skia.cmake)
-
 set(SOURCES
-
+        src/cpp/library.cpp
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -33,12 +31,10 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif ()
 
     list(APPEND SOURCES
-            src/cpp/linux/GLXContext.cpp
     )
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND SOURCES
             src/cpp/windows/D3DInterop.cpp
-            src/cpp/windows/WGLContext.cpp
     )
 endif ()
 
@@ -55,6 +51,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(${PROJECT_NAME} PUBLIC PkgConfig::GL)
     target_include_directories(${PROJECT_NAME} PUBLIC "${JAVA_HOME}/include/linux")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    include(cmake/skia.cmake)
     target_compile_definitions(${PROJECT_NAME} PRIVATE -D_WINDOWS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE SK_DIRECT3D NOMINMAX WIN32_LEAN_AND_MEAN)
     target_compile_options(${PROJECT_NAME} PRIVATE /MT)
