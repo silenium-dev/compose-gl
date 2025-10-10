@@ -18,7 +18,9 @@ import androidx.compose.ui.scene.PlatformLayersComposeScene
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import dev.silenium.compose.gl.LocalWindow
 import dev.silenium.compose.gl.canvas.GLCanvas
+import dev.silenium.compose.gl.findSkiaLayer
 import dev.silenium.compose.gl.graphicsApi
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.Version
@@ -41,6 +43,7 @@ fun main() = application {
     val renderer = SampleRenderer()
     Window(onCloseRequest = ::exitApplication, title = "Test") {
         Box(Modifier.fillMaxSize()) {
+            println("skia layer: ${LocalWindow.current?.findSkiaLayer()}")
             GLCanvas(
                 modifier = Modifier.fillMaxSize(),
                 onDispose = {
@@ -91,7 +94,7 @@ fun main() = application {
                     horizontalAlignment = Alignment.Start,
                     modifier = Modifier.padding(8.dp),
                 ) {
-                    Text("Skia Graphics API: ${window.graphicsApi()}")
+                    Text("Skia Graphics API: ${window.findSkiaLayer()?.graphicsApi()}")
                     Text("Skia Version: ${Version.skia}")
                     Text("Skiko Version: ${Version.skiko}")
                     Button(onClick = { println("button pressed") }) {

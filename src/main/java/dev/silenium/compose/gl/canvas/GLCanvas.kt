@@ -6,9 +6,11 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.LocalWindow
 import dev.silenium.compose.gl.directContext
+import dev.silenium.compose.gl.findSkiaLayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
@@ -26,7 +28,7 @@ fun GLCanvas(
     LaunchedEffect(window) {
         withContext(Dispatchers.IO) {
             while (isActive) {
-                window.directContext()?.let {
+                window.findSkiaLayer()?.directContext()?.let {
                     wrapper.setup(it)
                     return@withContext
                 }
@@ -39,6 +41,7 @@ fun GLCanvas(
         }
     }
     Canvas(modifier) {
+        drawContext.canvas.nativeCanvas
         wrapper.render(this, onResize) {
             drawGL { block() }
         }
