@@ -58,8 +58,7 @@ dependencies {
     }
 
     api(platform(libs.lwjgl.bom))
-    api(libs.lwjgl.egl)
-    libs.bundles.lwjgl.natives.get().forEach {
+    libs.bundles.lwjgl.get().forEach {
         api(it)
         lwjglNatives.forEach { native ->
             runtimeOnly(variantOf(provider { it }) { classifier(native) })
