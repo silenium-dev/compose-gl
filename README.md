@@ -5,14 +5,7 @@ Render OpenGL content onto a Compose Canvas.
 ## Supported platforms
 
 - JVM + Linux
-
-## Dependencies
-
-This library works with the default skiko and skia builds, 
-but also supports a custom skiko+skia build using EGL and GLES instead of GLX and Desktop GL on Linux:
-
-- Skiko: https://github.com/silenium-dev/skiko
-- Skia: https://github.com/silenium-dev/skia-pack
+- JVM + Windows
 
 ## Usage
 
@@ -20,45 +13,44 @@ You can add the dependency to your project as follows:
 
 ```kotlin
 repositories {
-    maven("https://reposilite.silenium.dev/releases") {
-        name = "silenium-releases"
+    maven("https://repo.silenium.dev/releases") {
+        name = "silenium-dev-releases"
     }
 }
 dependencies {
-    implementation("dev.silenium.compose.gl:compose-gl:0.6.0")
+    implementation("dev.silenium.compose.gl:compose-gl:0.7.4")
 }
 ```
 
+### Development Snapshots
+
+Snapshots are available from [silenium-dev-snapshots](https://repo.silenium.dev/snapshots).
+Versions don't follow semantic versioning, but are based on the commit hash: `<short-sha>-dev` (e.g. `c6d653e-dev`)
+
 ### Example
+
+This is a simple example of how to use the library.
+For a more complex example, see [src/test/kotlin/direct/Main.kt](src/test/kotlin/direct/Main.kt).
 
 ```kotlin
 @Composable
 fun App() {
-    Box(contentAlignment = Alignment.TopStart) {
-        // Button behind the GLSurfaceView -> Alpha works, clicks will be passed through, as long as the GLSurfaceView is not clickable
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
+        // Button behind the GLCanvas -> Alpha works. Clicks will be passed through, as long as the GLCanvas is not clickable
         Button(onClick = {}) {
             Text("Click me!")
         }
-        // Size needs to be specified, as the default size is 0x0
+        // Size needs to be specified, as the default size of a Compose Canvas is 0x0
         // Internally uses a Compose Canvas, so it can be used like any other Composable
-        GLSurfaceView(
-            modifier = Modifier.size(100.dp),
-            presentMode = GLSurfaceView.PresentMode.MAILBOX, // Present mode is based on the Vulkan present modes
-            swapChainSize = 2,
-        ) {
-            // Translucent grey
-            // Use GLES or GL, depending on the skiko variant you are using
-            GL30.glClearColor(0.5f, 0.5f, 0.5f, 0.5f)
-            GL30.glClear(GL_COLOR_BUFFER_BIT)
-            // Render with 30 FPS, this should be the time from start of frame n to frame n+1, the internal logic subtracts render time and other delays
-            // Defaults to 60 FPS
-            // Will be replaced with a better solution in the future
-            redrawAfter((1000.0 / 30).milliseconds)
+        GLCanvas(modifier = Modifier.size(100.dp)) {
+            // Translucent blue
+            // Use LWJGL GL, other GL libraries may work but are not tested
+            GL30.glClearColor(0f, 0f, 0.5f, 0.5f)
+            GL30.glClear(GL30.GL_COLOR_BUFFER_BIT)
         }
     }
 }
 
-// awaitApplication{} is required for now. For some reason, the JVM gets stuck on shutdown, when using application{}.
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         App()
