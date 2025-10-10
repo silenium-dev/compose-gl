@@ -3,7 +3,7 @@ package direct
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL30.*
-import java.io.File
+import java.io.InputStream
 import javax.imageio.ImageIO
 
 //language=glsl
@@ -46,8 +46,8 @@ class SampleRenderer {
         if (initialized) return
 
         val img = "image.png"
-        val (id, _) = loadTexture(File(img))
-        textureId = id
+        val stream = javaClass.classLoader.getResourceAsStream(img) ?: error("Resource not found: $img")
+        textureId = loadTexture(stream)
 
         shaderProgram = glCreateProgram()
         val vertexShader = glCreateShader(GL_VERTEX_SHADER)
@@ -143,8 +143,8 @@ class SampleRenderer {
     }
 }
 
-fun loadTexture(file: File): Pair<Int, Pair<Int, Int>> {
-    val image = ImageIO.read(file)
+fun loadTexture(stream: InputStream): Int {
+    val image = ImageIO.read(stream)
 
     val width = image.width
     val height = image.height
@@ -190,5 +190,5 @@ fun loadTexture(file: File): Pair<Int, Pair<Int, Int>> {
     )
     glBindTexture(GL_TEXTURE_2D, 0)
 
-    return textureID to (width to height)
+    return textureID
 }
