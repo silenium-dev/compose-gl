@@ -1,9 +1,8 @@
 [versions]
 kotlinx-coroutines = "1.10.2"
 lwjgl = "3.3.6"
-skiko = "0.9.22.2"
 jni-utils = "0.1.6"
-compose = "1.9.0"
+compose = "1.10.0-alpha02"
 kotlin = "2.2.20"
 
 [libraries]
@@ -19,8 +18,7 @@ lwjgl-core = { group = "org.lwjgl", name = "lwjgl", version.ref = "lwjgl" }
 lwjgl-glfw = { group = "org.lwjgl", name = "lwjgl-glfw", version.ref = "lwjgl" }
 lwjgl-opengl = { group = "org.lwjgl", name = "lwjgl-opengl", version.ref = "lwjgl" }
 
-skiko-awt = { group = "org.jetbrains.skiko", name = "skiko-awt", version.ref = "skiko" }
-skiko-awt-runtime-linux-x64 = { group = "org.jetbrains.skiko", name = "skiko-awt-runtime-linux-x64", version.ref = "skiko" }
+skiko-awt = { group = "org.jetbrains.skiko", name = "skiko-awt" }
 
 jni-utils = { group = "dev.silenium.libs.jni", name = "jni-utils", version.ref = "jni-utils" }
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.17" }
@@ -44,7 +42,6 @@ kotlinx-coroutines = [
 
 skiko = [
     "skiko-awt",
-    "skiko-awt-runtime-linux-x64",
 ]
 
 lwjgl = [
