@@ -30,6 +30,7 @@ data class Texture(
 
     override fun destroyInternal() {
         glDeleteTextures(id)
+        checkGLError("glDeleteTextures")
     }
 
     companion object {

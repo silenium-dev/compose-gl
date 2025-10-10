@@ -27,7 +27,20 @@ jobs:
           repo-username: ${{ secrets.REPOSILITE_USERNAME }}
           repo-password: ${{ secrets.REPOSILITE_PASSWORD }}
           tests: false
-          java-version: 11
+          java-version: 17
+          platform: ${{ github.job }}
+  windows-x86_64:
+    runs-on: windows-latest
+    steps:
+      - uses: silenium-dev/actions/jni-natives/windows@main
+        with:
+          gradle-cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
+          snapshot-repo-url: "https://reposilite.silenium.dev/snapshots"
+          release-repo-url: "https://reposilite.silenium.dev/releases"
+          repo-username: ${{ secrets.REPOSILITE_USERNAME }}
+          repo-password: ${{ secrets.REPOSILITE_PASSWORD }}
+          tests: false
+          java-version: 17
           platform: ${{ github.job }}
   kotlin:
     runs-on: ubuntu-22.04
@@ -40,4 +53,4 @@ jobs:
           repo-username: ${{ secrets.REPOSILITE_USERNAME }}
           repo-password: ${{ secrets.REPOSILITE_PASSWORD }}
           tests: false
-          java-version: 11
+          java-version: 17

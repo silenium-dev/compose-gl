@@ -29,21 +29,20 @@ val platform = platformString?.let(Platform::invoke) ?: NativePlatform.platform(
 val cmakeExe = findProperty("cmake.executable") as? String ?: "cmake"
 val generateMakefile = tasks.register<Exec>("generateMakefile") {
     workingDir = layout.buildDirectory.dir("cmake").get().asFile.apply { mkdirs() }
-    val additionalFlags = mutableListOf(
-        "-DJAVA_HOME=${System.getProperty("java.home")}",
-        "-DPROJECT_NAME=${libName}",
+    val additionalFlags = listOfNotNull(
+        "JAVA_HOME" to System.getProperty("java.home"),
+        "PROJECT_NAME" to libName,
+        "CMAKE_BUILD_TYPE" to "Debug",
+        rootProject.ext.get("skia.version")?.let { "SKIA_VERSION" to it },
     )
     commandLine(
         cmakeExe,
-        *additionalFlags.toTypedArray(),
+        *additionalFlags.map { "-D${it.first}=${it.second}" }.toTypedArray(),
         layout.projectDirectory.asFile.absolutePath,
     )
 
     inputs.file(layout.projectDirectory.file("CMakeLists.txt"))
-    inputs.properties(
-        "JAVA_HOME" to System.getProperty("java.home"),
-        "PROJECT_NAME" to libName,
-    )
+    inputs.properties(additionalFlags.toMap())
     outputs.dir(workingDir)
     standardOutput = System.out
 }
@@ -76,6 +75,7 @@ val jar = tasks.register<Jar>("nativeJar") {
     val libName = rootProject.name
     val platformString = findProperty("deploy.platform")?.toString()
     val platform = platformString?.let(Platform::invoke) ?: NativePlatform.platform()
+    archiveBaseName.set("$libName-natives-$platform")
 
     from(compileNative.get().outputs.files) {
         rename {

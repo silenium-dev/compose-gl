@@ -31,6 +31,7 @@ logback-classic = { group = "ch.qos.logback", name = "logback-classic", version 
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+bytebuddy = { id = "net.bytebuddy.byte-buddy-gradle-plugin", version = "1.17.7" }
 
 [bundles]
 kotlinx-coroutines = [
