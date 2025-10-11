@@ -1,4 +1,4 @@
-package direct
+package dev.silenium.compose.gl.examples.skia_gl
 
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL

@@ -1,4 +1,4 @@
-package direct
+package dev.silenium.compose.gl.examples.skia_gl
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
