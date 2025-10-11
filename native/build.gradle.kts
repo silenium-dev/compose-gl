@@ -93,7 +93,7 @@ publishing {
         if (deployNative) {
             create<MavenPublication>("natives${platform.capitalized}") {
                 artifact(jar)
-                artifactId = "$libName-natives-$platform"
+                artifactId = nativeArtifactId(platform)
             }
         }
     }

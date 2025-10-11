@@ -13,8 +13,14 @@ plugins {
 rootProject.name = "compose-gl"
 
 val deployNative = if (extra.has("deploy.native")) {
-    extra.get("deploy.native")?.toString()?.toBoolean() ?: true
+    extra.get("deploy.native").toString().toBoolean()
 } else true
+val deployKotlin = if (extra.has("deploy.native")) {
+    extra.get("deploy.kotlin").toString().toBoolean()
+} else false
 if (deployNative) {
     include(":native")
+}
+if (deployKotlin) {
+    include(":native-all")
 }

@@ -29,7 +29,33 @@ jobs:
           tests: false
           java-version: 17
           platform: ${{ github.job }}
+  linux-arm64:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: silenium-dev/actions/jni-natives/ubuntu@main
+        with:
+          gradle-cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
+          snapshot-repo-url: "https://reposilite.silenium.dev/snapshots"
+          release-repo-url: "https://reposilite.silenium.dev/releases"
+          repo-username: ${{ secrets.REPOSILITE_USERNAME }}
+          repo-password: ${{ secrets.REPOSILITE_PASSWORD }}
+          tests: false
+          java-version: 17
+          platform: ${{ github.job }}
   windows-x86_64:
+    runs-on: windows-latest
+    steps:
+      - uses: silenium-dev/actions/jni-natives/windows@main
+        with:
+          gradle-cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
+          snapshot-repo-url: "https://reposilite.silenium.dev/snapshots"
+          release-repo-url: "https://reposilite.silenium.dev/releases"
+          repo-username: ${{ secrets.REPOSILITE_USERNAME }}
+          repo-password: ${{ secrets.REPOSILITE_PASSWORD }}
+          tests: false
+          java-version: 17
+          platform: ${{ github.job }}
+  windows-arm64:
     runs-on: windows-latest
     steps:
       - uses: silenium-dev/actions/jni-natives/windows@main
@@ -44,6 +70,7 @@ jobs:
           platform: ${{ github.job }}
   kotlin:
     runs-on: ubuntu-22.04
+    needs: [ linux-x86_64, linux-arm64, windows-x86_64, windows-arm64 ]
     steps:
       - uses: silenium-dev/actions/kotlin@main
         with:
