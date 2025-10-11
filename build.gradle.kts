@@ -13,18 +13,18 @@ plugins {
     `maven-publish`
 }
 
-repositories {
-    maven("https://reposilite.silenium.dev/releases") {
-        name = "reposilite"
-    }
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    google()
-}
-
 allprojects {
     apply<MavenPublishPlugin>()
     apply<BasePlugin>()
+
+    repositories {
+        maven("https://reposilite.silenium.dev/releases") {
+            name = "reposilite"
+        }
+        mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        google()
+    }
 
     this.group = "dev.silenium.compose.gl"
     this.version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
