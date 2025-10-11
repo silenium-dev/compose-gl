@@ -3,7 +3,7 @@ import dev.silenium.libs.jni.Platform.Arch
 import dev.silenium.libs.jni.Platform.OS
 
 plugins {
-    `java-library`
+    `java-platform`
 }
 
 val supportedPlatforms = listOf(
@@ -14,7 +14,12 @@ val supportedPlatforms = listOf(
 )
 val libName = rootProject.name
 
+javaPlatform {
+    allowDependencies()
+}
+
 dependencies {
+    api(libs.jni.utils)
     supportedPlatforms.forEach { platform ->
         api("${project.group}:${nativeArtifactId(platform)}:${project.version}")
     }
@@ -24,6 +29,7 @@ publishing {
     publications {
         create<MavenPublication>("nativesAll") {
             artifactId = allNativesArtifactId
+            from(components["javaPlatform"])
         }
     }
 }
