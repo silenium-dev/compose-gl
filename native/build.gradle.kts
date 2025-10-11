@@ -33,8 +33,10 @@ val generateMakefile = tasks.register<Exec>("generateMakefile") {
         "JAVA_HOME" to System.getProperty("java.home"),
         "PROJECT_NAME" to libName,
         "CMAKE_BUILD_TYPE" to "Debug",
+        "CMAKE_TOOLCHAIN_FILE" to layout.projectDirectory.file("toolchains/${platform.osArch}.cmake").asFile,
         rootProject.ext.get("skia.version")?.let { "SKIA_VERSION" to it },
     )
+
     commandLine(
         cmakeExe,
         *additionalFlags.map { "-D${it.first}=${it.second}" }.toTypedArray(),
