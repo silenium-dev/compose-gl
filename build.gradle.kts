@@ -71,7 +71,7 @@ dependencies {
 
     testImplementation(compose.desktop.currentOs)
     testImplementation(libs.logback.classic)
-    testImplementation("me.saket.telephoto:zoomable:0.14.0")
+    testImplementation("me.saket.telephoto:zoomable:0.18.0")
 }
 
 java {
