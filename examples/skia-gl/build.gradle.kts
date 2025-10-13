@@ -7,10 +7,17 @@ plugins {
 
 val composeGlVersion = "2e851b0-dev"
 
+val useParent: Boolean = project.ext.properties.getOrDefault("examples.use-parent", "false").toString().toBoolean()
+
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation("dev.silenium.compose.gl:compose-gl:${composeGlVersion}")
-    implementation("dev.silenium.compose.gl:compose-gl-natives-all:${composeGlVersion}")
+    if (useParent) {
+        implementation(project(":"))
+    } else {
+        implementation("dev.silenium.compose.gl:compose-gl:${composeGlVersion}")
+        implementation("dev.silenium.compose.gl:compose-gl-natives-all:${composeGlVersion}")
+    }
+    implementation(libs.slf4j.api)
     runtimeOnly("ch.qos.logback:logback-classic:1.5.19")
 }
 

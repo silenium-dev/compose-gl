@@ -29,7 +29,7 @@ out vec4 color;
 uniform sampler2D myTextureSampler;
 
 void main() {
-    color = vec4(texture(myTextureSampler, UV).rgb, 1.0);
+    color = vec4(texture(myTextureSampler, UV).rgb, 0.7f);
     //color = vec4(UV.xy, 0.0, 1.0);
 }
 """
@@ -111,9 +111,6 @@ class SampleRenderer {
 
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-        glClearColor(0f, .8f, .4f, 1f)
-        glClear(GL_COLOR_BUFFER_BIT)
 
         glBindVertexArray(vao)
         glUseProgram(shaderProgram)

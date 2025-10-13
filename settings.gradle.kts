@@ -24,3 +24,4 @@ if (deployNative) {
 if (deployKotlin) {
     include(":native-all")
 }
+include(":examples", ":examples:skia-gl")
