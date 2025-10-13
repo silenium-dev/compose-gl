@@ -7,7 +7,7 @@ plugins {
 
 val composeGlVersion = "2e851b0-dev"
 
-val useParent: Boolean = project.ext.properties.getOrDefault("examples.use-parent", "false").toString().toBoolean()
+val useParent: Boolean = project.ext.properties.getOrDefault("examples.use-parent", "true").toString().toBoolean()
 
 dependencies {
     implementation(compose.desktop.currentOs)
