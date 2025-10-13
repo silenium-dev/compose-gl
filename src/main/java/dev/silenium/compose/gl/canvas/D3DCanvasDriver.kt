@@ -61,8 +61,8 @@ class D3DCanvasDriver(private val window: Window) : CanvasDriver {
 
     override fun render(
         scope: DrawScope,
-        userResizeHandler: GLDrawScope.(old: IntSize?, new: IntSize) -> Unit,
-        block: GLDrawScope.() -> Unit
+        userResizeHandler: FBOScope.(old: IntSize?, new: IntSize) -> Unit,
+        block: FBOScope.() -> Unit
     ) {
         val d3dCtx = d3dDirectContext ?: return
         ensureInitialized()
@@ -71,12 +71,11 @@ class D3DCanvasDriver(private val window: Window) : CanvasDriver {
         val oldSize = fbo?.size
         val newSize = scope.size.toIntSize()
         ensureFBO(scope.size.toIntSize(), d3dCtx)
-
         if (oldSize != newSize) {
-            GLDrawScope(fbo!!).userResizeHandler(oldSize, newSize)
+            FBOScopeImpl(fbo!!).userResizeHandler(oldSize, newSize)
         }
 
-        GLDrawScope(fbo!!).block()
+        FBOScopeImpl(fbo!!).block()
         glFlush()
         GLFW.glfwMakeContextCurrent(MemoryUtil.NULL)
     }

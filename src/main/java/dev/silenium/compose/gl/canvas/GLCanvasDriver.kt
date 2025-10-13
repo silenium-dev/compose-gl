@@ -13,7 +13,7 @@ import dev.silenium.compose.gl.objects.Texture
 import org.jetbrains.skia.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL11.glFlush
+import org.lwjgl.opengl.GL11.glFinish
 import org.lwjgl.opengl.GL33
 import org.lwjgl.opengl.GLCapabilities
 import org.slf4j.LoggerFactory
@@ -47,8 +47,8 @@ class GLCanvasDriver : CanvasDriver {
 
     override fun render(
         scope: DrawScope,
-        userResizeHandler: GLDrawScope.(old: IntSize?, new: IntSize) -> Unit,
-        block: GLDrawScope.() -> Unit
+        userResizeHandler: FBOScope.(old: IntSize?, new: IntSize) -> Unit,
+        block: FBOScope.() -> Unit
     ) {
         val ctx = directContext ?: return
         ctx.submit(syncCpu = true)
@@ -58,12 +58,12 @@ class GLCanvasDriver : CanvasDriver {
         val newSize = scope.size.toIntSize()
         ensureFBO(newSize, ctx)
         if (oldSize != newSize) {
-            GLDrawScope(fbo!!).userResizeHandler(oldSize, newSize)
+            FBOScopeImpl(fbo!!).userResizeHandler(oldSize, newSize)
         }
 
-        GLDrawScope(fbo!!).block()
-        glFlush()
-        ctx.resetGLAll()
+        FBOScopeImpl(fbo!!).block()
+        glFinish()
+        ctx.resetAll()
     }
 
     override fun display(scope: DrawScope) {
