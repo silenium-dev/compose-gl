@@ -18,7 +18,7 @@ dependencies {
         implementation("dev.silenium.compose.gl:compose-gl-natives-all:${composeGlVersion}")
     }
     implementation(libs.slf4j.api)
-    runtimeOnly("ch.qos.logback:logback-classic:1.5.19")
+    runtimeOnly("ch.qos.logback:logback-classic:1.5.20")
 }
 
 kotlin {
