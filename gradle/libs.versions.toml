@@ -2,7 +2,7 @@
 kotlinx-coroutines = "1.10.2"
 lwjgl = "3.3.6"
 jni-utils = "0.1.6"
-compose = "1.10.0-alpha02"
+compose = "1.10.0-alpha03"
 kotlin = "2.2.20"
 
 [libraries]

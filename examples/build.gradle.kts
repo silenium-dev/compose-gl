@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "2.2.20" apply false
     kotlin("plugin.compose") version "2.2.20" apply false
-    id("org.jetbrains.compose") version "1.10.0-alpha02" apply false
+    id("org.jetbrains.compose") version "1.10.0-alpha03" apply false
 }
 
 group = "dev.silenium.compose.gl.sample"
