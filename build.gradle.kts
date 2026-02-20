@@ -22,7 +22,7 @@ allprojects {
             name = "reposilite"
         }
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         google()
     }
 
@@ -88,7 +88,7 @@ kotlin {
     }
 }
 
-val skiaVersion = configurations.compileClasspath.map {
+configurations.compileClasspath.map {
     it.filter { it.name.matches(Regex("skiko-awt-\\d.+.jar")) }.singleFile
 }.get().let {
     val loader = URLClassLoader(arrayOf(it.toURI().toURL()))

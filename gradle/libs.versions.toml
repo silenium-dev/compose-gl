@@ -1,9 +1,9 @@
 [versions]
 kotlinx-coroutines = "1.10.2"
-lwjgl = "3.3.6"
-jni-utils = "0.1.6"
-compose = "1.10.0-alpha02"
-kotlin = "2.2.20"
+lwjgl = "3.4.1"
+jni-utils = "0.1.7"
+compose = "1.11.0-alpha02"
+kotlin = "2.3.10"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
