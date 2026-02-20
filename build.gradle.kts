@@ -83,7 +83,7 @@ java {
 kotlin {
     jvmToolchain(11)
     compilerOptions {
-        languageVersion = KotlinVersion.KOTLIN_2_0
+        languageVersion = KotlinVersion.KOTLIN_2_1
         jvmTarget = JvmTarget.JVM_11
     }
 }
@@ -102,6 +102,7 @@ configurations.compileClasspath.map {
     val skiaVersion = getSkiaVersion.call(instance)
     println("skiko version: $skikoVersion")
     println("skia version: $skiaVersion")
+    rootProject.ext.set("skiko.version", skikoVersion)
     rootProject.ext.set("skia.version", skiaVersion)
 }
 
