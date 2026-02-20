@@ -27,7 +27,6 @@ pkgs.mkShell {
     echo "Gradle version: $(gradle --version | grep Gradle)"
     echo "CMake version: $(cmake --version | head -n 1)"
     echo "GCC version: $(gcc --version | head -n 1)"
-    echo "Clang version: $(clang --version | head -n 1)"
     echo "Ninja version: $(ninja --version)"
   '';
 
