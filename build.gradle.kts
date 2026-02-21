@@ -37,8 +37,6 @@ allprojects {
                 credentials {
                     val mavenUsername = System.getenv("MAVEN_REPO_USERNAME") ?: ""
                     val mavenPassword = System.getenv("MAVEN_REPO_PASSWORD") ?: ""
-                    logger.lifecycle("Using maven credentials: $mavenUsername")
-                    logger.lifecycle("Using maven credentials: ${mavenPassword.substring(0, 3)}...")
                     username = mavenUsername
                     password = mavenPassword
                 }
