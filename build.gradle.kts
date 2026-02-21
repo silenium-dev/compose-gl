@@ -35,8 +35,12 @@ allprojects {
             maven(url) {
                 name = "reposilite"
                 credentials {
-                    username = System.getenv("MAVEN_REPO_USERNAME") ?: ""
-                    password = System.getenv("MAVEN_REPO_PASSWORD") ?: ""
+                    val mavenUsername = System.getenv("MAVEN_REPO_USERNAME") ?: ""
+                    val mavenPassword = System.getenv("MAVEN_REPO_PASSWORD") ?: ""
+                    logger.lifecycle("Using maven credentials: $mavenUsername")
+                    logger.lifecycle("Using maven credentials: ${mavenPassword.substring(0, 3)}...")
+                    username = mavenUsername
+                    password = mavenPassword
                 }
             }
         }
