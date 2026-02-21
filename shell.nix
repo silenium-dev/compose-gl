@@ -1,9 +1,6 @@
 { pkgs ? import <nixpkgs> { } }:
 
 pkgs.mkShell {
-  pname = "dev-shell";
-  version = "0.1.0";
-  src = ./.;
   strictDeps = true;
   nativeBuildInputs = with pkgs; [
     # Java Development
