@@ -11,7 +11,7 @@ data class Texture(
     override val size: IntSize,
     override val target: Int,
     override val internalFormat: Int,
-) : TextureOrRenderbuffer, DoubleDestructionProtection<Int>() {
+) : TextureOrRenderbuffer<Texture>, DoubleDestructionProtection<Int>() {
     init {
         require(target in textureTargetBindings) { "Unsupported texture target: $target" }
     }
@@ -31,6 +31,22 @@ data class Texture(
     override fun destroyInternal() {
         glDeleteTextures(id)
         checkGLError("glDeleteTextures")
+    }
+
+    @Synchronized
+    override fun resize(size: IntSize): Texture {
+        val prev = glGetInteger(binding)
+        checkGLError("glGetInteger")
+        try {
+            glBindTexture(target, id)
+            checkGLError("glBindTexture")
+            glTexImage2D(target, 0, internalFormat, size.width, size.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0)
+            checkGLError("glTexImage2D")
+            return copy(size = size).also { this.abandon() }
+        } finally {
+            glBindTexture(target, prev)
+            checkGLError("glBindTexture")
+        }
     }
 
     companion object {

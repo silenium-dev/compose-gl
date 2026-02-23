@@ -27,3 +27,7 @@ if (deployKotlin) {
 if (!deployKotlin && !deployNative) {
     include(":examples", ":examples:skia-gl")
 }
+
+if ("CI" !in System.getenv()) {
+    include(":examples:skia-gl")
+}

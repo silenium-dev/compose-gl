@@ -1,11 +1,11 @@
 plugins {
-    kotlin("jvm") version "2.2.20"
-    kotlin("plugin.compose") version "2.2.20"
-    id("org.jetbrains.compose") version "1.10.0-alpha02"
+    kotlin("jvm") version "2.3.10"
+    kotlin("plugin.compose") version "2.3.10"
+    id("org.jetbrains.compose") version "1.11.0-alpha02"
     application
 }
 
-val composeGlVersion = "2e851b0-dev"
+val composeGlVersion = "0.9.1"
 
 val useParent: Boolean = project.ext.properties.getOrDefault("examples.use-parent", "true").toString().toBoolean()
 

@@ -8,6 +8,8 @@ abstract class DoubleDestructionProtection<ID> {
 
     private val destroyed = AtomicBoolean(false)
     private var destructionPoint: Throwable? = null
+
+    @Synchronized
     fun destroy() {
         if (destroyed.compareAndSet(false, true)) {
             destroyInternal()
@@ -23,6 +25,7 @@ abstract class DoubleDestructionProtection<ID> {
         }
     }
 
+    @Synchronized
     fun abandon() {
         if (destroyed.compareAndSet(false, true)) {
             destructionPoint = Exception("Abandoned")

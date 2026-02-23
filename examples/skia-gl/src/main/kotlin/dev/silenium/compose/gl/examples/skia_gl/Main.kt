@@ -89,9 +89,7 @@ fun main() = application {
                     glScene.render(it.asComposeCanvas(), System.nanoTime())
                     it.restore()
                 }
-                glSurface?.flushAndSubmit(true)
                 glContext?.flush()
-                glContext?.submit(true)
                 resetGLFeatures()
                 renderer.draw()
                 state.requestUpdate()

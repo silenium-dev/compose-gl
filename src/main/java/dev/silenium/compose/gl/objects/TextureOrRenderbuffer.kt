@@ -3,7 +3,7 @@ package dev.silenium.compose.gl.objects
 import androidx.compose.ui.unit.IntSize
 import org.lwjgl.opengl.GL46.*
 
-interface TextureOrRenderbuffer {
+interface TextureOrRenderbuffer<T: TextureOrRenderbuffer<T>> {
     val id: Int
     val target: Int
     val binding: Int
@@ -13,6 +13,11 @@ interface TextureOrRenderbuffer {
     fun bind()
     fun unbind()
     fun destroy()
+
+    /**
+     * Returns the resized renderbuffer and abandons this.
+     */
+    fun resize(size: IntSize): T
 
     companion object {
         val textureTargetBindings = mapOf(

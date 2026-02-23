@@ -14,6 +14,7 @@ import org.jetbrains.skia.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.glFinish
+import org.lwjgl.opengl.GL11.glFlush
 import org.lwjgl.opengl.GL33
 import org.lwjgl.opengl.GLCapabilities
 import org.slf4j.LoggerFactory
@@ -51,7 +52,6 @@ class GLCanvasDriver : CanvasDriver {
         block: FBOScope.() -> Unit
     ) {
         val ctx = directContext ?: return
-        ctx.submit(syncCpu = true)
         ensureInitialized()
 
         val oldSize = fbo?.size
@@ -62,8 +62,7 @@ class GLCanvasDriver : CanvasDriver {
         }
 
         FBOScopeImpl(fbo!!).block()
-        glFinish()
-        ctx.resetAll()
+        ctx.resetGLAll()
     }
 
     override fun display(scope: DrawScope) {
