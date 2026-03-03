@@ -87,6 +87,5 @@ fun resetGLFeatures() {
         GL_STENCIL_TEST,
         GL_TEXTURE_CUBE_MAP_SEAMLESS,
         GL_PROGRAM_POINT_SIZE,
-    )
-    glDisable(GL_BLEND)
+    ).forEach(::glDisable)
 }
