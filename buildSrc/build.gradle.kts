@@ -5,8 +5,8 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://reposilite.silenium.dev/releases") {
-        name = "silenium-releases"
+    maven("https://nexus.silenium.dev/repository/maven-releases") {
+        name = "nexus"
     }
 }
 

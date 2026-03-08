@@ -18,8 +18,8 @@ allprojects {
     apply<BasePlugin>()
 
     repositories {
-        maven("https://reposilite.silenium.dev/releases") {
-            name = "reposilite"
+        maven("https://nexus.silenium.dev/repository/maven-releases") {
+            name = "nexus"
         }
         mavenCentral()
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
@@ -33,7 +33,7 @@ allprojects {
         repositories {
             val url = System.getenv("MAVEN_REPO_URL") ?: return@repositories
             maven(url) {
-                name = "reposilite"
+                name = "nexus"
                 credentials {
                     val mavenUsername = System.getenv("MAVEN_REPO_USERNAME") ?: ""
                     val mavenPassword = System.getenv("MAVEN_REPO_PASSWORD") ?: ""
