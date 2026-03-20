@@ -5,7 +5,6 @@ import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.buildFeatures.vcsLabeling
 import jetbrains.buildServer.configs.kotlin.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.projectFeatures.UntrustedBuildsSettings
-import jetbrains.buildServer.configs.kotlin.projectFeatures.githubConnection
 import jetbrains.buildServer.configs.kotlin.projectFeatures.untrustedBuildsSettings
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
@@ -16,13 +15,6 @@ project {
     buildType(BuildRelease)
 
     features {
-        githubConnection {
-            id = "PROJECT_EXT_10"
-            displayName = "GitHub.com"
-            clientId = "Ov23liT97vPVEYmQSgyV"
-            clientSecret = "credentialsJSON:caa167f1-c169-4bab-add1-445d1770fe1d"
-        }
-
         untrustedBuildsSettings {
             enableLog = true
             manualRunsApproved = true
