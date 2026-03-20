@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.compose)
-    application
 }
 
 val composeGlVersion = "0.9.1"
@@ -24,6 +23,8 @@ kotlin {
     jvmToolchain(21)
 }
 
-application {
-    mainClass.set("dev.silenium.compose.gl.examples.skia_gl.MainKt")
+compose.desktop {
+    application {
+        mainClass = "dev.silenium.compose.gl.examples.skia_gl.MainKt"
+    }
 }
