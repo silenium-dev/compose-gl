@@ -1,6 +1,6 @@
 skia_dep = skia.get_variable('skia_dep')
 #jni = dependency('jni')
-jni_dep = jni.get_variable('jni_dep')
+jni_dep = jni_headers.get_variable('jni_headers_dep')
 
 deps = [jni_dep, skia_dep]
 #deps = [jni]

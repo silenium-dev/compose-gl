@@ -59,6 +59,7 @@
               rev = "68b16cb0252c32b66b28f7260439970cec24ba04";
               deepClone = false;
               hash = "sha256-1R92P5IGTcdg0xYu+VW395bl9Z8K/LoVTumxbZL0xX4=";
+              name = "jni-headers";
             })
           ];
 
@@ -73,9 +74,9 @@
           7z x -y -ocompose-gl/subprojects/skia "''${sourceArray[1]}"
           cp -r compose-gl/subprojects.tpl/skia/* compose-gl/subprojects/skia/
 
-          mkdir -p compose-gl/subprojects/jni
-          cp -r "''${sourceArray[2]}"/* compose-gl/subprojects/jni
-          cp -r compose-gl/subprojects.tpl/jni/* compose-gl/subprojects/jni/
+          mkdir -p compose-gl/subprojects/jni-headers
+          cp -r "''${sourceArray[2]}"/* compose-gl/subprojects/jni-headers
+          cp -r compose-gl/subprojects.tpl/jni-headers/* compose-gl/subprojects/jni-headers/
 
           runHook postUnpack
         '';

@@ -1,5 +1,5 @@
 project(
-  'jni', 'cpp',
+  'jni-headers', 'cpp',
   meson_version : '>=1.2.0',
 )
 
@@ -10,10 +10,10 @@ elif host_machine.system() == 'linux'
 endif
 
 jni_version = get_option('jni_version')
-jni_dep = declare_dependency(
+jni_headers = declare_dependency(
   include_directories: include_directories(
     './versions' / jni_version / 'include',
     './versions' / jni_version / 'include' / jniIncludeDir,
   )
 )
-meson.override_dependency('jni', jni_dep)
+meson.override_dependency('jni-headers', jni_headers)

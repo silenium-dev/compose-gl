@@ -14,15 +14,15 @@ if os == 'linux'
 endif
 
 skia = subproject('skia',
-                 default_options : {
-                   'wrap_mode' : 'forcefallback',
-                   'default_library' : 'static',
-                   'prefer_static' : true,
-                 }
+                  default_options : {
+                    'wrap_mode' : 'forcefallback',
+                    'default_library' : 'static',
+                    'prefer_static' : true,
+                  }
 )
-jni = subproject('jni',
-                 default_options : {
-                   'wrap_mode' : 'forcefallback',
-                 }
+jni_headers = subproject('jni-headers',
+                         default_options : {
+                           'wrap_mode' : 'forcefallback',
+                         }
 )
 subdir('src')
