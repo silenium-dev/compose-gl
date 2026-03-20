@@ -1,7 +1,7 @@
 [versions]
 kotlinx-coroutines = "1.10.2"
 lwjgl = "3.4.1"
-jni-utils = "0.3.0"
+jni-utils = "0.4.1"
 compose = "1.11.0-alpha02"
 kotlin = "2.3.10"
 
@@ -29,6 +29,7 @@ kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 bytebuddy = { id = "net.bytebuddy.byte-buddy-gradle-plugin", version = "1.18.5" }
+nixNatives = { id = "dev.silenium.libs.jni.nix-natives", version.ref = "jni-utils" }
 
 [bundles]
 kotlinx-coroutines = [

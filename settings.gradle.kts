@@ -1,6 +1,8 @@
 pluginManagement {
     repositories {
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://nexus.silenium.dev/repository/maven-releases") {
+            name = "nexus"
+        }
         google()
         gradlePluginPortal()
         mavenCentral()
@@ -12,22 +14,10 @@ plugins {
 
 rootProject.name = "compose-gl"
 
-val deployNative = if (extra.has("deploy.native")) {
-    extra.get("deploy.native").toString().toBoolean()
-} else true
-val deployKotlin = if (extra.has("deploy.native")) {
-    extra.get("deploy.kotlin").toString().toBoolean()
+val deployEnabled = if (extra.has("deploy.enabled")) {
+    extra.get("deploy.enabled").toString().toBoolean()
 } else false
-if (deployNative) {
-    include(":native")
-}
-if (deployKotlin) {
-    include(":native-all")
-}
-if (!deployKotlin && !deployNative) {
+include(":natives")
+if (!deployEnabled) {
     include(":examples", ":examples:skia-gl")
-}
-
-if ("CI" !in System.getenv()) {
-    include(":examples:skia-gl")
 }

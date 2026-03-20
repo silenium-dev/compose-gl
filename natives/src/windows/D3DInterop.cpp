@@ -2,6 +2,9 @@
 // Created by silenium-dev on 2025-10-04.
 //
 
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <Windows.h>
 #include <gpu/ganesh/d3d/GrD3DBackendContext.h>
 #include <gpu/ganesh/d3d/GrD3DTypes.h>
 

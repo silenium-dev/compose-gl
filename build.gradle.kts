@@ -45,8 +45,7 @@ allprojects {
     }
 }
 
-val deployNative = (findProperty("deploy.native") as String?)?.toBoolean() ?: true
-val deployKotlin = (findProperty("deploy.kotlin") as String?)?.toBoolean() ?: true
+val deployEnabled = (findProperty("deploy.enabled") as String?)?.toBoolean() ?: true
 
 val lwjglNatives = arrayOf("natives-linux", "natives-windows")
 
@@ -55,9 +54,7 @@ dependencies {
     implementation(libs.jni.utils)
     implementation(libs.slf4j.api)
     implementation(kotlin("reflect"))
-    if (deployNative) {
-        implementation(project(":native", configuration = "main"))
-    }
+    implementation(project(":natives"))
 
     api(platform(libs.lwjgl.bom))
     libs.bundles.lwjgl.get().forEach {
@@ -122,7 +119,7 @@ compose.desktop {
 
 publishing {
     publications {
-        if (deployKotlin) {
+        if (deployEnabled) {
             create<MavenPublication>("maven") {
                 from(components["java"])
             }

@@ -1,0 +1,1 @@
+option('build_type', type: 'string', value: 'Release')
