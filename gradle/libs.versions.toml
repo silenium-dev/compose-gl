@@ -2,8 +2,9 @@
 kotlinx-coroutines = "1.10.2"
 lwjgl = "3.4.1"
 jni-utils = "0.4.1"
-compose = "1.11.0-alpha02"
+compose = "1.11.0-alpha03"
 kotlin = "2.3.10"
+idea-ext = "1.4.1"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -19,6 +20,7 @@ lwjgl-glfw = { group = "org.lwjgl", name = "lwjgl-glfw", version.ref = "lwjgl" }
 lwjgl-opengl = { group = "org.lwjgl", name = "lwjgl-opengl", version.ref = "lwjgl" }
 
 skiko-awt = { group = "org.jetbrains.skiko", name = "skiko-awt" }
+compose-desktop = { group = "org.jetbrains.compose.desktop", name = "desktop", version.ref = "compose" }
 
 jni-utils = { group = "dev.silenium.libs.jni", name = "jni-utils", version.ref = "jni-utils" }
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.17" }
@@ -28,7 +30,7 @@ logback-classic = { group = "ch.qos.logback", name = "logback-classic", version 
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
-bytebuddy = { id = "net.bytebuddy.byte-buddy-gradle-plugin", version = "1.18.5" }
+idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "idea-ext" }
 nixNatives = { id = "dev.silenium.libs.jni.nix-natives", version.ref = "jni-utils" }
 
 [bundles]

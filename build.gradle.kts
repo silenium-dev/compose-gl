@@ -1,6 +1,6 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.gradle.ext.ProjectSettings
+import org.jetbrains.gradle.ext.TaskTriggersConfig
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import java.net.URLClassLoader
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.isAccessible
@@ -9,48 +9,59 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.compose)
-    alias(libs.plugins.bytebuddy)
+    alias(libs.plugins.idea.ext)
     `maven-publish`
 }
+
+val deployEnabled = (findProperty("deploy.enabled") as String?)?.toBoolean() ?: false
 
 allprojects {
     apply<MavenPublishPlugin>()
     apply<BasePlugin>()
+
+    group = "dev.silenium.compose.gl"
+    val gitVersionProvider = providers.gradleProperty("ci").flatMap {
+        if (it.toBoolean()) {
+            providers.exec {
+                commandLine("git", "describe", "--tags")
+                workingDir = layout.projectDirectory.asFile
+            }.standardOutput.asText.map(String::trim)
+        } else null
+    }
+    version = providers
+        .gradleProperty("deploy.version")
+        .orElse(gitVersionProvider)
+        .orElse("0.0.0-SNAPSHOT")
+        .get()
 
     repositories {
         maven("https://nexus.silenium.dev/repository/maven-releases") {
             name = "nexus"
         }
         mavenCentral()
-        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         google()
     }
 
-    this.group = "dev.silenium.compose.gl"
-    this.version = findProperty("deploy.version") as String? ?: "0.0.0-SNAPSHOT"
-
     publishing {
         repositories {
-            val url = System.getenv("MAVEN_REPO_URL") ?: return@repositories
-            maven(url) {
-                name = "nexus"
-                credentials {
-                    val mavenUsername = System.getenv("MAVEN_REPO_USERNAME") ?: ""
-                    val mavenPassword = System.getenv("MAVEN_REPO_PASSWORD") ?: ""
-                    username = mavenUsername
-                    password = mavenPassword
+            if (deployEnabled) {
+                val url = findProperty("deploy.repo-url") as? String ?: error("No deploy.repo-url specified")
+                maven(url) {
+                    name = "nexus"
+                    credentials {
+                        username = findProperty("deploy.username") as? String ?: ""
+                        password = findProperty("deploy.password") as? String ?: ""
+                    }
                 }
             }
         }
     }
 }
 
-val deployEnabled = (findProperty("deploy.enabled") as String?)?.toBoolean() ?: true
-
 val lwjglNatives = arrayOf("natives-linux", "natives-windows")
 
 dependencies {
-    implementation(compose.desktop.common)
+    implementation(libs.compose.desktop)
     implementation(libs.jni.utils)
     implementation(libs.slf4j.api)
     implementation(kotlin("reflect"))
@@ -65,7 +76,6 @@ dependencies {
     }
 
     implementation(libs.bundles.kotlinx.coroutines)
-    implementation("net.java.dev.jna:jna")
     api(libs.bundles.skiko)
 
     testImplementation(compose.desktop.currentOs)
@@ -73,19 +83,6 @@ dependencies {
     testImplementation("me.saket.telephoto:zoomable:0.14.0")
 }
 
-java {
-    withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-kotlin {
-    jvmToolchain(11)
-    compilerOptions {
-        languageVersion = KotlinVersion.KOTLIN_2_1
-        jvmTarget = JvmTarget.JVM_11
-    }
-}
 
 configurations.compileClasspath.map {
     it.filter { it.name.matches(Regex("skiko-awt-\\d.+.jar")) }.singleFile
@@ -105,24 +102,69 @@ configurations.compileClasspath.map {
     rootProject.ext.set("skia.version", skiaVersion)
 }
 
-compose.desktop {
-    application {
-        mainClass = "MainKt"
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "compose-gl"
-            packageVersion = "1.0.0"
-        }
+val templateSrc = layout.projectDirectory.dir("src/main/templates")
+val templateDst = layout.buildDirectory.dir("generated/templates")
+val templateProps = mapOf(
+    "LIBRARY_NAME" to rootProject.name,
+)
+tasks {
+    test {
+        useJUnitPlatform()
     }
+
+    val generateTemplates = register<Copy>("generateTemplates") {
+        from(templateSrc)
+        into(templateDst)
+        expand(templateProps)
+
+        inputs.dir(templateSrc)
+        inputs.properties(templateProps)
+        outputs.dir(templateDst)
+    }
+
+    withType<Jar> {
+        dependsOn(generateTemplates)
+    }
+
+    compileKotlin {
+        dependsOn("generateTemplates")
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+    }
+}
+
+sourceSets.main {
+    kotlin {
+        srcDir(templateDst)
+    }
+}
+
+java {
+    sourceCompatibility = kotlin.compilerOptions.jvmTarget.map { JavaVersion.toVersion(it.target) }.get()
+    targetCompatibility = sourceCompatibility
+
+    withSourcesJar()
+    withJavadocJar()
 }
 
 publishing {
     publications {
-        if (deployEnabled) {
-            create<MavenPublication>("maven") {
-                from(components["java"])
-            }
+        create<MavenPublication>("main") {
+            from(components["java"])
+        }
+    }
+}
+
+rootProject.idea.project {
+    this as ExtensionAware
+    configure<ProjectSettings> {
+        this as ExtensionAware
+        configure<TaskTriggersConfig> {
+            afterSync("generateTemplates")
         }
     }
 }

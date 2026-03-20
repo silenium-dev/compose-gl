@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "2.3.10"
-    kotlin("plugin.compose") version "2.3.10"
-    id("org.jetbrains.compose") version "1.11.0-alpha02"
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.compose)
     application
 }
 
@@ -15,10 +15,9 @@ dependencies {
         implementation(project(":"))
     } else {
         implementation("dev.silenium.compose.gl:compose-gl:${composeGlVersion}")
-        implementation("dev.silenium.compose.gl:compose-gl-natives-all:${composeGlVersion}")
     }
     implementation(libs.slf4j.api)
-    runtimeOnly("ch.qos.logback:logback-classic:1.5.20")
+    runtimeOnly("ch.qos.logback:logback-classic:1.5.32")
 }
 
 kotlin {
