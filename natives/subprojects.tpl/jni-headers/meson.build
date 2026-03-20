@@ -10,10 +10,10 @@ elif host_machine.system() == 'linux'
 endif
 
 jni_version = get_option('jni_version')
-jni_headers = declare_dependency(
+jni_headers_dep = declare_dependency(
   include_directories: include_directories(
     './versions' / jni_version / 'include',
     './versions' / jni_version / 'include' / jniIncludeDir,
   )
 )
-meson.override_dependency('jni-headers', jni_headers)
+meson.override_dependency('jni-headers', jni_headers_dep)
