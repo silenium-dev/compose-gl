@@ -148,7 +148,6 @@ java {
     targetCompatibility = sourceCompatibility
 
     withSourcesJar()
-    withJavadocJar()
 }
 
 publishing {
