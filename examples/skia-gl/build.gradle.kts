@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.compose)
 }
 
-val composeGlVersion = "0.9.1"
+val composeGlVersion = "0.11.0-rc.1"
 
 val useParent: Boolean = project.ext.properties.getOrDefault("examples.use-parent", "true").toString().toBoolean()
 
