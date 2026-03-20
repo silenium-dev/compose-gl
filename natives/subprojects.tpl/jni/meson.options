@@ -1,0 +1,1 @@
+option('jni_version', type : 'combo', choices : ['8', '11', '17', '21', '25'], value : '21')

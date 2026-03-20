@@ -30,6 +30,7 @@
         additionalInputs = targetSystem: pkgs:
           if jni-utils.lib.isLinux targetSystem
           then [ pkgs.libxcb pkgs.libxau pkgs.libxdmcp ]
+          else if jni-utils.lib.isWindows targetSystem then [ ]
           else [ ];
         sources = targetSystem:
           let
@@ -53,6 +54,12 @@
               url = skia."${targetSystem}".source_url;
               hash = skia."${targetSystem}".source_hash;
             })
+            (pkgs.fetchgit {
+              url = "https://github.com/Casterlabs/jni-headers.git";
+              rev = "68b16cb0252c32b66b28f7260439970cec24ba04";
+              deepClone = false;
+              hash = "sha256-1R92P5IGTcdg0xYu+VW395bl9Z8K/LoVTumxbZL0xX4=";
+            })
           ];
 
         unpack = targetSystem: ''
@@ -61,9 +68,14 @@
           IFS=' ' read -r -a sourceArray <<< "$srcs"
           cp -r "''${sourceArray[0]}" "compose-gl"
           chmod -R +w compose-gl
+
           mkdir -p compose-gl/subprojects/skia
           7z x -y -ocompose-gl/subprojects/skia "''${sourceArray[1]}"
           cp -r compose-gl/subprojects.tpl/skia/* compose-gl/subprojects/skia/
+
+          mkdir -p compose-gl/subprojects/jni
+          cp -r "''${sourceArray[2]}"/* compose-gl/subprojects/jni
+          cp -r compose-gl/subprojects.tpl/jni/* compose-gl/subprojects/jni/
 
           runHook postUnpack
         '';

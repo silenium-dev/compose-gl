@@ -1,7 +1,9 @@
 skia_dep = skia.get_variable('skia_dep')
-jni = dependency('jni')
+#jni = dependency('jni')
+jni_dep = jni.get_variable('jni_dep')
 
-deps = [jni, skia_dep]
+deps = [jni_dep, skia_dep]
+#deps = [jni]
 link_args = []
 
 sources = [

@@ -20,4 +20,9 @@ skia = subproject('skia',
                    'prefer_static' : true,
                  }
 )
+jni = subproject('jni',
+                 default_options : {
+                   'wrap_mode' : 'forcefallback',
+                 }
+)
 subdir('src')

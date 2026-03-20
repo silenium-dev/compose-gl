@@ -73,7 +73,6 @@ elif skiaOs == 'linux'
     skia_lib_dir / 'libzlib.a',
     skia_lib_dir / 'libicu.a',
     skia_lib_dir / 'libskottie.a',
-
   ]
 endif
 
