@@ -3,7 +3,7 @@ kotlinx-coroutines = "1.10.2"
 lwjgl = "3.4.1"
 jni-utils = "0.4.1"
 compose = "1.11.0-alpha03"
-kotlin = "2.3.10"
+kotlin = "2.3.20"
 idea-ext = "1.4.1"
 
 [libraries]
