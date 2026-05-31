@@ -42,6 +42,7 @@ class GLCanvasDriver : CanvasDriver {
 
     override fun dispose(userDisposeHandler: () -> Unit) {
         userDisposeHandler()
+        image?.close()
         texture?.close()
         fbo?.destroy()
     }
@@ -74,6 +75,7 @@ class GLCanvasDriver : CanvasDriver {
 
     private fun ensureFBO(size: IntSize, ctx: DirectContext) {
         if (size != this.size) {
+            image?.close()
             texture?.close()
             fbo?.destroy()
             val fbo = createFBO(size).also { this.fbo = it }
