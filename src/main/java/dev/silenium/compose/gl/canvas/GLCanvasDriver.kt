@@ -13,8 +13,6 @@ import dev.silenium.compose.gl.objects.Texture
 import org.jetbrains.skia.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL11.glFinish
-import org.lwjgl.opengl.GL11.glFlush
 import org.lwjgl.opengl.GL33
 import org.lwjgl.opengl.GLCapabilities
 import org.slf4j.LoggerFactory
@@ -23,7 +21,6 @@ import java.awt.Window
 class GLCanvasDriver : CanvasDriver {
     var fbo: FBO? = null
     var image: Image? = null
-    var texture: BackendTexture? = null
     var initialized = false
     lateinit var glCapabilities: GLCapabilities
     var directContext: DirectContext? by mutableStateOf(null)
@@ -43,8 +40,7 @@ class GLCanvasDriver : CanvasDriver {
     override fun dispose(userDisposeHandler: () -> Unit) {
         userDisposeHandler()
         image?.close()
-        texture?.close()
-        fbo?.destroy()
+        fbo?.destroySkikoCompatible()
     }
 
     override fun render(
@@ -76,8 +72,7 @@ class GLCanvasDriver : CanvasDriver {
     private fun ensureFBO(size: IntSize, ctx: DirectContext) {
         if (size != this.size) {
             image?.close()
-            texture?.close()
-            fbo?.destroy()
+            fbo?.destroySkikoCompatible()
             val fbo = createFBO(size).also { this.fbo = it }
             this.size = size
 
@@ -88,7 +83,7 @@ class GLCanvasDriver : CanvasDriver {
                 textureId = fbo.colorAttachment.id,
                 textureTarget = fbo.colorAttachment.target,
                 textureFormat = fbo.colorAttachment.internalFormat,
-            ).also { this.texture = it }
+            )
             image = Image.adoptTextureFrom(
                 context = ctx,
                 backendTexture = texture,

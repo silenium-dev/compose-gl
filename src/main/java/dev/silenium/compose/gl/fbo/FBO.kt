@@ -26,10 +26,21 @@ data class FBO(
         checkGLError("glBindFramebuffer")
     }
 
+    private var destroySkikoCompatible = false
     override fun destroyInternal() {
         glDeleteFramebuffers(id)
-        colorAttachment.destroy()
+        if (destroySkikoCompatible) {
+            colorAttachment.abandon()
+        } else {
+            colorAttachment.destroy()
+        }
         depthStencilAttachment.destroy()
+    }
+
+    @Synchronized
+    fun destroySkikoCompatible() {
+        destroySkikoCompatible = true
+        destroy()
     }
 
     companion object {
