@@ -19,7 +19,7 @@ abstract class DoubleDestructionProtection<ID> {
                 "{} {} was already destroyed at: {}",
                 javaClass.simpleName,
                 id,
-                destroyed.get(),
+                destructionPoint,
                 Exception(),
             )
         }
@@ -34,7 +34,7 @@ abstract class DoubleDestructionProtection<ID> {
                 "{} {} was already destroyed at: {}",
                 javaClass.simpleName,
                 id,
-                destroyed.get(),
+                destructionPoint,
                 Exception(),
             )
         }
