@@ -1,10 +1,8 @@
-import com.android.build.gradle.internal.tasks.MergeNativeLibsTask
 import org.gradle.kotlin.dsl.support.serviceOf
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
+    com.android.application
+    org.jetbrains.kotlin.plugin.compose
 }
 
 group = "dev.silenium.compose.gl.examples"
@@ -20,18 +18,13 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.11.2")
     implementation("androidx.compose.runtime:runtime:1.11.2")
     implementation("androidx.compose.material3:material3:1.4.0")
+
+    androidTestDependencies()
 }
 
 android {
+    commonConfig()
     namespace = "dev.silenium.compose.gl.examples"
-    compileSdk {
-        version = release(37)
-    }
-    defaultConfig {
-        minSdk = 26
-        targetSdk = 37
-    }
-    packaging.resources.pickFirsts += "META-INF/*"
 }
 
 // 1. Create a dedicated configuration just to resolve the jars

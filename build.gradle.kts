@@ -2,13 +2,6 @@ import org.gradle.kotlin.dsl.`maven-publish`
 
 plugins {
     `maven-publish`
-    alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.multiplatform) apply false
-    alias(libs.plugins.android.kotlin) apply false
-    alias(libs.plugins.kotlin.compose) apply false
-    alias(libs.plugins.compose) apply false
-    alias(libs.plugins.idea.ext) apply false
 }
 
 val deployEnabled = (findProperty("deploy.enabled") as String?)?.toBoolean() ?: false

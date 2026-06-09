@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.nixNatives)
+    dev.silenium.libs.jni.`nix-natives`
 }
 
 nixNatives {

@@ -1,7 +1,7 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.compose)
+    org.jetbrains.kotlin.jvm
+    org.jetbrains.kotlin.plugin.compose
+    org.jetbrains.compose
 }
 
 group = "dev.silenium.compose.gl.examples"

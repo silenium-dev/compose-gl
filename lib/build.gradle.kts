@@ -4,34 +4,27 @@ import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.isAccessible
 
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.kotlin)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.compose)
-    alias(libs.plugins.idea.ext)
+    com.android.kotlin.multiplatform.library
+    org.jetbrains.kotlin.multiplatform
+    org.jetbrains.kotlin.plugin.compose
+    org.jetbrains.compose
     `maven-publish`
 }
 
 val lwjglNatives = arrayOf("natives-linux", "natives-windows")
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(ProjectConfig.JVM_TARGET.target.toInt())
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
     jvm {
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_17
+            jvmTarget = ProjectConfig.JVM_TARGET
         }
     }
     android {
         namespace = "dev.silenium.compose.gl"
-        compileSdk {
-            version = release(37)
-        }
-        minSdk = 26
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_11
-        }
+        commonConfig()
     }
 
     sourceSets {

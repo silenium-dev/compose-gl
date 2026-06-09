@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.skiaCanvas
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toIntSize
 import dev.silenium.compose.gl.fbo.FBO
@@ -84,7 +85,7 @@ class D3DCanvasDriver(private val window: Window) : CanvasDriver {
         d3dDirectContext ?: return
         ensureInitialized()
         val img = image ?: return log.warn("No image")
-        scope.drawContext.canvas.nativeCanvas.drawImage(img, 0f, 0f)
+        scope.drawContext.canvas.skiaCanvas.drawImage(img, 0f, 0f)
     }
 
     override fun dispose(userDisposeHandler: () -> Unit) {
