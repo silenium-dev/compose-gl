@@ -1,9 +1,8 @@
-import com.android.build.api.dsl.LibraryBuildType
-import org.gradle.tooling.model.build.JavaEnvironment
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
     com.android.library
+    `maven-publish`
 }
 
 group = "dev.silenium.compose.gl.natives"
@@ -22,13 +21,22 @@ android {
     }
 
     publishing {
-        singleVariant("release") {
+        multipleVariants {
+            allVariants()
             withSourcesJar()
         }
     }
 }
 
 afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["default"])
+            }
+        }
+    }
+
     configurations.forEach {
         if (it.name.startsWith("release") &&
             it.isCanBeConsumed && !it.isCanBeResolved &&
