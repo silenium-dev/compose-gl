@@ -11,8 +11,6 @@ plugins {
     `maven-publish`
 }
 
-base.archivesName.set("compose-gl")
-
 val lwjglNatives = arrayOf("natives-linux", "natives-windows")
 kotlin {
     jvmToolchain(ProjectConfig.JVM_TARGET.target.toInt())

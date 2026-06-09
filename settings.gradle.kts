@@ -21,3 +21,4 @@ include(":lib", ":lib:natives")
 if (!deployEnabled) {
     include(":examples", ":examples:skia-gl", ":examples:android-app")
 }
+project(":lib").name = "compose-gl"
