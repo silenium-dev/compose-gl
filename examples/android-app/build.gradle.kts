@@ -8,7 +8,7 @@ plugins {
 group = "dev.silenium.compose.gl.examples"
 
 dependencies {
-    implementation(project(":lib")) {
+    implementation(project(":compose-gl")) {
         exclude(group = "org.jetbrains.skiko")
     }
     implementation(libs.skiko)

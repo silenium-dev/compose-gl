@@ -13,7 +13,7 @@ val useParent: Boolean =
 dependencies {
     implementation(compose.desktop.currentOs)
     if (useParent) {
-        implementation(project(":lib"))
+        implementation(project(":compose-gl"))
     } else {
         implementation("dev.silenium.compose.gl:compose-gl:${composeGlVersion}")
     }
