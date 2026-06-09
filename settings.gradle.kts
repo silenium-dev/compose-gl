@@ -12,13 +12,12 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-rootProject.name = "compose-gl"
+rootProject.name = "compose-gl-root"
 
 val deployEnabled = if (extra.has("deploy.enabled")) {
     extra.get("deploy.enabled").toString().toBoolean()
 } else false
-include(":lib", ":lib:natives")
+include(":compose-gl", ":compose-gl:natives:desktop", ":compose-gl:natives:android")
 if (!deployEnabled) {
     include(":examples", ":examples:skia-gl", ":examples:android-app")
 }
-project(":lib").name = "compose-gl"

@@ -8,6 +8,7 @@ build/
 *.log
 local.properties
 gradle/gradle-daemon-jvm.properties
+.cxx/
 
 ### IntelliJ IDEA ###
 .idea/
