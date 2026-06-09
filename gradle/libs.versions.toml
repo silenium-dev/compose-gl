@@ -1,10 +1,11 @@
 [versions]
-kotlinx-coroutines = "1.10.2"
+kotlinx-coroutines = "1.11.0"
 lwjgl = "3.4.1"
-jni-utils = "0.4.1"
-compose = "1.11.0-alpha03"
-kotlin = "2.3.10"
+jni-utils = "0.6.1"
+compose = "1.11.1"
+kotlin = "2.4.0"
 idea-ext = "1.4.1"
+agp = "9.2.1"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -21,14 +22,23 @@ lwjgl-opengl = { group = "org.lwjgl", name = "lwjgl-opengl", version.ref = "lwjg
 
 skiko-awt = { group = "org.jetbrains.skiko", name = "skiko-awt" }
 compose-desktop = { group = "org.jetbrains.compose.desktop", name = "desktop", version.ref = "compose" }
+compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "compose" }
+compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "compose" }
+compose-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "compose" }
+compose-material = { group = "org.jetbrains.compose.material", name = "material", version.ref = "compose" }
 
 jni-utils = { group = "dev.silenium.libs.jni", name = "jni-utils", version.ref = "jni-utils" }
-slf4j-api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.17" }
-logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.32" }
+slf4j-api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.18" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.34" }
+slf4j-android = { module = "uk.uuid.slf4j:slf4j-android", version = "2.0.17-0" }
 
 [plugins]
-kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-kotlin = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+android-application = { id = "com.android.application", version.ref = "agp" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "idea-ext" }
 nixNatives = { id = "dev.silenium.libs.jni.nix-natives", version.ref = "jni-utils" }
@@ -51,4 +61,11 @@ lwjgl = [
     "lwjgl-core",
     "lwjgl-glfw",
     "lwjgl-opengl",
+]
+
+compose-common = [
+    "compose-ui",
+    "compose-runtime",
+    "compose-foundation",
+    "compose-material",
 ]

@@ -6,6 +6,8 @@ build/
 !**/src/test/**/build/
 /*.png
 *.log
+local.properties
+gradle/gradle-daemon-jvm.properties
 
 ### IntelliJ IDEA ###
 .idea/

@@ -30,7 +30,7 @@ Versions don't follow semantic versioning, but are based on the commit hash: `<s
 ### Example
 
 This is a simple example of how to use the library.
-For a more complex example, see [src/test/kotlin/direct/Main.kt](src/test/kotlin/direct/Main.kt).
+For a more complex example, see [src/test/kotlin/direct/Main.kt](lib/src/test/kotlin/direct/Main.kt).
 
 ```kotlin
 @Composable

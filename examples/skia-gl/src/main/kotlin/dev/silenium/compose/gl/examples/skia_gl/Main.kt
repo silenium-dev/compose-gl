@@ -1,7 +1,14 @@
 package dev.silenium.compose.gl.examples.skia_gl
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -23,9 +30,15 @@ import dev.silenium.compose.gl.canvas.GLCanvas
 import dev.silenium.compose.gl.canvas.Stats
 import dev.silenium.compose.gl.canvas.rememberGLCanvasState
 import dev.silenium.compose.gl.canvas.resetGLFeatures
+import dev.silenium.compose.gl.fbo.FBO
 import dev.silenium.compose.gl.findSkiaLayer
 import dev.silenium.compose.gl.graphicsApi
-import org.jetbrains.skia.*
+import org.jetbrains.skia.BackendRenderTarget
+import org.jetbrains.skia.ColorSpace
+import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.SurfaceColorFormat
+import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skiko.Version
 
 @OptIn(InternalComposeUiApi::class)
@@ -72,7 +85,7 @@ fun main() = application {
                         sampleCnt = 1,
                         stencilBits = 8,
                         fbId = fbo.id,
-                        fbFormat = fbo.colorAttachment.internalFormat,
+                        fbFormat = (fbo as FBO.Custom).colorAttachment.internalFormat,
                     )
                     glSurface = Surface.makeFromBackendRenderTarget(
                         context = glContext!!, rt = glRenderTarget!!,
@@ -116,14 +129,28 @@ fun main() = application {
                     Text("Display frame time: ${display.frameTimes.median.inWholeMicroseconds / 1000.0} ms")
                     Text("Display frame time (99th): ${display.frameTimes.percentile(0.99).inWholeMicroseconds / 1000.0} ms")
                     Text("Display FPS: ${display.fps.median}")
-                    Text("Display FPS (99th): ${display.fps.percentile(0.99, Stats.Percentile.LOWEST)}")
+                    Text(
+                        "Display FPS (99th): ${
+                            display.fps.percentile(
+                                0.99,
+                                Stats.Percentile.LOWEST
+                            )
+                        }"
+                    )
 
                     val render by state.renderStatistics.collectAsState()
                     Text("Render datapoints: ${render.frameTimes.values.size}")
                     Text("Render frame time: ${render.frameTimes.median.inWholeMicroseconds / 1000.0} ms")
                     Text("Render frame time (99th): ${render.frameTimes.percentile(0.99).inWholeMicroseconds / 1000.0} ms")
                     Text("Render FPS: ${render.fps.median} ms")
-                    Text("Render FPS (99th): ${render.fps.percentile(0.99, Stats.Percentile.LOWEST)}")
+                    Text(
+                        "Render FPS (99th): ${
+                            render.fps.percentile(
+                                0.99,
+                                Stats.Percentile.LOWEST
+                            )
+                        }"
+                    )
                 }
             }
         }
