@@ -20,7 +20,9 @@ lwjgl-core = { group = "org.lwjgl", name = "lwjgl", version.ref = "lwjgl" }
 lwjgl-glfw = { group = "org.lwjgl", name = "lwjgl-glfw", version.ref = "lwjgl" }
 lwjgl-opengl = { group = "org.lwjgl", name = "lwjgl-opengl", version.ref = "lwjgl" }
 
-skiko-awt = { group = "org.jetbrains.skiko", name = "skiko-awt" }
+skiko = { group = "org.jetbrains.skiko", name = "skiko", version = "0.148.1" }
+skiko-android-runtime-x64 = { group = "org.jetbrains.skiko", name = "skiko-android-runtime-x64", version = "0.148.1" }
+skiko-android-runtime-arm64 = { group = "org.jetbrains.skiko", name = "skiko-android-runtime-arm64", version = "0.148.1" }
 compose-desktop = { group = "org.jetbrains.compose.desktop", name = "desktop", version.ref = "compose" }
 compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "compose" }
 compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "compose" }
@@ -34,7 +36,6 @@ slf4j-android = { module = "uk.uuid.slf4j:slf4j-android", version = "2.0.17-0" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-kotlin = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
@@ -51,10 +52,6 @@ kotlinx-coroutines = [
     "kotlinx-coroutines-jdk9",
     "kotlinx-coroutines-slf4j",
     "kotlinx-coroutines-swing",
-]
-
-skiko = [
-    "skiko-awt",
 ]
 
 lwjgl = [

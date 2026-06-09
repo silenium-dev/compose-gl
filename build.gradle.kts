@@ -38,6 +38,7 @@ allprojects {
         maven("https://nexus.silenium.dev/repository/maven-releases") {
             name = "nexus"
         }
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
     }
 
     publishing {
