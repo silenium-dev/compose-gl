@@ -78,7 +78,10 @@ class MainActivity : ComponentActivity() {
             }, onDispose = {
                 log.info("Disposed")
             }) {
-                log.info("Rendering")
+                log.info(
+                    "Rendering, glGetIntegerv addr: {}",
+                    getGlProcAddress("glGetIntegerv").toHexString(),
+                )
                 GLES32.glClearColor(
                     Random.nextFloat(),
                     Random.nextFloat(),
