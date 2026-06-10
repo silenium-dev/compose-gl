@@ -15,10 +15,13 @@ import org.jetbrains.skia.ColorType
 import org.jetbrains.skia.DirectContext
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.SurfaceOrigin
-import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL33
+import org.lwjgl.opengl.GL33.GL_CLAMP_TO_EDGE
+import org.lwjgl.opengl.GL33.GL_DEPTH24_STENCIL8
+import org.lwjgl.opengl.GL33.GL_NEAREST
+import org.lwjgl.opengl.GL33.GL_RGBA8
+import org.lwjgl.opengl.GL33.GL_TEXTURE_2D
+import org.lwjgl.opengl.GL33.glFlush
 import org.lwjgl.opengl.GLCapabilities
 import org.slf4j.LoggerFactory
 import java.awt.Window
@@ -64,6 +67,7 @@ class GLCanvasDriver : CanvasDriver {
         }
 
         FBOScopeImpl(fbo!!).block()
+        glFlush()
         ctx.resetGLAll()
     }
 
@@ -100,11 +104,11 @@ class GLCanvasDriver : CanvasDriver {
 
     private fun createFBO(size: IntSize): FBO.Custom {
         val colorAttachment = Texture.create(
-            target = GL11.GL_TEXTURE_2D, size = size, internalFormat = GL11.GL_RGBA8,
-            wrapS = GL33.GL_CLAMP_TO_EDGE, wrapT = GL33.GL_CLAMP_TO_EDGE,
-            minFilter = GL33.GL_NEAREST, magFilter = GL33.GL_NEAREST,
+            target = GL_TEXTURE_2D, size = size, internalFormat = GL_RGBA8,
+            wrapS = GL_CLAMP_TO_EDGE, wrapT = GL_CLAMP_TO_EDGE,
+            minFilter = GL_NEAREST, magFilter = GL_NEAREST,
         )
-        val depthStencil = Renderbuffer.create(size, GL33.GL_DEPTH24_STENCIL8)
+        val depthStencil = Renderbuffer.create(size, GL_DEPTH24_STENCIL8)
         return FBO.create(colorAttachment, depthStencil)
     }
 

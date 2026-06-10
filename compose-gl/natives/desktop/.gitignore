@@ -2,3 +2,4 @@
 *.iml
 cmake-build-*/
 third_party/
+subprojects/

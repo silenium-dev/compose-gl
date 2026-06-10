@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.skiaCanvas
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toIntSize
@@ -13,16 +12,36 @@ import dev.silenium.compose.gl.interop.D3DInterop
 import dev.silenium.compose.gl.objects.Renderbuffer
 import dev.silenium.compose.gl.objects.Texture
 import dev.silenium.compose.gl.util.checkGLError
-import org.jetbrains.skia.*
+import org.jetbrains.skia.BackendTexture
+import org.jetbrains.skia.ColorType
+import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.SurfaceOrigin
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.EXTMemoryObject
 import org.lwjgl.opengl.EXTMemoryObject.GL_OPTIMAL_TILING_EXT
 import org.lwjgl.opengl.EXTMemoryObject.GL_TEXTURE_TILING_EXT
 import org.lwjgl.opengl.EXTMemoryObjectWin32
 import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE
-import org.lwjgl.opengl.GL30.GL_DEPTH24_STENCIL8
+import org.lwjgl.opengl.GL32.GL_ALREADY_SIGNALED
+import org.lwjgl.opengl.GL32.GL_CLAMP_TO_EDGE
+import org.lwjgl.opengl.GL32.GL_CONDITION_SATISFIED
+import org.lwjgl.opengl.GL32.GL_DEPTH24_STENCIL8
+import org.lwjgl.opengl.GL32.GL_LINEAR
+import org.lwjgl.opengl.GL32.GL_RGBA8
+import org.lwjgl.opengl.GL32.GL_SYNC_FLUSH_COMMANDS_BIT
+import org.lwjgl.opengl.GL32.GL_SYNC_GPU_COMMANDS_COMPLETE
+import org.lwjgl.opengl.GL32.GL_TEXTURE_2D
+import org.lwjgl.opengl.GL32.GL_TEXTURE_MAG_FILTER
+import org.lwjgl.opengl.GL32.GL_TEXTURE_MIN_FILTER
+import org.lwjgl.opengl.GL32.GL_TEXTURE_WRAP_S
+import org.lwjgl.opengl.GL32.GL_TEXTURE_WRAP_T
+import org.lwjgl.opengl.GL32.glClientWaitSync
+import org.lwjgl.opengl.GL32.glDeleteSync
+import org.lwjgl.opengl.GL32.glFenceSync
+import org.lwjgl.opengl.GL32.glFlush
+import org.lwjgl.opengl.GL32.glGenTextures
+import org.lwjgl.opengl.GL32.glTexParameteri
 import org.lwjgl.opengl.GLCapabilities
 import org.lwjgl.system.MemoryUtil
 import org.slf4j.LoggerFactory
@@ -40,6 +59,7 @@ class D3DCanvasDriver(private val window: Window) : CanvasDriver {
     var glfwWindow = 0L
     var fbo: FBO? = null
     var glCaps: GLCapabilities? = null
+    var sync: Long? = null
 
     override fun setup(directContext: DirectContext) {
         d3dDirectContext = directContext
@@ -77,13 +97,14 @@ class D3DCanvasDriver(private val window: Window) : CanvasDriver {
         }
 
         FBOScopeImpl(fbo!!).block()
-        glFlush()
+        setupFence()
         GLFW.glfwMakeContextCurrent(MemoryUtil.NULL)
     }
 
     override fun display(scope: DrawScope) {
         d3dDirectContext ?: return
         ensureInitialized()
+        sync?.let(::waitSync)
         val img = image ?: return log.warn("No image")
         scope.drawContext.canvas.skiaCanvas.drawImage(img, 0f, 0f)
     }
@@ -104,6 +125,8 @@ class D3DCanvasDriver(private val window: Window) : CanvasDriver {
 
     private fun ensureFBO(size: IntSize, d3dContext: DirectContext) {
         if (fbo?.size != size) {
+            d3dContext.flush()
+            d3dContext.submit(true)
             glMemory?.let(EXTMemoryObject::glDeleteMemoryObjectsEXT)
             glMemory = null
             sharedHandle?.let(D3DInterop::closeSharedHandle)
@@ -162,6 +185,29 @@ class D3DCanvasDriver(private val window: Window) : CanvasDriver {
     }
 
     override fun getGlProcAddress(name: String): Long = GLFW.glfwGetProcAddress(name)
+
+    private fun setupFence() {
+        sync?.let(::glDeleteSync)
+        val sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0).also { this.sync = it }
+        checkGLError("glFenceSync")
+        check(sync != 0L) {
+            "Failed to create sync"
+        }
+        glFlush()
+    }
+
+    private fun waitSync(sync: Long) {
+        GLFW.glfwMakeContextCurrent(glfwWindow)
+        try {
+            while (true) {
+                val result = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1_000_000L)
+                checkGLError("glClientWaitSync")
+                if (result == GL_ALREADY_SIGNALED || result == GL_CONDITION_SATISFIED) break
+            }
+        } finally {
+            GLFW.glfwMakeContextCurrent(MemoryUtil.NULL)
+        }
+    }
 
     companion object : CanvasDriverFactory<D3DCanvasDriver> {
         private val log = LoggerFactory.getLogger(D3DCanvasDriver::class.java)
