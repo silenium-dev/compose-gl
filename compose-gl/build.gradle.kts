@@ -1,4 +1,3 @@
-import com.android.build.api.component.impl.JavaCompilationImpl
 import java.net.URLClassLoader
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.isAccessible
