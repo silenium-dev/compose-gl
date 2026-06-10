@@ -137,7 +137,7 @@ class D3DCanvasDriver(private val window: Window) : CanvasDriver {
             glMemory = EXTMemoryObject.glCreateMemoryObjectsEXT()
             checkGLError("glCreateMemoryObjectsEXT")
             EXTMemoryObjectWin32.glImportMemoryWin32HandleEXT(
-                glMemory!!, size.width * size.height * 4 * 2L,
+                glMemory!!, size.width * size.height * 4L,
                 EXTMemoryObjectWin32.GL_HANDLE_TYPE_D3D12_RESOURCE_EXT, sharedHandle!!,
             )
             checkGLError("glImportMemoryWin32HandleEXT")
