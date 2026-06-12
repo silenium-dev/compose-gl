@@ -1,0 +1,2 @@
+Manifest-Version: 1.0
+Enable-Native-Access: dev.silenium.compose.gl

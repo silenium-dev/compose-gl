@@ -101,4 +101,8 @@ tasks {
     withType<Test> {
         useJUnitPlatform()
     }
+
+    named<JavaCompile>("compileJvmMainJava") {
+        options.compilerArgs.addAll(listOf("--add-reads", "dev.silenium.compose.gl=ALL-UNNAMED"))
+    }
 }
