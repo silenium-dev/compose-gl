@@ -38,6 +38,7 @@ kotlin {
 
         androidMain {
             dependencies {
+                implementation(libs.kotlinx.coroutines.slf4j)
                 implementation(project(":compose-gl:natives:android"))
             }
         }
@@ -47,6 +48,7 @@ kotlin {
                 implementation(project(":compose-gl:natives:desktop"))
                 implementation(libs.compose.desktop)
                 implementation(libs.jni.utils)
+                implementation(libs.kotlinx.coroutines.slf4j)
                 api(dependencies.platform(libs.lwjgl.bom))
                 libs.bundles.lwjgl.get().forEach {
                     api(it)
