@@ -30,7 +30,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(kotlin("reflect"))
-                implementation(libs.bundles.kotlinx.coroutines)
+                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.slf4j.api)
                 implementation(libs.bundles.compose.common)
             }
@@ -60,6 +60,7 @@ kotlin {
         jvmTest {
             dependencies {
                 implementation(libs.logback.classic)
+                implementation(libs.bundles.kotlinx.coroutines.jvm)
             }
         }
     }
