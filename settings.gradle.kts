@@ -12,7 +12,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-rootProject.name = "compose-gl-root"
+rootProject.name = "compose-gl"
 
 val deployEnabled = if (extra.has("deploy.enabled")) {
     extra.get("deploy.enabled").toString().toBoolean()
