@@ -1,7 +1,7 @@
 [versions]
 kotlinx-coroutines = "1.11.0"
 lwjgl = "3.4.1"
-jni-utils = "0.6.1"
+jni-utils = "0.6.3"
 compose = "1.11.1"
 kotlin = "2.4.0"
 idea-ext = "1.4.1"
