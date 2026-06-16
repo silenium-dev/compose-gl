@@ -1,29 +1,34 @@
+import dev.silenium.build.ProjectConfig
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import dev.silenium.gradle.conventions.*
 
 plugins {
-    com.android.library
+    dev.silenium.gradle.conventions.android.library
     `maven-publish`
 }
 
 group = "dev.silenium.compose.gl.natives"
 
-androidTestDependencies()
+
+conventions {
+    android {
+        compileSdk {
+            version = release(ProjectConfig.COMPILE_SDK)
+        }
+        namespace = "dev.silenium.compose.gl.natives.android"
+        jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
+        cmakeVersion = ProjectConfig.CMAKE_VERSION
+        ndkVersion = ProjectConfig.NDK_VERSION
+    }
+    publishing {
+        enabled = true
+    }
+}
 
 android {
-    namespace = "dev.silenium.compose.gl.natives.android"
-    commonConfig()
-
     externalNativeBuild {
         cmake {
-            version = ProjectConfig.CMAKE_VERSION
             path = file("src/main/cpp/CMakeLists.txt")
-        }
-    }
-
-    publishing {
-        multipleVariants {
-            allVariants()
-            withSourcesJar()
         }
     }
 }

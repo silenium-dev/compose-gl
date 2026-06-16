@@ -1,4 +1,9 @@
+import dev.silenium.build.ProjectConfig
+import dev.silenium.gradle.conventions.jvm
+import dev.silenium.gradle.conventions.publishing
+
 plugins {
+    dev.silenium.gradle.conventions.jvm
     dev.silenium.libs.jni.`nix-natives`
 }
 
@@ -12,10 +17,11 @@ nixNatives {
     showLogs = providers.environmentVariable("CI").orElse("false").map { it != "false" }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["kotlin"])
-        }
+conventions {
+    publishing {
+        enabled = true
+    }
+    jvm {
+        jvmTarget = ProjectConfig.JVM_TARGET
     }
 }

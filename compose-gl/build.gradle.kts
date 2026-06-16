@@ -1,38 +1,26 @@
-import java.net.URLClassLoader
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.isAccessible
+import dev.silenium.build.ProjectConfig
+import dev.silenium.gradle.conventions.android
+import dev.silenium.gradle.conventions.compileSdk
+import dev.silenium.gradle.conventions.jvm
+import dev.silenium.gradle.conventions.publishing
 
 plugins {
-    com.android.kotlin.multiplatform.library
-    org.jetbrains.kotlin.multiplatform
     org.jetbrains.kotlin.plugin.compose
-    org.jetbrains.compose
-    `maven-publish`
+    dev.silenium.gradle.conventions.kmp
 }
 
 val lwjglNatives = arrayOf("natives-linux", "natives-windows")
 kotlin {
-    jvmToolchain(ProjectConfig.JVM_TARGET.target.toInt())
-    compilerOptions {
-        freeCompilerArgs.add("-Xexpect-actual-classes")
-    }
-    jvm {
-        compilerOptions {
-            jvmTarget = ProjectConfig.JVM_TARGET
-        }
-    }
-    android {
-        namespace = "dev.silenium.compose.gl"
-        commonConfig()
-    }
-
     sourceSets {
         commonMain {
             dependencies {
                 implementation(kotlin("reflect"))
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.slf4j.api)
-                implementation(libs.bundles.compose.common)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.ui.get().toString()) {
+                    exclude("androidx.compose.runtime")
+                }
             }
         }
 
@@ -46,12 +34,14 @@ kotlin {
         jvmMain {
             dependencies {
                 implementation(project(":compose-gl:natives:desktop"))
-                implementation(libs.compose.desktop)
+                implementation(libs.compose.foundation.get().toString()) {
+                    exclude("androidx.compose.runtime")
+                }
                 implementation(libs.jni.utils)
                 implementation(libs.kotlinx.coroutines.slf4j)
                 api(dependencies.platform(libs.lwjgl.bom))
+                api(libs.bundles.lwjgl)
                 libs.bundles.lwjgl.get().forEach {
-                    api(it)
                     lwjglNatives.forEach { native ->
                         runtimeOnly(dependencies.variantOf(provider { it }) { classifier(native) })
                     }
@@ -61,50 +51,30 @@ kotlin {
 
         jvmTest {
             dependencies {
-                implementation(libs.logback.classic)
                 implementation(libs.bundles.kotlinx.coroutines.jvm)
             }
         }
     }
 }
 
-val skikoVersionClasspath by configurations.creating {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-
-    attributes {
-        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+conventions {
+    jvm {
+        jvmTarget = ProjectConfig.JVM_TARGET
     }
-}
-
-dependencies {
-    skikoVersionClasspath(libs.compose.desktop)
-}
-
-skikoVersionClasspath.let {
-    val file = it.filter { it.name.matches(Regex("skiko-awt-\\d.+.jar")) }.singleFile
-    val loader = URLClassLoader(arrayOf(file.toURI().toURL()))
-    val clazz = loader.loadClass("org.jetbrains.skiko.Version").kotlin
-    val getSkikoVersion = clazz.functions.single { it.name == "getSkiko" }
-    val getSkiaVersion = clazz.functions.single { it.name == "getSkia" }
-    val constructor = clazz.constructors.single()
-    constructor.isAccessible = true
-    val instance = constructor.call()
-    val skikoVersion = getSkikoVersion.call(instance)
-    val skiaVersion = getSkiaVersion.call(instance)
-    println("skiko version: $skikoVersion")
-    println("skia version: $skiaVersion")
-    rootProject.ext.set("skiko.version", skikoVersion)
-    rootProject.ext.set("skia.version", skiaVersion)
+    android {
+        compileSdk {
+            version = release(ProjectConfig.COMPILE_SDK)
+        }
+        minSdk = ProjectConfig.MIN_SDK
+        jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
+        namespace = "dev.silenium.compose.gl"
+    }
+    publishing {
+        enabled = true
+    }
 }
 
 tasks {
-    withType<Test> {
-        useJUnitPlatform()
-    }
-
     named<JavaCompile>("compileJvmMainJava") {
         options.compilerArgs.addAll(listOf("--add-reads", "dev.silenium.compose.gl=ALL-UNNAMED"))
     }

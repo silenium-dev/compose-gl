@@ -1,11 +1,24 @@
-import org.gradle.kotlin.dsl.support.serviceOf
+import dev.silenium.build.PrepareAndroidSkikoNatives
+import dev.silenium.build.ProjectConfig
+import dev.silenium.gradle.conventions.android
+import dev.silenium.gradle.conventions.bundleNatives
+import dev.silenium.gradle.conventions.compileSdk
 
 plugins {
-    com.android.application
+    dev.silenium.gradle.conventions.android.application
     org.jetbrains.kotlin.plugin.compose
 }
 
 group = "dev.silenium.compose.gl.examples"
+
+repositories {
+    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+}
+
+val skikoJniClasspath by configurations.registering {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
 
 dependencies {
     implementation(project(":compose-gl")) {
@@ -19,43 +32,31 @@ dependencies {
     implementation("androidx.compose.runtime:runtime:1.11.2")
     implementation("androidx.compose.material3:material3:1.4.0")
 
-    androidTestDependencies()
-}
-
-android {
-    commonConfig()
-    namespace = "dev.silenium.compose.gl.examples"
-}
-
-// 1. Create a dedicated configuration just to resolve the jars
-val skikoJniClasspath by configurations.creating {
-    isCanBeResolved = true
-    isCanBeConsumed = false
-}
-
-// 2. Add the runtime dependencies specifically to this configuration
-dependencies {
     skikoJniClasspath(libs.skiko.android.runtime.arm64)
     skikoJniClasspath(libs.skiko.android.runtime.x64)
 }
 
-// 3. Register a copy task that maps the flat .so files into standard ABI folders
-val archiveOps = serviceOf<ArchiveOperations>()
-val extractSkikoJni = tasks.register<AgpCopyCompat>("extractSkikoJni") {
-    from(skikoJniClasspath.map { zipTree(it) }) {
-        include("*.so")
-        eachFile {
-            if (name.contains("arm64")) {
-                path = "arm64-v8a/$name"
-            } else if (name.contains("x64")) {
-                path = "x86_64/$name"
-            }
-        }
-        includeEmptyDirs = false
-    }
-    destination = layout.buildDirectory.dir("skiko_jni")
+val prepareJniLibs by tasks.registering(PrepareAndroidSkikoNatives::class) {
+    skikoNatives.from(skikoJniClasspath)
+    destinationDirectory = layout.buildDirectory.dir("generated")
+    archiveFileName = "skiko-natives.zip"
 }
 
-androidComponents.onVariants {
-    it.sources.jniLibs?.addGeneratedSourceDirectory(extractSkikoJni, AgpCopyCompat::destination)
+conventions {
+    android {
+        compileSdk {
+            version = release(ProjectConfig.COMPILE_SDK)
+        }
+        namespace = "dev.silenium.compose.gl.examples"
+        minSdk = ProjectConfig.MIN_SDK
+        jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
+
+        bundleNatives {
+            configuration.from(prepareJniLibs)
+            libraries.addAll(
+                "libskiko-android-arm64.so",
+                "libskiko-android-x64.so",
+            )
+        }
+    }
 }

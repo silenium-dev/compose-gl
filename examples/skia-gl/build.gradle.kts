@@ -1,28 +1,25 @@
+import dev.silenium.build.ProjectConfig
+import dev.silenium.gradle.conventions.*
+
 plugins {
-    org.jetbrains.kotlin.jvm
+    dev.silenium.gradle.conventions.jvm
     org.jetbrains.kotlin.plugin.compose
     org.jetbrains.compose
 }
 
 group = "dev.silenium.compose.gl.examples"
-val composeGlVersion = "0.11.0-rc.1"
-
-val useParent: Boolean =
-    project.ext.properties.getOrDefault("examples.use-parent", "true").toString().toBoolean()
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    if (useParent) {
-        implementation(project(":compose-gl"))
-    } else {
-        implementation("dev.silenium.compose.gl:compose-gl:${composeGlVersion}")
-    }
+    implementation(project(":compose-gl"))
     implementation(libs.slf4j.api)
     runtimeOnly(libs.logback.classic)
 }
 
-kotlin {
-    jvmToolchain(21)
+conventions {
+    jvm {
+        jvmTarget = ProjectConfig.JVM_TARGET
+    }
 }
 
 compose.desktop {

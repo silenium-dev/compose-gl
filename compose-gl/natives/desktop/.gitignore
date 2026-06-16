@@ -3,3 +3,4 @@
 cmake-build-*/
 third_party/
 subprojects/
+result

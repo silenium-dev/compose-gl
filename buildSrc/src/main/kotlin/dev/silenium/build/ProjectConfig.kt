@@ -1,3 +1,5 @@
+package dev.silenium.build
+
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import com.android.build.api.dsl.ManagedVirtualDevice
@@ -70,15 +72,4 @@ fun KotlinMultiplatformAndroidLibraryTarget.commonConfig() {
         instrumentationRunnerArguments["notPackage"] = "com.v7878"
     }
     packaging.resources.pickFirsts += "META-INF/*"
-}
-
-fun Project.androidTestDependencies() {
-    val androidTestImplementation =
-        configurations.getByName<Configuration>("androidTestImplementation")
-    dependencies {
-        androidTestImplementation(libs.slf4j.android)
-        androidTestImplementation(libs.bundles.androidx.test)
-        androidTestImplementation(libs.bundles.tests)
-        androidTestImplementation(libs.kotest.runner.junit4)
-    }
 }

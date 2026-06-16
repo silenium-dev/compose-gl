@@ -1,15 +1,13 @@
 plugins {
     `kotlin-dsl`
-    `java-gradle-plugin`
 }
 
 repositories {
     mavenCentral()
     google()
     gradlePluginPortal()
-    maven("https://nexus.silenium.dev/repository/maven-releases") {
-        name = "nexus"
-    }
+    maven("https://nexus.silenium.dev/repository/maven-releases/")
+    maven("https://nexus.silenium.dev/repository/maven-snapshots/")
 }
 
 dependencies {
@@ -33,14 +31,10 @@ dependencies {
             }
         }
     }
-    configurations.implementation(plugin = libs.plugins.kotlin.multiplatform)
-    configurations.implementation(plugin = libs.plugins.android.kotlin)
-    configurations.implementation(plugin = libs.plugins.nixNatives)
-    configurations.implementation(plugin = libs.plugins.compose)
-    configurations.implementation(plugin = libs.plugins.kotlin.compose)
-    configurations.implementation(plugin = libs.plugins.android.application)
-    configurations.implementation(plugin = libs.plugins.kotlin.jvm)
-    configurations.implementation(plugin = libs.plugins.idea.ext)
+    configurations.implementation(libs.plugins.conventions.jvm)
+    configurations.implementation(libs.plugins.conventions.kmp)
+    configurations.implementation(libs.plugins.conventions.android.library)
+    configurations.implementation(libs.plugins.conventions.android.application)
     implementation(gradleApi())
     implementation(gradleKotlinDsl())
     implementation(files(libs.javaClass.protectionDomain.codeSource.location.file))

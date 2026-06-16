@@ -1,11 +1,10 @@
 pluginManagement {
     repositories {
-        maven("https://nexus.silenium.dev/repository/maven-releases") {
-            name = "nexus"
-        }
         google()
         gradlePluginPortal()
         mavenCentral()
+        maven("https://nexus.silenium.dev/repository/maven-releases/")
+        maven("https://nexus.silenium.dev/repository/maven-snapshots/")
     }
 }
 plugins {
