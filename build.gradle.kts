@@ -5,6 +5,8 @@ plugins {
     dev.silenium.gradle.conventions.jvm
 }
 
+group = "dev.silenium.compose.gl"
+
 allprojects {
     afterEvaluate {
         extensions.findByName("conventions")
