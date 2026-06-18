@@ -119,9 +119,6 @@ object BuildRelease : BuildType({
     }
 
     steps {
-        with(Nix) {
-            loadNixEnv()
-        }
         val gradleArgs = """
                 |-Pdeploy.version=%release.version%
                 |-Pdeploy.enabled=true
@@ -218,9 +215,6 @@ object BuildSnapshot : BuildType({
     }
 
     steps {
-        with(Nix) {
-            loadNixEnv()
-        }
         gradle {
             tasks = """
                 |build
@@ -272,9 +266,6 @@ object BuildPR : BuildType({
     }
 
     steps {
-        with(Nix) {
-            loadNixEnv()
-        }
         gradle {
             tasks = """
                 |build
@@ -288,41 +279,3 @@ object BuildPR : BuildType({
         }
     }
 })
-
-object Nix {
-    fun BuildSteps.loadNixEnv(flakeDir: String = ".", devShell: String? = null) {
-        script {
-            name = "Load Nix Environment"
-            // language="Shell Script"
-            scriptContent = """
-                |set -xeuo pipefail
-                |
-                |FLAKE_REF="$flakeDir#${devShell.orEmpty()}"
-                |
-                |tmp_before=$(mktemp)
-                |tmp_after=$(mktemp)
-                |
-                |env | sort > "${"$"}tmp_before"
-                |nix develop "${"$"}FLAKE_REF" --command env | sort > "${"$"}tmp_after"
-                |
-                |MODIFIED_ENV=$(
-                |  {
-                |    diff "${"$"}tmp_before" "${"$"}tmp_after" || status=${'$'}?
-                |    if [ "${"$"}{status:-0}" -gt 1 ]; then
-                |      exit "${"$"}status"
-                |    fi
-                |  } | sed -n 's/^> //p'
-                |)
-                |while IFS="=" read -r name value; do
-                |   escaped_value="${"$"}{value//|/||}"
-                |   escaped_value="${"$"}{escaped_value//$'\n'/|n}"
-                |   escaped_value="${"$"}{escaped_value//$'\r'/|r}"
-                |   escaped_value="${"$"}{escaped_value//\'/|\'}"
-                |   escaped_value="${"$"}{escaped_value//[/|[}"
-                |   escaped_value="${"$"}{escaped_value//]/|]}"
-                |   echo "##teamcity[setParameter name='env.${"$"}{name}' value='${"$"}{escaped_value}']"
-                |done <<< "${"$"}MODIFIED_ENV"
-            """.trimMargin()
-        }
-    }
-}
