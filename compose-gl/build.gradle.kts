@@ -9,6 +9,8 @@ plugins {
     dev.silenium.gradle.conventions.kmp
 }
 
+group = "dev.silenium.compose.gl"
+
 val lwjglNatives = arrayOf("natives-linux", "natives-windows")
 kotlin {
     sourceSets {
