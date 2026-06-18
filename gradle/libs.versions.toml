@@ -6,7 +6,7 @@ compose = "1.11.1"
 kotlin = "2.4.0"
 idea-ext = "1.4.1"
 agp = "9.2.1"
-conventions = "0.1.5-24-g3fc300c0"
+conventions = "0.1.5-25-g242eef0d"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
