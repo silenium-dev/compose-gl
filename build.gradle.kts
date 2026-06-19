@@ -40,3 +40,17 @@ allprojects {
             }
     }
 }
+
+jreleaser {
+    deploy {
+        maven {
+            mavenCentral {
+                configureEach {
+                    artifactOverride {
+                        javadocJar = false
+                    }
+                }
+            }
+        }
+    }
+}
