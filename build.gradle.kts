@@ -46,9 +46,7 @@ jreleaser {
         maven {
             mavenCentral {
                 configureEach {
-                    artifactOverride {
-                        javadocJar = false
-                    }
+                    javadocJar = false
                 }
             }
         }
