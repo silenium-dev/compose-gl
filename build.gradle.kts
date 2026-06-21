@@ -40,15 +40,3 @@ allprojects {
             }
     }
 }
-
-jreleaser {
-    deploy {
-        maven {
-            mavenCentral {
-                configureEach {
-                    javadocJar = false
-                }
-            }
-        }
-    }
-}
