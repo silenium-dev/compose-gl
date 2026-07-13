@@ -31,7 +31,7 @@ compose-foundation = { group = "org.jetbrains.compose.foundation", name = "found
 
 jni-utils = { group = "dev.silenium.libs.jni", name = "jni-utils", version.ref = "jni-utils" }
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.18" }
-logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.37" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.5.38" }
 slf4j-android = { module = "uk.uuid.slf4j:slf4j-android", version = "2.0.17-0" }
 
 [plugins]
