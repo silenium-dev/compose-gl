@@ -27,23 +27,14 @@ val LocalCanvasDriverFactory = staticCompositionLocalOf<CanvasDriverFactory<Canv
     DefaultCanvasDriverFactory
 }
 
-@Suppress("UNCHECKED_CAST")
-val LocalWindow: CompositionLocal<Window?> by lazy {
-    val clazz = Class.forName("androidx.compose.ui.window.LocalWindowKt")
-    val method = clazz.getMethod("getLocalWindow")
-    method.invoke(null) as CompositionLocal<Window?>
-}
-
-fun Window.directX12Device(): NativePointer? {
-    return findSkiaLayer()?.let { layer ->
-        if (layer.graphicsApi() != GraphicsApi.DIRECT3D) return null
-        layer.redrawer().let { redrawer ->
-            val getter = redrawer::class.memberProperties.first {
-                it.name == "device" && it.returnType == typeOf<Long>()
-            }
-            getter.isAccessible = true
-            getter.call(redrawer) as Long?
+fun Window.directX12Device(): NativePointer? = findSkiaLayer()?.let { layer ->
+    if (layer.graphicsApi() != GraphicsApi.DIRECT3D) return null
+    layer.redrawer().let { redrawer ->
+        val getter = redrawer::class.memberProperties.first {
+            it.name == "device" && it.returnType == typeOf<Long>()
         }
+        getter.isAccessible = true
+        getter.call(redrawer) as Long?
     }
 }
 
@@ -51,9 +42,7 @@ fun SkiaLayer.directContext(): DirectContext? {
     return contextHandler()?.findProperty<DirectContext?>()
 }
 
-inline fun <reified T> Any.findProperty(): T? {
-    return findProperty(typeOf<T>()) as T?
-}
+inline fun <reified T> Any.findProperty(): T? = findProperty(typeOf<T>()) as T?
 
 fun Any.findProperty(type: KType): Any? {
     val supertypes = LinkedList<KClass<*>>()
@@ -73,9 +62,7 @@ fun Any.findProperty(type: KType): Any? {
     return getter?.call(this)
 }
 
-fun SkiaLayer.graphicsApi(): GraphicsApi {
-    return findProperty<GraphicsApi>() ?: GraphicsApi.UNKNOWN
-}
+fun SkiaLayer.graphicsApi() = findProperty<GraphicsApi>() ?: GraphicsApi.UNKNOWN
 
 fun SkiaLayer.contextHandler(): Any? {
     val propType = Class.forName("org.jetbrains.skiko.context.ContextHandler")

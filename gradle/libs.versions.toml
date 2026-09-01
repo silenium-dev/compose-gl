@@ -1,12 +1,10 @@
 [versions]
 kotlinx-coroutines = "1.11.0"
-lwjgl = "3.4.2"
-jni-utils = "0.6.4"
-compose = "1.11.1"
-kotlin = "2.4.0"
-idea-ext = "1.4.1"
-agp = "9.2.1"
-conventions = "0.1.5-35-gafa2500c"
+lwjgl = "3.4.3"
+jni-utils = "0.6.5"
+compose = "1.12.0"
+conventions = "0.1.7"
+skiko = "0.150.1"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -22,10 +20,11 @@ lwjgl-core = { group = "org.lwjgl", name = "lwjgl", version.ref = "lwjgl" }
 lwjgl-glfw = { group = "org.lwjgl", name = "lwjgl-glfw", version.ref = "lwjgl" }
 lwjgl-opengl = { group = "org.lwjgl", name = "lwjgl-opengl", version.ref = "lwjgl" }
 
-skiko = { group = "org.jetbrains.skiko", name = "skiko", version = "0.148.1" }
-skiko-android-runtime-x64 = { group = "org.jetbrains.skiko", name = "skiko-android-runtime-x64", version = "0.148.1" }
-skiko-android-runtime-arm64 = { group = "org.jetbrains.skiko", name = "skiko-android-runtime-arm64", version = "0.148.1" }
-compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "compose" }
+skiko = { group = "org.jetbrains.skiko", name = "skiko", version.ref = "skiko" }
+skiko-android-runtime-x64 = { group = "org.jetbrains.skiko", name = "skiko-android-runtime-x64", version.ref = "skiko" }
+skiko-android-runtime-arm64 = { group = "org.jetbrains.skiko", name = "skiko-android-runtime-arm64", version.ref = "skiko" }
+compose-ui-all = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "compose" }
+compose-ui-unit = { module = "org.jetbrains.compose.ui:ui-unit", version.ref = "compose" }
 compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "compose" }
 compose-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "compose" }
 

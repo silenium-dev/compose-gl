@@ -5,11 +5,10 @@ import dev.silenium.gradle.conventions.jvm
 import dev.silenium.gradle.conventions.publishing
 
 plugins {
-    org.jetbrains.kotlin.plugin.compose
     dev.silenium.gradle.conventions.kmp
 }
 
-group = "dev.silenium.compose.gl"
+group = "dev.silenium.libs.gl"
 
 val lwjglNatives = arrayOf("natives-linux", "natives-windows")
 kotlin {
@@ -19,26 +18,19 @@ kotlin {
                 implementation(kotlin("reflect"))
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.slf4j.api)
-                implementation(libs.compose.runtime)
-                implementation(libs.compose.ui.all.get().toString()) {
-                    exclude("androidx.compose.runtime")
-                }
-                api(project(":gl"))
+                implementation(libs.compose.ui.unit)
             }
         }
 
         androidMain {
             dependencies {
                 implementation(libs.kotlinx.coroutines.slf4j)
+                api(project(":gl:natives:android"))
             }
         }
 
         jvmMain {
             dependencies {
-                implementation(project(":compose-gl:natives:desktop"))
-                implementation(libs.compose.foundation.get().toString()) {
-                    exclude("androidx.compose.runtime")
-                }
                 implementation(libs.jni.utils)
                 implementation(libs.kotlinx.coroutines.slf4j)
                 api(dependencies.platform(libs.lwjgl.bom))
@@ -69,15 +61,9 @@ conventions {
         }
         minSdk = ProjectConfig.MIN_SDK
         jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
-        namespace = "dev.silenium.compose.gl"
+        namespace = "dev.silenium.libs.gl"
     }
     publishing {
         enabled = true
-    }
-}
-
-tasks {
-    named<JavaCompile>("compileJvmMainJava") {
-        options.compilerArgs.addAll(listOf("--add-reads", "dev.silenium.compose.gl=ALL-UNNAMED"))
     }
 }

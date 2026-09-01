@@ -5,10 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.LocalAwtWindow
 import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.LocalCanvasDriverFactory
-import dev.silenium.compose.gl.LocalWindow
 import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.findSkiaLayer
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 actual fun GLCanvas(
     state: GLCanvasState,
@@ -26,7 +28,7 @@ actual fun GLCanvas(
     block: GLDrawScope.() -> Unit,
 ) {
     val driverFactory = LocalCanvasDriverFactory.current
-    val window = LocalWindow.current ?: throw IllegalStateException("No window")
+    val window = LocalAwtWindow.current ?: error("No window")
     val driver = remember { driverFactory.create(window) }
     LaunchedEffect(window) {
         withContext(Dispatchers.IO) {

@@ -1,11 +1,11 @@
-package dev.silenium.compose.gl
+package dev.silenium.libs.gl
 
 import org.lwjgl.opengl.GL32
 import org.lwjgl.opengl.GL40
 import org.lwjgl.opengl.GL43
 import java.nio.ByteBuffer
 
-internal actual object GLProvider {
+actual object GLProvider {
     // General
     actual fun glGetInteger(name: Int): Int = GL32.glGetInteger(name)
 

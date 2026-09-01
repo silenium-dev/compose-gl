@@ -1,25 +1,25 @@
-package dev.silenium.compose.gl.fbo
+package dev.silenium.libs.gl.fbo
 
 import androidx.compose.ui.unit.IntSize
-import dev.silenium.compose.gl.GLProvider.GL_COLOR_ATTACHMENT0
-import dev.silenium.compose.gl.GLProvider.GL_DEPTH_STENCIL_ATTACHMENT
-import dev.silenium.compose.gl.GLProvider.GL_FRAMEBUFFER
-import dev.silenium.compose.gl.GLProvider.GL_FRAMEBUFFER_BINDING
-import dev.silenium.compose.gl.GLProvider.GL_FRAMEBUFFER_COMPLETE
-import dev.silenium.compose.gl.GLProvider.GL_RENDERBUFFER
-import dev.silenium.compose.gl.GLProvider.GL_TEXTURE_2D
-import dev.silenium.compose.gl.GLProvider.glBindFramebuffer
-import dev.silenium.compose.gl.GLProvider.glCheckFramebufferStatus
-import dev.silenium.compose.gl.GLProvider.glDeleteFramebuffers
-import dev.silenium.compose.gl.GLProvider.glFramebufferRenderbuffer
-import dev.silenium.compose.gl.GLProvider.glFramebufferTexture2D
-import dev.silenium.compose.gl.GLProvider.glGenFramebuffers
-import dev.silenium.compose.gl.GLProvider.glGetInteger
-import dev.silenium.compose.gl.GLProvider.glViewport
-import dev.silenium.compose.gl.objects.Renderbuffer
-import dev.silenium.compose.gl.objects.Texture
-import dev.silenium.compose.gl.util.DoubleDestructionProtection
-import dev.silenium.compose.gl.util.checkGLError
+import dev.silenium.libs.gl.GLProvider.GL_COLOR_ATTACHMENT0
+import dev.silenium.libs.gl.GLProvider.GL_DEPTH_STENCIL_ATTACHMENT
+import dev.silenium.libs.gl.GLProvider.GL_FRAMEBUFFER
+import dev.silenium.libs.gl.GLProvider.GL_FRAMEBUFFER_BINDING
+import dev.silenium.libs.gl.GLProvider.GL_FRAMEBUFFER_COMPLETE
+import dev.silenium.libs.gl.GLProvider.GL_RENDERBUFFER
+import dev.silenium.libs.gl.GLProvider.GL_TEXTURE_2D
+import dev.silenium.libs.gl.GLProvider.glBindFramebuffer
+import dev.silenium.libs.gl.GLProvider.glCheckFramebufferStatus
+import dev.silenium.libs.gl.GLProvider.glDeleteFramebuffers
+import dev.silenium.libs.gl.GLProvider.glFramebufferRenderbuffer
+import dev.silenium.libs.gl.GLProvider.glFramebufferTexture2D
+import dev.silenium.libs.gl.GLProvider.glGenFramebuffers
+import dev.silenium.libs.gl.GLProvider.glGetInteger
+import dev.silenium.libs.gl.GLProvider.glViewport
+import dev.silenium.libs.gl.objects.Renderbuffer
+import dev.silenium.libs.gl.objects.Texture
+import dev.silenium.libs.gl.util.DoubleDestructionProtection
+import dev.silenium.libs.gl.util.checkGLError
 
 sealed class FBO : DoubleDestructionProtection<Int>() {
     abstract val size: IntSize

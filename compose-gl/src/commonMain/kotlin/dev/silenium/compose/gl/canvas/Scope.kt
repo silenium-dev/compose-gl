@@ -1,8 +1,8 @@
 package dev.silenium.compose.gl.canvas
 
-import dev.silenium.compose.gl.GLProvider
-import dev.silenium.compose.gl.GLProvider.glFlush
-import dev.silenium.compose.gl.fbo.FBO
+import dev.silenium.libs.gl.GLProvider
+import dev.silenium.libs.gl.GLProvider.glFlush
+import dev.silenium.libs.gl.fbo.FBO
 import kotlin.time.Duration
 
 interface FBOScope {

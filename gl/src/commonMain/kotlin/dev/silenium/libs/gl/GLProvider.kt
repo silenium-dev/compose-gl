@@ -1,8 +1,8 @@
-package dev.silenium.compose.gl
+package dev.silenium.libs.gl
 
 import java.nio.ByteBuffer
 
-internal expect object GLProvider {
+expect object GLProvider {
     // General
     fun glGetInteger(name: Int): Int
     fun glGetError(): Int

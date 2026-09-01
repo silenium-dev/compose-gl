@@ -13,6 +13,7 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(project(":compose-gl"))
     implementation(libs.slf4j.api)
+    implementation(libs.kotlinx.coroutines.swing)
     runtimeOnly(libs.logback.classic)
 }
 

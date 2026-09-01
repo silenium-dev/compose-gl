@@ -1,7 +1,7 @@
-package dev.silenium.compose.gl.util
+package dev.silenium.libs.gl.util
 
-import dev.silenium.compose.gl.GLProvider.GL_NO_ERROR
-import dev.silenium.compose.gl.GLProvider.glGetError
+import dev.silenium.libs.gl.GLProvider.GL_NO_ERROR
+import dev.silenium.libs.gl.GLProvider.glGetError
 
 data class GLError(val error: Int, val operation: String? = null) :
     Exception(

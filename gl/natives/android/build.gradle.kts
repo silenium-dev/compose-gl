@@ -7,15 +7,14 @@ plugins {
     `maven-publish`
 }
 
-group = "dev.silenium.compose.gl.natives"
-
+group = "dev.silenium.libs.gl.natives"
 
 conventions {
     android {
         compileSdk {
             version = release(ProjectConfig.COMPILE_SDK)
         }
-        namespace = "dev.silenium.compose.gl.natives.android"
+        namespace = "dev.silenium.libs.gl.natives.android"
         jvmTarget = ProjectConfig.ANDROID_JVM_TARGET
         cmakeVersion = ProjectConfig.CMAKE_VERSION
         ndkVersion = ProjectConfig.NDK_VERSION

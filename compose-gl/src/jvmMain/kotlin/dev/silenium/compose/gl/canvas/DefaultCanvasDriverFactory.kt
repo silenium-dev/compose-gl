@@ -1,11 +1,9 @@
 package dev.silenium.compose.gl.canvas
 
-import androidx.compose.runtime.staticCompositionLocalOf
 import dev.silenium.compose.gl.findSkiaLayer
 import dev.silenium.compose.gl.graphicsApi
 import org.jetbrains.skiko.GraphicsApi
 import java.awt.Window
-import kotlin.collections.get
 
 object DefaultCanvasDriverFactory : CanvasDriverFactory<CanvasDriver> {
     override fun create(window: Window): CanvasDriver {

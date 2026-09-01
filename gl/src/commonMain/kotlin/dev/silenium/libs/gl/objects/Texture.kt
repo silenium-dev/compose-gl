@@ -1,21 +1,21 @@
-package dev.silenium.compose.gl.objects
+package dev.silenium.libs.gl.objects
 
 import androidx.compose.ui.unit.IntSize
-import dev.silenium.compose.gl.GLProvider.GL_RGBA
-import dev.silenium.compose.gl.GLProvider.GL_TEXTURE_MAG_FILTER
-import dev.silenium.compose.gl.GLProvider.GL_TEXTURE_MIN_FILTER
-import dev.silenium.compose.gl.GLProvider.GL_TEXTURE_WRAP_S
-import dev.silenium.compose.gl.GLProvider.GL_TEXTURE_WRAP_T
-import dev.silenium.compose.gl.GLProvider.GL_UNSIGNED_BYTE
-import dev.silenium.compose.gl.GLProvider.glBindTexture
-import dev.silenium.compose.gl.GLProvider.glDeleteTextures
-import dev.silenium.compose.gl.GLProvider.glGenTextures
-import dev.silenium.compose.gl.GLProvider.glGetInteger
-import dev.silenium.compose.gl.GLProvider.glTexImage2D
-import dev.silenium.compose.gl.GLProvider.glTexParameteri
-import dev.silenium.compose.gl.objects.TextureOrRenderbuffer.Companion.textureTargetBindings
-import dev.silenium.compose.gl.util.DoubleDestructionProtection
-import dev.silenium.compose.gl.util.checkGLError
+import dev.silenium.libs.gl.GLProvider.GL_RGBA
+import dev.silenium.libs.gl.GLProvider.GL_TEXTURE_MAG_FILTER
+import dev.silenium.libs.gl.GLProvider.GL_TEXTURE_MIN_FILTER
+import dev.silenium.libs.gl.GLProvider.GL_TEXTURE_WRAP_S
+import dev.silenium.libs.gl.GLProvider.GL_TEXTURE_WRAP_T
+import dev.silenium.libs.gl.GLProvider.GL_UNSIGNED_BYTE
+import dev.silenium.libs.gl.GLProvider.glBindTexture
+import dev.silenium.libs.gl.GLProvider.glDeleteTextures
+import dev.silenium.libs.gl.GLProvider.glGenTextures
+import dev.silenium.libs.gl.GLProvider.glGetInteger
+import dev.silenium.libs.gl.GLProvider.glTexImage2D
+import dev.silenium.libs.gl.GLProvider.glTexParameteri
+import dev.silenium.libs.gl.objects.TextureOrRenderbuffer.Companion.textureTargetBindings
+import dev.silenium.libs.gl.util.DoubleDestructionProtection
+import dev.silenium.libs.gl.util.checkGLError
 
 data class Texture(
     override val id: Int,

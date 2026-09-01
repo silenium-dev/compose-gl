@@ -22,6 +22,7 @@ import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeCanvas
+import androidx.compose.ui.platform.FrameRecomposer
 import androidx.compose.ui.scene.PlatformLayersComposeScene
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -30,9 +31,11 @@ import dev.silenium.compose.gl.canvas.GLCanvas
 import dev.silenium.compose.gl.canvas.Stats
 import dev.silenium.compose.gl.canvas.rememberGLCanvasState
 import dev.silenium.compose.gl.canvas.resetGLFeatures
-import dev.silenium.compose.gl.fbo.FBO
 import dev.silenium.compose.gl.findSkiaLayer
 import dev.silenium.compose.gl.graphicsApi
+import dev.silenium.libs.gl.fbo.FBO
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.DirectContext
@@ -40,10 +43,12 @@ import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skiko.Version
+import kotlin.coroutines.coroutineContext
 
 @OptIn(InternalComposeUiApi::class)
 fun main() = application {
-    val glScene = PlatformLayersComposeScene()
+    val composer = FrameRecomposer(Dispatchers.Main)
+    val glScene = PlatformLayersComposeScene(composer)
     glScene.setContent {
         Box(modifier = Modifier.wrapContentSize().background(Color.Red)) {
             Box(modifier = Modifier.wrapContentSize().padding(50.dp).background(Color.Blue)) {
@@ -99,7 +104,8 @@ fun main() = application {
                 glSurface?.canvas?.let {
                     it.save()
                     it.translate(50f, 200f)
-                    glScene.render(it.asComposeCanvas(), System.nanoTime())
+                    composer.performFrame(System.nanoTime())
+                    glScene.draw(it.asComposeCanvas())
                     it.restore()
                 }
                 glContext?.flush()

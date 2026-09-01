@@ -6,8 +6,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
-import dev.silenium.compose.gl.GLProvider.glViewport
-import dev.silenium.compose.gl.fbo.FBO
+import dev.silenium.libs.gl.GLProvider.glViewport
+import dev.silenium.libs.gl.fbo.FBO
 import dev.silenium.compose.gl.natives.android.EGLNative
 import org.slf4j.LoggerFactory
 import javax.microedition.khronos.egl.EGLConfig

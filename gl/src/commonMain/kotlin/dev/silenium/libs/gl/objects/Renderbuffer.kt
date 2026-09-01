@@ -1,15 +1,15 @@
-package dev.silenium.compose.gl.objects
+package dev.silenium.libs.gl.objects
 
 import androidx.compose.ui.unit.IntSize
-import dev.silenium.compose.gl.GLProvider.GL_RENDERBUFFER
-import dev.silenium.compose.gl.GLProvider.GL_RENDERBUFFER_BINDING
-import dev.silenium.compose.gl.GLProvider.glBindRenderbuffer
-import dev.silenium.compose.gl.GLProvider.glDeleteRenderbuffers
-import dev.silenium.compose.gl.GLProvider.glGenRenderbuffers
-import dev.silenium.compose.gl.GLProvider.glGetInteger
-import dev.silenium.compose.gl.GLProvider.glRenderbufferStorage
-import dev.silenium.compose.gl.util.DoubleDestructionProtection
-import dev.silenium.compose.gl.util.checkGLError
+import dev.silenium.libs.gl.GLProvider.GL_RENDERBUFFER
+import dev.silenium.libs.gl.GLProvider.GL_RENDERBUFFER_BINDING
+import dev.silenium.libs.gl.GLProvider.glBindRenderbuffer
+import dev.silenium.libs.gl.GLProvider.glDeleteRenderbuffers
+import dev.silenium.libs.gl.GLProvider.glGenRenderbuffers
+import dev.silenium.libs.gl.GLProvider.glGetInteger
+import dev.silenium.libs.gl.GLProvider.glRenderbufferStorage
+import dev.silenium.libs.gl.util.DoubleDestructionProtection
+import dev.silenium.libs.gl.util.checkGLError
 
 data class Renderbuffer(
     override val id: Int,

@@ -1,6 +1,11 @@
 package dev.silenium.compose.gl.canvas
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -98,10 +103,11 @@ data class RollingWindowStatistics(
 }
 
 @OptIn(ExperimentalTime::class)
+@Stable
 class GLCanvasState {
     private val renderStatisticsMutable = MutableStateFlow(RollingWindowStatistics())
     private val displayStatisticsMutable = MutableStateFlow(RollingWindowStatistics())
-    internal var invalidations by mutableStateOf(0L)
+    internal var invalidations by mutableLongStateOf(0L)
     internal var lastFrame: Long? = null
 
     val renderStatistics: StateFlow<RollingWindowStatistics> get() = renderStatisticsMutable.asStateFlow()

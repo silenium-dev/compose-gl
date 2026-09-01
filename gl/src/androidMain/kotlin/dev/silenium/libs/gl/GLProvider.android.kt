@@ -1,9 +1,9 @@
-package dev.silenium.compose.gl
+package dev.silenium.libs.gl
 
 import android.opengl.GLES32
 import java.nio.ByteBuffer
 
-internal actual object GLProvider {
+actual object GLProvider {
     // General
     actual fun glGetInteger(name: Int): Int {
         val result = IntArray(1)

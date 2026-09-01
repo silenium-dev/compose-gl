@@ -1,4 +1,4 @@
-package dev.silenium.compose.gl.util
+package dev.silenium.libs.gl.util
 
 import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicBoolean

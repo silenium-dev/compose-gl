@@ -16,7 +16,8 @@ rootProject.name = "compose-gl"
 val deployEnabled = if (extra.has("deploy.enabled")) {
     extra.get("deploy.enabled").toString().toBoolean()
 } else false
-include(":compose-gl", ":compose-gl:natives:desktop", ":compose-gl:natives:android")
+include(":compose-gl", ":compose-gl:natives:desktop")
+include(":gl", ":gl:natives:android")
 if (!deployEnabled) {
     include(":examples", ":examples:skia-gl", ":examples:android-app")
 }
