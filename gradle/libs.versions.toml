@@ -3,7 +3,7 @@ kotlinx-coroutines = "1.11.0"
 lwjgl = "3.4.3"
 jni-utils = "0.6.5"
 compose = "1.12.0"
-conventions = "0.1.7"
+conventions = "0.1.8"
 skiko = "0.150.1"
 
 [libraries]
