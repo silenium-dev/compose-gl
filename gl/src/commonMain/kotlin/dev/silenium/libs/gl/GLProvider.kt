@@ -2,6 +2,7 @@ package dev.silenium.libs.gl
 
 import java.nio.ByteBuffer
 
+// TODO: Replace with GLProcAddressProvider-based approach
 expect object GLProvider {
     // General
     fun glGetInteger(name: Int): Int

@@ -11,6 +11,7 @@ module dev.silenium.libs.gl {
     requires org.lwjgl;
 
     exports dev.silenium.libs.gl;
+    exports dev.silenium.libs.gl.draw;
     exports dev.silenium.libs.gl.fbo;
     exports dev.silenium.libs.gl.objects;
     exports dev.silenium.libs.gl.util;

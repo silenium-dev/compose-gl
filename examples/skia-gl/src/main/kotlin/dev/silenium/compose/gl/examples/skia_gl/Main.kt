@@ -30,12 +30,11 @@ import androidx.compose.ui.window.application
 import dev.silenium.compose.gl.canvas.GLCanvas
 import dev.silenium.compose.gl.canvas.Stats
 import dev.silenium.compose.gl.canvas.rememberGLCanvasState
-import dev.silenium.compose.gl.canvas.resetGLFeatures
+import dev.silenium.libs.gl.draw.resetGLFeatures
 import dev.silenium.compose.gl.findSkiaLayer
 import dev.silenium.compose.gl.graphicsApi
 import dev.silenium.libs.gl.fbo.FBO
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.DirectContext
@@ -43,7 +42,6 @@ import org.jetbrains.skia.Surface
 import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
 import org.jetbrains.skiko.Version
-import kotlin.coroutines.coroutineContext
 
 @OptIn(InternalComposeUiApi::class)
 fun main() = application {

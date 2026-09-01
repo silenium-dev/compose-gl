@@ -1,6 +1,5 @@
 package dev.silenium.compose.gl
 
-import androidx.compose.runtime.CompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import dev.silenium.compose.gl.canvas.CanvasDriver
 import dev.silenium.compose.gl.canvas.CanvasDriverFactory

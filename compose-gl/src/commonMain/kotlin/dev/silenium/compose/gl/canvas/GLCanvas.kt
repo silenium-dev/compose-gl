@@ -3,6 +3,8 @@ package dev.silenium.compose.gl.canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
+import dev.silenium.libs.gl.draw.GLDrawScope
+import dev.silenium.libs.gl.fbo.FBOScope
 
 @Composable
 expect fun GLCanvas(

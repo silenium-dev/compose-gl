@@ -2,6 +2,8 @@ package dev.silenium.compose.gl.canvas
 
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.IntSize
+import dev.silenium.libs.gl.GLProcAddressProvider
+import dev.silenium.libs.gl.fbo.FBOScope
 import org.jetbrains.skia.DirectContext
 
 interface CanvasDriver : GLProcAddressProvider {

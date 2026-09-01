@@ -12,6 +12,10 @@ import androidx.compose.ui.unit.IntSize
 import dev.silenium.compose.gl.LocalCanvasDriverFactory
 import dev.silenium.compose.gl.directContext
 import dev.silenium.compose.gl.findSkiaLayer
+import dev.silenium.libs.gl.draw.GLDrawScope
+import dev.silenium.libs.gl.draw.GLDrawScopeImpl
+import dev.silenium.libs.gl.fbo.FBOScope
+import dev.silenium.libs.gl.fbo.drawGL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext

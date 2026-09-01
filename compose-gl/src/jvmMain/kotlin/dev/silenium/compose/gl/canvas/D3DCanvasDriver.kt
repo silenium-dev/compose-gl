@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toIntSize
 import dev.silenium.compose.gl.interop.D3DInterop
 import dev.silenium.libs.gl.fbo.FBO
+import dev.silenium.libs.gl.fbo.FBOScope
+import dev.silenium.libs.gl.fbo.FBOScopeImpl
 import dev.silenium.libs.gl.objects.Renderbuffer
 import dev.silenium.libs.gl.objects.Texture
 import dev.silenium.libs.gl.util.checkGLError
