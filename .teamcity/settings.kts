@@ -9,7 +9,7 @@ import jetbrains.buildServer.configs.kotlin.projectFeatures.UntrustedBuildsSetti
 import jetbrains.buildServer.configs.kotlin.projectFeatures.untrustedBuildsSettings
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
-version = "2026.1"
+version = "2026.2"
 
 project {
     buildType(BuildSnapshot)
