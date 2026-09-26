@@ -11,7 +11,7 @@ import kotlin.io.path.outputStream
 fun FBO.snapshot(target: Path) {
     val prevReadFbo = glGetInteger(GL_READ_FRAMEBUFFER_BINDING)
 
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, id)
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, value)
     val pixels = MemoryUtil.memAlloc(size.width * size.height * 4)
     glReadPixels(0, 0, size.width, size.height, GL_RGBA, GL_UNSIGNED_BYTE, pixels)
     glFinish()

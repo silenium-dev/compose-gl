@@ -1,6 +1,7 @@
 package dev.silenium.libs.gl.objects
 
 import androidx.compose.ui.unit.IntSize
+import dev.silenium.libs.foreign.ext.DoubleDestructionProtection
 import dev.silenium.libs.gl.GLProvider.GL_RGBA
 import dev.silenium.libs.gl.GLProvider.GL_TEXTURE_MAG_FILTER
 import dev.silenium.libs.gl.GLProvider.GL_TEXTURE_MIN_FILTER
@@ -14,15 +15,16 @@ import dev.silenium.libs.gl.GLProvider.glGetInteger
 import dev.silenium.libs.gl.GLProvider.glTexImage2D
 import dev.silenium.libs.gl.GLProvider.glTexParameteri
 import dev.silenium.libs.gl.objects.TextureOrRenderbuffer.Companion.textureTargetBindings
-import dev.silenium.libs.gl.util.DoubleDestructionProtection
 import dev.silenium.libs.gl.util.checkGLError
 
 data class Texture(
-    override val id: Int,
+    override val value: Int,
     override val size: IntSize,
     override val target: Int,
     override val internalFormat: Int,
 ) : TextureOrRenderbuffer<Texture>, DoubleDestructionProtection<Int>() {
+    override val id: Int by ::value
+
     init {
         require(target in textureTargetBindings) { "Unsupported texture target: $target" }
     }

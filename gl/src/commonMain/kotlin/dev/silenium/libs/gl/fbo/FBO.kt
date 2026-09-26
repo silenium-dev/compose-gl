@@ -1,6 +1,7 @@
 package dev.silenium.libs.gl.fbo
 
 import androidx.compose.ui.unit.IntSize
+import dev.silenium.libs.foreign.ext.DoubleDestructionProtection
 import dev.silenium.libs.gl.GLProvider.GL_COLOR_ATTACHMENT0
 import dev.silenium.libs.gl.GLProvider.GL_DEPTH_STENCIL_ATTACHMENT
 import dev.silenium.libs.gl.GLProvider.GL_FRAMEBUFFER
@@ -18,16 +19,15 @@ import dev.silenium.libs.gl.GLProvider.glGetInteger
 import dev.silenium.libs.gl.GLProvider.glViewport
 import dev.silenium.libs.gl.objects.Renderbuffer
 import dev.silenium.libs.gl.objects.Texture
-import dev.silenium.libs.gl.util.DoubleDestructionProtection
 import dev.silenium.libs.gl.util.checkGLError
 
 sealed class FBO : DoubleDestructionProtection<Int>() {
     abstract val size: IntSize
-    abstract override val id: Int
+    abstract override val value: Int
     protected var destroySkikoCompatible = false
 
     open fun bind() {
-        glBindFramebuffer(GL_FRAMEBUFFER, id)
+        glBindFramebuffer(GL_FRAMEBUFFER, value)
         checkGLError("glBindFramebuffer")
         glViewport(0, 0, size.width, size.height)
     }
@@ -45,22 +45,23 @@ sealed class FBO : DoubleDestructionProtection<Int>() {
         destroy()
     }
 
-    data class Indestructible(override val id: Int, override val size: IntSize) : FBO() {
+    data class Indestructible(override val value: Int, override val size: IntSize) : FBO() {
         override fun destroyInternal() = Unit
         override fun bind() {
             glViewport(0, 0, size.width, size.height)
         }
+
         override fun unbind() = Unit
     }
 
     data class Custom(
-        override val id: Int,
+        override val value: Int,
         override val size: IntSize,
         val colorAttachment: Texture,
         val depthStencilAttachment: Renderbuffer,
     ) : FBO() {
         override fun destroyInternal() {
-            glDeleteFramebuffers(id)
+            glDeleteFramebuffers(value)
             if (destroySkikoCompatible) {
                 colorAttachment.abandon()
             } else {
@@ -103,7 +104,7 @@ sealed class FBO : DoubleDestructionProtection<Int>() {
                     GL_FRAMEBUFFER,
                     GL_DEPTH_STENCIL_ATTACHMENT,
                     GL_RENDERBUFFER,
-                    depthStencilAttachment.id,
+                    depthStencilAttachment.value,
                 )
                 checkGLError("glFramebufferRenderbuffer")
 

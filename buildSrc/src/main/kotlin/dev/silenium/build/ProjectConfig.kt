@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidExtension
 
 object ProjectConfig {
     const val COMPILE_SDK = 37
-    const val MIN_SDK = 26
+    const val MIN_SDK = 30
     const val NDK_VERSION = "29.0.14206865"
     const val CMAKE_VERSION = "4.1.2"
     val JVM_TARGET = JvmTarget.JVM_11
