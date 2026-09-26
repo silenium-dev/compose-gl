@@ -15,7 +15,7 @@ repositories {
     maven("https://packages.jetbrains.team/maven/p/cmp/dev")
 }
 
-val skikoJniClasspath by configurations.registering {
+val skikoJniClasspath = configurations.register("skikoJniClasspath") {
     isCanBeResolved = true
     isCanBeConsumed = false
 }
@@ -27,16 +27,17 @@ dependencies {
     implementation(libs.skiko)
     implementation(libs.slf4j.android)
     implementation("androidx.activity:activity-compose:1.13.0")
-    implementation("androidx.compose.ui:ui:1.11.2")
-    implementation("androidx.compose.foundation:foundation:1.11.2")
-    implementation("androidx.compose.runtime:runtime:1.11.2")
+    implementation("androidx.compose.ui:ui:1.12.1")
+    implementation("androidx.compose.foundation:foundation:1.12.1")
+    implementation("androidx.compose.runtime:runtime:1.12.1")
     implementation("androidx.compose.material3:material3:1.4.0")
 
     skikoJniClasspath(libs.skiko.android.runtime.arm64)
     skikoJniClasspath(libs.skiko.android.runtime.x64)
 }
 
-val prepareJniLibs by tasks.registering(PrepareAndroidSkikoNatives::class) {
+val prepareJniLibs = tasks.register<PrepareAndroidSkikoNatives>("prepareJniLibs") {
+    description = "assembles skiko natives into correct directory structure"
     skikoNatives.from(skikoJniClasspath)
     destinationDirectory = layout.buildDirectory.dir("generated")
     archiveFileName = "skiko-natives.zip"

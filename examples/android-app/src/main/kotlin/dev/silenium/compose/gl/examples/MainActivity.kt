@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
                     height = new.height,
                     sampleCnt = 1,
                     stencilBits = 8,
-                    fbId = fbo.id,
+                    fbId = fbo.value,
                     fbFormat = FramebufferFormat.GR_GL_RGBA8,
                 )
                 glSurface = Surface.makeFromBackendRenderTarget(

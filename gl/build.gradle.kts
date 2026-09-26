@@ -16,9 +16,10 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(kotlin("reflect"))
-                implementation(libs.kotlinx.coroutines.core)
+                api(libs.kotlinx.coroutines.core)
                 implementation(libs.slf4j.api)
-                implementation(libs.compose.ui.unit)
+                api(libs.compose.ui.unit)
+                api(libs.kmp.panama)
             }
         }
 

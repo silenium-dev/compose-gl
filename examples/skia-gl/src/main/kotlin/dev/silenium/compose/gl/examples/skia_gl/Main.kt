@@ -75,7 +75,7 @@ fun main() = application {
                     println("Disposed")
                 },
                 onResize = { old, new ->
-                    println("Resized from $old to $new, new fbo: ${fbo.id}")
+                    println("Resized from $old to $new, new fbo: ${fbo.value}")
 
                     if (glContext == null) {
                         glContext = DirectContext.makeGL()
@@ -87,7 +87,7 @@ fun main() = application {
                         height = new.height,
                         sampleCnt = 1,
                         stencilBits = 8,
-                        fbId = fbo.id,
+                        fbId = fbo.value,
                         fbFormat = (fbo as FBO.Custom).colorAttachment.internalFormat,
                     )
                     glSurface = Surface.makeFromBackendRenderTarget(

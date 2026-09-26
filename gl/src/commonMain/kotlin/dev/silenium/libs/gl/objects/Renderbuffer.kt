@@ -1,6 +1,7 @@
 package dev.silenium.libs.gl.objects
 
 import androidx.compose.ui.unit.IntSize
+import dev.silenium.libs.foreign.ext.DoubleDestructionProtection
 import dev.silenium.libs.gl.GLProvider.GL_RENDERBUFFER
 import dev.silenium.libs.gl.GLProvider.GL_RENDERBUFFER_BINDING
 import dev.silenium.libs.gl.GLProvider.glBindRenderbuffer
@@ -8,19 +9,19 @@ import dev.silenium.libs.gl.GLProvider.glDeleteRenderbuffers
 import dev.silenium.libs.gl.GLProvider.glGenRenderbuffers
 import dev.silenium.libs.gl.GLProvider.glGetInteger
 import dev.silenium.libs.gl.GLProvider.glRenderbufferStorage
-import dev.silenium.libs.gl.util.DoubleDestructionProtection
 import dev.silenium.libs.gl.util.checkGLError
 
 data class Renderbuffer(
-    override val id: Int,
+    override val value: Int,
     override val size: IntSize,
     override val internalFormat: Int,
 ) : TextureOrRenderbuffer<Renderbuffer>, DoubleDestructionProtection<Int>() {
+    override val id: Int by ::value
     override val target: Int = GL_RENDERBUFFER
     override val binding: Int = GL_RENDERBUFFER_BINDING
 
     override fun bind() {
-        glBindRenderbuffer(GL_RENDERBUFFER, id)
+        glBindRenderbuffer(GL_RENDERBUFFER, value)
         checkGLError("glBindRenderbuffer")
     }
 
@@ -30,7 +31,7 @@ data class Renderbuffer(
     }
 
     override fun destroyInternal() {
-        glDeleteRenderbuffers(id)
+        glDeleteRenderbuffers(value)
     }
 
     @Synchronized
