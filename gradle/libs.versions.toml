@@ -34,7 +34,7 @@ compose-foundation = { group = "org.jetbrains.compose.foundation", name = "found
 jni-utils = { group = "dev.silenium.libs.jni", name = "jni-utils", version.ref = "jni-utils" }
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.20" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version = "1.6.4" }
-slf4j-android = { module = "uk.uuid.slf4j:slf4j-android", version = "2.0.19-0" }
+slf4j-android = { module = "uk.uuid.slf4j:slf4j-android", version = "2.0.20-0" }
 
 [plugins]
 conventions-kmp = { id = "dev.silenium.gradle.conventions.kmp", version.ref = "conventions" }
