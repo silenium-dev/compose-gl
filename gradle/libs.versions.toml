@@ -2,7 +2,7 @@
 kotlinx-coroutines = "1.11.0"
 lwjgl = "3.4.3"
 jni-utils = "0.6.5"
-compose = "1.12.1"
+compose = "1.12.2"
 conventions = "0.1.8"
 skiko = "0.150.1"
 kmp-panama = "0.2.0"
