@@ -5,7 +5,6 @@ import dev.silenium.libs.gl.GLProvider
 import dev.silenium.libs.gl.fbo.FBOScope
 import kotlin.time.Duration
 
-
 interface GLDrawScope : FBOScope, GLProcAddressProvider {
     val deltaTime: Duration
 }
