@@ -36,14 +36,14 @@ actual object GLProvider {
         attachment: Int,
         textureTarget: Int,
         texture: Int,
-        level: Int
+        level: Int,
     ) = GLES32.glFramebufferTexture2D(target, attachment, textureTarget, texture, level)
 
     actual fun glFramebufferRenderbuffer(
         target: Int,
         attachment: Int,
         renderbufferTarget: Int,
-        renderbuffer: Int
+        renderbuffer: Int,
     ) = GLES32.glFramebufferRenderbuffer(target, attachment, renderbufferTarget, renderbuffer)
 
     actual fun glCheckFramebufferStatus(target: Int): Int = GLES32.glCheckFramebufferStatus(target)
@@ -69,7 +69,7 @@ actual object GLProvider {
         border: Int,
         format: Int,
         type: Int,
-        pixels: ByteBuffer?
+        pixels: ByteArray?,
     ) = GLES32.glTexImage2D(
         target,
         level,
@@ -79,7 +79,7 @@ actual object GLProvider {
         border,
         format,
         type,
-        pixels,
+        pixels?.let(ByteBuffer::wrap),
     )
 
     // Renderbuffers

@@ -58,7 +58,7 @@ actual object GLProvider {
         border: Int,
         format: Int,
         type: Int,
-        pixels: ByteBuffer?
+        pixels: ByteArray?
     ) = GL32.glTexImage2D(
         target,
         level,
@@ -68,7 +68,7 @@ actual object GLProvider {
         border,
         format,
         type,
-        pixels,
+        pixels?.let(ByteBuffer::wrap),
     )
 
     // Renderbuffers

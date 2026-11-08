@@ -1,7 +1,5 @@
 package dev.silenium.libs.gl
 
-import java.nio.ByteBuffer
-
 // TODO: Replace with GLProcAddressProvider-based approach
 expect object GLProvider {
     // General
@@ -33,7 +31,7 @@ expect object GLProvider {
         border: Int,
         format: Int,
         type: Int,
-        pixels: ByteBuffer?
+        pixels: ByteArray?
     )
 
     // Renderbuffers
