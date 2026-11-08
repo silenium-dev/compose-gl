@@ -8,9 +8,10 @@
 #include <gpu/ganesh/d3d/GrD3DBackendContext.h>
 #include <gpu/ganesh/d3d/GrD3DTypes.h>
 
-#define SK_DIRECT3D// for some reason, the d3d headers undefine this macro
+#define SK_DIRECT3D // for some reason, the d3d headers undefine this macro
 #include <gpu/ganesh/GrBackendSurface.h>
 #include <gpu/ganesh/GrDirectContext.h>
+#include <gpu/ganesh/d3d/GrD3DBackendSurface.h>
 
 #include <comdef.h>
 #include <d3d12.h>
@@ -104,7 +105,7 @@ JNIEXPORT jlong JNICALL Java_dev_silenium_compose_gl_interop_D3DInteropKt_makeD3
     importInfo.fLevelCount = 1;
     importInfo.fFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-    const auto texture = new GrBackendTexture(static_cast<int>(desc.Width), static_cast<int>(desc.Height), importInfo);
+    const auto texture = new GrBackendTexture(GrBackendTextures::MakeD3D(static_cast<int>(desc.Width), static_cast<int>(desc.Height), importInfo));
     return reinterpret_cast<jlong>(texture);
 }
 
