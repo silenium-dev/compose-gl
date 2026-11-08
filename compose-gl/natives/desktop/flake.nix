@@ -15,7 +15,7 @@
       packages."x86_64-linux" = jni-utils.lib.buildJNILib {
         name = "compose-gl";
         version = "0.1.0";
-        mesonTarget = "compose-gl";
+        mesonTarget = _: "compose-gl";
         buildType = "release";
         libName = "compose-gl";
         libDir = "src";
@@ -23,7 +23,6 @@
           "x86_64-linux"
           "aarch64-linux"
           "x86_64-windows"
-          "aarch64-windows"
         ];
 
         additionalNativeInputs = targetSystem: pkgs: [ pkgs.p7zip ];

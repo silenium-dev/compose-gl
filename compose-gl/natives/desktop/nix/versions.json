@@ -1,0 +1,37 @@
+{
+    "version": "m150-a3f509bf52",
+    "platforms": {
+        "x86_64-linux": {
+            "target": {
+                "os": "linux",
+                "buildType": "Release",
+                "arch": "x64"
+            },
+            "hash": "sha256:03623be99d095b1426956b496cc291e397e96e189006aa131471d868c7c797de"
+        },
+        "aarch64-linux": {
+            "target": {
+                "os": "linux",
+                "buildType": "Release",
+                "arch": "arm64"
+            },
+            "hash": "sha256:1d011fc6c4dfd00fac2a59786fa538af65dc1a216aa0ea5c99b371ca252791e3"
+        },
+        "x86_64-windows": {
+            "target": {
+                "os": "windows",
+                "buildType": "Release",
+                "arch": "x64"
+            },
+            "hash": "sha256:b7891ecc225d7d7e890e42e92b9c7f959529db469f6a052fa95def5d92e2d5b6"
+        },
+        "aarch64-windows": {
+            "target": {
+                "os": "windows",
+                "buildType": "Release",
+                "arch": "arm64"
+            },
+            "hash": "sha256:f078b2b000c42eace401ee6eead517a513d4885dbed721d68f2ce8874ae6b1c8"
+        }
+    }
+}

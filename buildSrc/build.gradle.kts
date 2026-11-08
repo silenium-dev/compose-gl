@@ -1,5 +1,6 @@
 plugins {
     `kotlin-dsl`
+    embeddedKotlin("plugin.serialization")
 }
 
 repositories {
@@ -37,5 +38,7 @@ dependencies {
     configurations.implementation(libs.plugins.conventions.android.application)
     implementation(gradleApi())
     implementation(gradleKotlinDsl())
+    implementation(kotlin("reflect"))
     implementation(files(libs.javaClass.protectionDomain.codeSource.location.file))
+    implementation(libs.bundles.kotlinx.serialization)
 }
