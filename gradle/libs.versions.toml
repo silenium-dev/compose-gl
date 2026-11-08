@@ -1,20 +1,23 @@
 [versions]
 kotlinx-coroutines = "1.11.0"
+kotlinx-serialization = "1.12.0"
 lwjgl = "3.4.3"
 jni-utils = "0.6.5"
 compose = "1.12.2"
-conventions = "0.1.8"
+conventions = "0.1.9"
 skiko = "0.150.2"
 kmp-panama = "0.4.0"
 
 [libraries]
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
-
 kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-jdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-jdk9 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk9", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-slf4j = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-slf4j", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+
+kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 lwjgl-bom = { group = "org.lwjgl", name = "lwjgl-bom", version.ref = "lwjgl" }
 lwjgl-core = { group = "org.lwjgl", name = "lwjgl", version.ref = "lwjgl" }
@@ -41,6 +44,7 @@ conventions-kmp = { id = "dev.silenium.gradle.conventions.kmp", version.ref = "c
 conventions-jvm = { id = "dev.silenium.gradle.conventions.jvm", version.ref = "conventions" }
 conventions-android-application = { id = "dev.silenium.gradle.conventions.android.application", version.ref = "conventions" }
 conventions-android-library = { id = "dev.silenium.gradle.conventions.android.library", version.ref = "conventions" }
+stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version = "0.15.0" }
 
 [bundles]
 kotlinx-coroutines-jvm = [
@@ -49,6 +53,11 @@ kotlinx-coroutines-jvm = [
     "kotlinx-coroutines-jdk9",
     "kotlinx-coroutines-slf4j",
     "kotlinx-coroutines-swing",
+]
+
+kotlinx-serialization = [
+    "kotlinx-serialization-core",
+    "kotlinx-serialization-json",
 ]
 
 lwjgl = [

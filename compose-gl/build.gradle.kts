@@ -7,6 +7,7 @@ import dev.silenium.gradle.conventions.publishing
 plugins {
     org.jetbrains.kotlin.plugin.compose
     dev.silenium.gradle.conventions.kmp
+    alias(libs.plugins.stability.analyzer)
 }
 
 group = "dev.silenium.compose.gl"
@@ -79,5 +80,9 @@ conventions {
 tasks {
     named<JavaCompile>("compileJvmMainJava") {
         options.compilerArgs.addAll(listOf("--add-reads", "dev.silenium.compose.gl=ALL-UNNAMED"))
+    }
+
+    stabilityCheck {
+        dependsOn(compileAndroidMain)
     }
 }

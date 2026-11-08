@@ -3,6 +3,7 @@ import dev.silenium.gradle.conventions.BaseExtension
 
 plugins {
     dev.silenium.gradle.conventions.jvm
+    alias(libs.plugins.stability.analyzer) apply false
 }
 
 group = "dev.silenium.compose.gl"
