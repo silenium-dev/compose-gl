@@ -2,7 +2,7 @@
 kotlinx-coroutines = "1.11.0"
 kotlinx-serialization = "1.13.0"
 lwjgl = "3.4.3"
-jni-utils = "0.6.5"
+jni-utils = "0.7.0"
 compose = "1.12.2"
 conventions = "0.1.10"
 skiko = "0.150.2"
